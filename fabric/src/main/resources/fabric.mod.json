@@ -29,7 +29,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [ "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusFabric" ],
-    "frame-enchantments:targets": [ "com.github.teamfusion.spyglassplus.enchantment.target.SpyglassPlusEnchantmentTargetsEntrypoint" ],
+    "mm:early_risers": [ "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusASM" ],
     "fabric-datagen": [ "com.github.teamfusion.spyglassplus.datagen.SpyglassPlusDataGenerator" ]
   },
   "mixins": [

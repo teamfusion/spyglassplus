@@ -2,7 +2,9 @@
   "required": true,
   "package": "com.github.teamfusion.spyglassplus.mixin.fabric",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [],
+  "mixins": [
+    "EnchantmentTargetMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

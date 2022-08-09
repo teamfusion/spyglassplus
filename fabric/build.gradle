@@ -43,6 +43,8 @@ dependencies {
   modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.ver_fabric_api}"
 
   include modApi("dev.architectury:architectury-fabric:${rootProject.ver_architectury}")
+
+  include modApi("com.github.Chocohead:Fabric-ASM:${project.ver_asm}")
   include modImplementation("net.moddingplayground.frame:frame-enchantments-v0:${project.ver_frame_enchantments}")
 
   modImplementation ("net.moddingplayground.frame:frame-toymaker-v0:${rootProject.ver_toymaker}") {
