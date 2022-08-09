@@ -653,7 +653,6 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         this.setMarker(nbt.getBoolean(MARKER_KEY));
         this.setInvisible(nbt.getBoolean(INVISIBLE_KEY));
         this.setSpyglassStack(ItemStack.fromNbt(nbt.getCompound(SPYGLASS_STACK_KEY)));
-        this.setUser(nbt.containsUuid(USER_KEY) ? nbt.getUuid(USER_KEY) : null);
 
         NbtList spyglassRotation = nbt.getList(SPYGLASS_ROTATION_KEY, NbtElement.FLOAT_TYPE);
         this.setSpyglassYaw(spyglassRotation.getFloat(0));
