@@ -197,7 +197,7 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
     public void animateModel(T entity, float limbAngle, float limbDistance, float tickDelta) {
         this.tripod.yaw = entity.getYaw(tickDelta) * ((float) Math.PI / 180F);
         this.holder.yaw = entity.getSpyglassYaw(tickDelta) * ((float) Math.PI / 180F);
-        this.holder.pitch = entity.getSpyglassPitch(tickDelta) * ((float) Math.PI / 180F);
+        this.spyglass.pitch = entity.getSpyglassPitch(tickDelta) * ((float) Math.PI / 180F);
     }
 
     @Override
