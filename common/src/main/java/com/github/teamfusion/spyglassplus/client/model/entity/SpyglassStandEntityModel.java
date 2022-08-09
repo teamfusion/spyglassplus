@@ -17,6 +17,8 @@ import static net.minecraft.client.render.entity.model.EntityModelPartNames.*;
 @SuppressWarnings({ "unused", "FieldCanBeLocal" })
 @Environment(EnvType.CLIENT)
 public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends SinglePartEntityModel<T> {
+    private static final float DEGREES_TO_RADIANS = (float) Math.PI / 180F;
+
     private static final String
         HOLDER = "holder",
         SPYGLASS = "spyglass",
@@ -195,9 +197,9 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
 
     @Override
     public void animateModel(T entity, float limbAngle, float limbDistance, float tickDelta) {
-        this.tripod.yaw = entity.getYaw(tickDelta) * ((float) Math.PI / 180F);
-        this.holder.yaw = entity.getSpyglassYaw(tickDelta) * ((float) Math.PI / 180F);
-        this.spyglass.pitch = entity.getSpyglassPitch(tickDelta) * ((float) Math.PI / 180F);
+        this.tripod.yaw = entity.getYaw(tickDelta) * DEGREES_TO_RADIANS;
+        this.holder.yaw = entity.getSpyglassYaw(tickDelta) * DEGREES_TO_RADIANS;
+        this.spyglass.pitch = entity.getSpyglassPitch(tickDelta) * DEGREES_TO_RADIANS;
     }
 
     @Override
