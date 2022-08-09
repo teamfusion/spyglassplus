@@ -6,8 +6,6 @@ repositories {
   maven { url "https://maven.quiltmc.org/repository/release/" }
 }
 
-archivesBaseName = "${archivesBaseName}-${name}"
-
 architectury {
   platformSetupLoomIde()
   loader("quilt")
