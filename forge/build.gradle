@@ -30,7 +30,7 @@ configurations {
 }
 
 dependencies {
-  forge "net.minecraftforge:forge:${rootProject.ver_forge}"
+  forge "net.minecraftforge:forge:${rootProject.ver_minecraft}-${rootProject.ver_forge}"
   modApi "dev.architectury:architectury-forge:${rootProject.ver_architectury}"
 
   common(project(path: ":common", configuration: "namedElements")) { transitive false }

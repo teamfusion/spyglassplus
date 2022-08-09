@@ -31,12 +31,19 @@ repositories {
     name = 'Terraformers'
     url  = 'https://maven.terraformersmc.com/releases/'
   }
+
+  maven {
+    name = 'Jitpack'
+    url  = 'https://jitpack.io/'
+  }
 }
 
 dependencies {
   modImplementation "net.fabricmc:fabric-loader:${rootProject.ver_fabric_loader}"
   modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.ver_fabric_api}"
-  modApi "dev.architectury:architectury-fabric:${rootProject.ver_architectury}"
+
+  include modApi("dev.architectury:architectury-fabric:${rootProject.ver_architectury}")
+  include modImplementation("net.moddingplayground.frame:frame-enchantments-v0:${project.ver_frame_enchantments}")
 
   modImplementation ("net.moddingplayground.frame:frame-toymaker-v0:${rootProject.ver_toymaker}") {
     exclude group: 'com.terraformersmc', module: 'modmenu'

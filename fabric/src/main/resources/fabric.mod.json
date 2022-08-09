@@ -28,12 +28,8 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusFabric"
-    ],
-    "client": [
-    ],
-
+    "main": [ "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusFabric" ],
+    "frame-enchantments:targets": [ "com.github.teamfusion.spyglassplus.enchantment.target.SpyglassPlusEnchantmentTargetsEntrypoint" ],
     "fabric-datagen": [ "com.github.teamfusion.spyglassplus.datagen.SpyglassPlusDataGenerator" ]
   },
   "mixins": [
@@ -45,6 +41,8 @@
     "java": ">=17",
     "minecraft": ">=1.19",
     "fabricloader": ">=0.14",
-    "fabric-api": ">=0.59"
+    "fabric-api": ">=0.59",
+    "architectury": ">=6.1",
+    "frame-enchantments-v0": "*"
   }
 }

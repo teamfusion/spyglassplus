@@ -26,3 +26,10 @@ mandatory = true
 versionRange = "[1.19,)"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.spyglassplus]]
+modId = "architectury"
+mandatory = true
+versionRange = "[6.1,)"
+ordering = "AFTER"
+side = "BOTH"

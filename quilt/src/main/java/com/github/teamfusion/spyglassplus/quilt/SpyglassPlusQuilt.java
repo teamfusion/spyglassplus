@@ -7,6 +7,6 @@ import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
 public final class SpyglassPlusQuilt implements SpyglassPlus, ModInitializer {
     @Override
     public void onInitialize(ModContainer mod) {
-        this.commonInitialize();
+        SpyglassPlus.commonInitialize();
     }
 }
