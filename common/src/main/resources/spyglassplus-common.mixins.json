@@ -9,12 +9,14 @@
     "SpyglassItemMixin"
   ],
   "client": [
+    "client.KeyBindingInvoker",
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
     "client.GameRendererMixin",
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin",
+    "client.MinecraftClientMixin",
     "client.MouseMixin"
   ],
   "injectors": {
