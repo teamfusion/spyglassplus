@@ -1,0 +1,90 @@
+plugins {
+  id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+archivesBaseName = "${archivesBaseName}-${name}"
+
+architectury {
+  platformSetupLoomIde()
+  forge()
+}
+
+loom {
+  accessWidenerPath = project(":common").loom.accessWidenerPath
+
+  forge {
+    convertAccessWideners = true
+    extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+
+    mixinConfig "${project.mod_id}-common.mixins.json"
+    mixinConfig "${project.mod_id}.mixins.json"
+  }
+}
+
+sourceSets.main.resources.srcDirs += project(":common").file(project.output_datagen)
+
+configurations {
+  common
+  shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+  compileClasspath.extendsFrom common
+  runtimeClasspath.extendsFrom common
+  developmentForge.extendsFrom common
+}
+
+dependencies {
+  forge "net.minecraftforge:forge:${rootProject.ver_forge}"
+  modApi "dev.architectury:architectury-forge:${rootProject.ver_architectury}"
+
+  common(project(path: ":common", configuration: "namedElements")) { transitive false }
+  shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+}
+
+processResources {
+  inputs.property "version", project.version
+
+  filesMatching("META-INF/mods.toml") {
+    expand "version": project.version
+  }
+}
+
+shadowJar {
+  exclude "fabric.mod.json"
+  exclude "architectury.common.json"
+
+  configurations = [project.configurations.shadowCommon]
+  classifier "dev-shadow"
+}
+
+remapJar {
+  input.set shadowJar.archiveFile
+  dependsOn shadowJar
+  classifier null
+}
+
+jar {
+  classifier "dev"
+}
+
+sourcesJar {
+  def commonSources = project(":common").sourcesJar
+  dependsOn commonSources
+  from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+  withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+    skip()
+  }
+}
+
+publishing {
+  publications {
+    mavenForge(MavenPublication) {
+      artifactId = archivesBaseName
+      from components.java
+    }
+  }
+
+  repositories {
+  }
+}

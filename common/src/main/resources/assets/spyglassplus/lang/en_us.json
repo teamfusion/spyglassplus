@@ -1,0 +1,31 @@
+{
+  "mod.spyglassplus.name": "Spyglass+",
+  "mod.spyglassplus.contact.discord": "Discord",
+
+  "itemGroup.spyglassplus.item_group": "Spyglass+",
+
+  "entity.spyglassplus.spyglass_stand": "Spyglass Stand",
+
+  "item.spyglassplus.binoculars": "Binoculars",
+  "item.spyglassplus.binoculars.spyglassplus.local_scrutiny_level_tooltip": "Scope adjusted to: -%s",
+  "item.spyglassplus.spyglass_stand": "Spyglass Stand",
+
+  "item.minecraft.spyglass.spyglassplus.local_scrutiny_level_tooltip": "Scope adjusted to: -%s",
+
+  "subtitles.item.spyglassplus.binoculars.use": "Binoculars expand",
+  "subtitles.item.spyglassplus.binoculars.stop_using": "Binoculars retract",
+  "subtitles.item.spyglassplus.binoculars.adjust": "Binoculars adjust",
+  "subtitles.item.spyglassplus.binoculars.reset_adjust": "Binoculars snap",
+
+  "subtitles.item.spyglassplus.spyglass.adjust": "Spyglass adjusts",
+  "subtitles.item.spyglassplus.spyglass.reset_adjust": "Spyglass snaps",
+  "subtitles.entity.spyglassplus.spyglass_stand.fall": "Something fell",
+  "subtitles.entity.spyglassplus.spyglass_stand.shrink": "Spyglass Stand shrinks",
+  "subtitles.entity.spyglassplus.spyglass_stand.enlarge": "Spyglass Stand enlarges",
+
+  "enchantment.spyglassplus.discovery": "Discovery",
+  "enchantment.spyglassplus.indicate": "Indicate",
+  "enchantment.spyglassplus.illuminate": "Illuminate",
+  "enchantment.spyglassplus.scrutiny": "Scrutiny",
+  "enchantment.spyglassplus.command": "Command"
+}

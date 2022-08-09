@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[41,)"
+issueTrackerURL = "https://github.com/teamfusion/spyglassplus/issues"
+license = "Mit (Code); All Rights Reserved (Assets)"
+
+[[mods]]
+modId = "spyglassplus"
+version = "${version}"
+displayName = "Spyglass+"
+authors = "Team Fusion"
+description = '''
+A Minecraft mod that adds to and improves the Spyglass experience!
+'''
+logoFile = "icon.png"
+
+[[dependencies.spyglassplus]]
+modId = "forge"
+mandatory = true
+versionRange = "[41,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.spyglassplus]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19,)"
+ordering = "NONE"
+side = "BOTH"

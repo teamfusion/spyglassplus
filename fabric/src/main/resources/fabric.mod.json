@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+
+  "id": "spyglassplus",
+  "version": "${version}",
+  "license": [
+    "MIT (Code)",
+    "All Rights Reserved (Assets)"
+  ],
+
+  "name": "Spyglass+",
+  "icon": "assets/spyglassplus/icon.png",
+  "description": "A Minecraft mod that adds to and improves the Spyglass experience!",
+
+  "authors": [
+    "Team Fusion"
+  ],
+  "contributors": ["",
+    "Andante"
+  ],
+  "contact": {
+    "sources": "https://github.com/teamfusion/spyglassplus",
+    "issues": "https://github.com/teamfusion/spyglassplus/issues"
+  },
+  "custom": {
+    "modmenu": { "links": { "mod.spyglassplus.contact.discord": "https://discord.gg/wGw5N7peR7" } }
+  },
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusFabric"
+    ],
+    "client": [
+    ],
+
+    "fabric-datagen": [ "com.github.teamfusion.spyglassplus.datagen.SpyglassPlusDataGenerator" ]
+  },
+  "mixins": [
+    "spyglassplus.mixins.json",
+    "spyglassplus-common.mixins.json"
+  ],
+
+  "depends": {
+    "java": ">=17",
+    "minecraft": ">=1.19",
+    "fabricloader": ">=0.14",
+    "fabric-api": ">=0.59"
+  }
+}

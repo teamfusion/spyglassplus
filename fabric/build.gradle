@@ -1,0 +1,115 @@
+plugins {
+  id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+archivesBaseName = "${archivesBaseName}-${name}"
+
+architectury {
+  platformSetupLoomIde()
+  fabric()
+}
+
+loom {
+  accessWidenerPath = project(":common").loom.accessWidenerPath
+}
+
+sourceSets.main.resources.srcDirs += project(":common").file(project.output_datagen)
+
+configurations {
+  common
+  shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+  compileClasspath.extendsFrom common
+  runtimeClasspath.extendsFrom common
+  developmentFabric.extendsFrom common
+}
+
+repositories {
+  maven {
+    name = 'Modding Playground'
+    url  = 'https://raw.githubusercontent.com/moddingplayground/maven/main/'
+  }
+
+  maven {
+    name = 'Terraformers'
+    url  = 'https://maven.terraformersmc.com/releases/'
+  }
+}
+
+dependencies {
+  modImplementation "net.fabricmc:fabric-loader:${rootProject.ver_fabric_loader}"
+  modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.ver_fabric_api}"
+  modApi "dev.architectury:architectury-fabric:${rootProject.ver_architectury}"
+
+  modImplementation ("net.moddingplayground.frame:frame-toymaker-v0:${rootProject.ver_toymaker}") {
+    exclude group: 'com.terraformersmc', module: 'modmenu'
+  }
+
+  modImplementation "com.terraformersmc:modmenu:${project.ver_mod_menu}"
+
+  common(project(path: ":common", configuration: "namedElements")) { transitive false }
+  shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+}
+
+loom {
+  runs {
+    datagen {
+      server()
+
+      name "Data Generation"
+      vmArg "-Dfabric-api.datagen"
+      vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file(project.output_datagen)}"
+
+      runDir "build/datagen"
+    }
+  }
+}
+
+processResources {
+  inputs.property "version", project.version
+
+  filesMatching("fabric.mod.json") {
+    expand "version": project.version
+  }
+}
+
+shadowJar {
+  exclude "architectury.common.json"
+
+  configurations = [project.configurations.shadowCommon]
+  classifier "dev-shadow"
+}
+
+remapJar {
+  injectAccessWidener = true
+  input.set shadowJar.archiveFile
+  dependsOn shadowJar
+  classifier null
+}
+
+jar {
+  classifier "dev"
+}
+
+sourcesJar {
+  def commonSources = project(":common").sourcesJar
+  dependsOn commonSources
+  from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+  withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+    skip()
+  }
+}
+
+publishing {
+  publications {
+    mavenFabric(MavenPublication) {
+      artifactId = archivesBaseName
+      from components.java
+    }
+  }
+
+  repositories {
+  }
+}

@@ -1,0 +1,24 @@
+architectury {
+  common(rootProject.enabled_platforms.split(","))
+}
+
+loom {
+  accessWidenerPath = file("src/main/resources/${project.mod_id}.accesswidener")
+}
+
+dependencies {
+  modImplementation "net.fabricmc:fabric-loader:${rootProject.ver_fabric_loader}"
+  modApi "dev.architectury:architectury:${rootProject.ver_architectury}"
+}
+
+publishing {
+  publications {
+    mavenCommon(MavenPublication) {
+      artifactId = rootProject.archivesBaseName
+      from components.java
+    }
+  }
+
+  repositories {
+  }
+}
