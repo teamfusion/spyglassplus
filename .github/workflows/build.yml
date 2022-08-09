@@ -1,4 +1,4 @@
-name: Check Builds For Errors
+name: build
 
 on: [ pull_request, push ]
 
