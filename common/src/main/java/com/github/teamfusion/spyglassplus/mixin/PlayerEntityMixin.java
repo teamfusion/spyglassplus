@@ -2,6 +2,7 @@ package com.github.teamfusion.spyglassplus.mixin;
 
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import com.github.teamfusion.spyglassplus.entity.SpyglassStandEntity;
+import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import com.github.teamfusion.spyglassplus.tag.SpyglassPlusItemTags;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -60,7 +61,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements ScopingP
     public ItemStack getScopingStack() {
         return this.getSpyglassStandEntity()
                    .map(SpyglassStandEntity::getScopingStack)
-                   .orElseGet(() -> this.isUsingItem() ? this.getActiveItem() : ItemStack.EMPTY);
+                   .or(() -> Optional.ofNullable(this.isUsingItem() ? this.getActiveItem() : null))
+                   .filter(stack -> stack.getItem() instanceof ISpyglass)
+                   .orElse(ItemStack.EMPTY);
     }
 
     @Unique
@@ -74,8 +77,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements ScopingP
      */
     @Inject(method = "isUsingSpyglass", at = @At("RETURN"), cancellable = true)
     private void onIsUsingSpyglass(CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValueZ()) {
-            if (this.getScopingStack().isIn(SpyglassPlusItemTags.SCOPING_ITEMS)) cir.setReturnValue(true);
-        }
+        if (!cir.getReturnValueZ() && !this.getScopingStack().isEmpty()) cir.setReturnValue(true);
     }
 }
