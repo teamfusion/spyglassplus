@@ -202,7 +202,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     }
 
     public boolean isWithinUseRange(Entity entity) {
-        return entity.distanceTo(this) <= 4.0D;
+        return entity.distanceTo(this) <= 3.0D;
     }
 
     public boolean doesNotMatch(PlayerEntity player) {
