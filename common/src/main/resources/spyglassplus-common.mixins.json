@@ -5,16 +5,17 @@
   "mixins": [
     "ItemGroupMixin",
     "ItemMixin",
+    "LivingEntityMixin",
     "PlayerEntityMixin",
     "SpyglassItemMixin"
   ],
   "client": [
-    "client.KeyBindingInvoker",
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
     "client.GameRendererMixin",
     "client.InGameHudMixin",
+    "client.KeyBindingInvoker",
     "client.LightmapTextureManagerMixin",
     "client.MinecraftClientMixin",
     "client.MouseMixin"
