@@ -8,7 +8,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -20,11 +19,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity.Type;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -33,6 +34,7 @@ import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
@@ -44,6 +46,7 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -66,13 +69,16 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         MARKER_DIMENSIONS = new EntityDimensions(0.0f, 0.0f, false),
         SMALL_DIMENSIONS = SpyglassPlusEntityType.SPYGLASS_STAND.get().getDimensions().scaled(0.5f);
 
+    /* Tracked Data */
+
     public static final TrackedData<Boolean>
-        SMALL = DataTracker.registerData(SpyglassStandEntity.class, TrackedDataHandlerRegistry.BOOLEAN),
-        MARKER = DataTracker.registerData(SpyglassStandEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    public static final TrackedData<ItemStack> SPYGLASS_STACK = DataTracker.registerData(SpyglassStandEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
-    public static final TrackedData<Optional<UUID>> USER = DataTracker.registerData(SpyglassStandEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
-    public static final TrackedData<Float> SPYGLASS_YAW = DataTracker.registerData(SpyglassStandEntity.class, TrackedDataHandlerRegistry.FLOAT);
-    public static final TrackedData<Float> SPYGLASS_PITCH = DataTracker.registerData(SpyglassStandEntity.class, TrackedDataHandlerRegistry.FLOAT);
+        SMALL = registerDataTracker(TrackedDataHandlerRegistry.BOOLEAN),
+        MARKER = registerDataTracker(TrackedDataHandlerRegistry.BOOLEAN);
+
+    public static final TrackedData<ItemStack> SPYGLASS_STACK = registerDataTracker(TrackedDataHandlerRegistry.ITEM_STACK);
+    public static final TrackedData<Optional<UUID>> USER = registerDataTracker(TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    public static final TrackedData<Float> SPYGLASS_YAW = registerDataTracker(TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Float> SPYGLASS_PITCH = registerDataTracker(TrackedDataHandlerRegistry.FLOAT);
 
     public long lastHitTime;
     protected boolean invisible;
@@ -121,18 +127,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
                     return ActionResult.SUCCESS;
                 } else if (this.getUser().isEmpty()) { // use spyglass stand
                     if (this.isWithinUseRange(player)) {
-                        if (this.world.isClient) this.useClient(player);
-
-                        ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
-                        scopingPlayer.setSpyglassStandEntity(this);
-                        this.setUserPlayer(player);
-
-                        player.setYaw(this.getSpyglassYaw());
-                        player.setPitch(this.getSpyglassPitch());
-
-                        player.setVelocity(Vec3d.ZERO);
-
-                        this.playSound(spyglass.getUseSound(), 1.0F, 1.0F);
+                        if (this.world.isClient) this.useSpyglassClient(player);
+                        this.useSpyglass(player, spyglass);
                         return ActionResult.CONSUME;
                     }
                 }
@@ -140,13 +136,6 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         }
 
         return super.interact(player, hand);
-    }
-
-    @Environment(EnvType.CLIENT)
-    public void useClient(PlayerEntity user) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        ClientPlayerEntity player = client.player;
-        if (player == user) client.setCameraEntity(this);
     }
 
     @Override
@@ -163,18 +152,18 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
      * Runs on the using player every tick.
      */
     public void tickUser(PlayerEntity player) {
-        if (player.isSneaking() || !this.isWithinUseRange(player) || this.doesNotMatch(player)) {
-            if (this.world.isClient) this.onStopUseClient(player);
+        ItemStack spyglassStack = this.getSpyglassStack();
+        Item spyglassItem = spyglassStack.getItem();
 
-            ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
-            scopingPlayer.setSpyglassStand(null);
-            this.setUser(null);
-
+        if (player.isSneaking() || !this.isWithinUseRange(player) || this.doesNotMatch(player)
+            || spyglassStack.isEmpty() || !(spyglassItem instanceof ISpyglass)
+        ) {
+            if (this.world.isClient) this.stopUsingSpyglassClient(player);
+            this.stopUsingSpyglass(player, spyglassItem instanceof ISpyglass spyglass ? spyglass : null);
             return;
         }
 
         // calculate rotations
-
         float bound = 30;
         float yaw = this.getYaw();
         float pitch = this.getPitch();
@@ -194,11 +183,43 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         this.spyglassPitch = spyglassPitch;
     }
 
+    /**
+     * Attaches a player to this spyglass stand.
+     */
+    public void useSpyglass(PlayerEntity player, ISpyglass spyglass) {
+        ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
+        scopingPlayer.setSpyglassStandEntity(this);
+        this.setUserPlayer(player);
+
+        player.setYaw(this.getSpyglassYaw());
+        player.setPitch(this.getSpyglassPitch());
+
+        player.setVelocity(Vec3d.ZERO);
+
+        this.playSound(spyglass.getUseSound(), 1.0F, 1.0F);
+    }
+
     @Environment(EnvType.CLIENT)
-    public void onStopUseClient(PlayerEntity user) {
+    public void useSpyglassClient(PlayerEntity player) {
         MinecraftClient client = MinecraftClient.getInstance();
-        ClientPlayerEntity player = client.player;
-        if (player == user) client.setCameraEntity(player);
+        if (client.player == player) client.setCameraEntity(this);
+    }
+
+    /**
+     * Detaches a player from this spyglass stand.
+     */
+    public void stopUsingSpyglass(PlayerEntity player, @Nullable ISpyglass spyglass) {
+        ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
+        scopingPlayer.setSpyglassStand(null);
+        this.setUser(null);
+
+        this.playSound(spyglass != null ? spyglass.getStopUsingSound() : SoundEvents.ITEM_SPYGLASS_STOP_USING, 1.0F, 1.0F);
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void stopUsingSpyglassClient(PlayerEntity player) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player == player) client.setCameraEntity(player);
     }
 
     public boolean isWithinUseRange(Entity entity) {
@@ -370,11 +391,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         return this.getDimensions(this.isMarker());
     }
 
-    protected EntityDimensions getDimensions(boolean marker) {
-        if (marker) {
-            return MARKER_DIMENSIONS;
-        }
-        return this.isBaby() ? SMALL_DIMENSIONS : this.getType().getDimensions();
+    public EntityDimensions getDimensions(boolean marker) {
+        return marker ? MARKER_DIMENSIONS : this.isBaby() ? SMALL_DIMENSIONS : this.getType().getDimensions();
     }
 
     @Override
@@ -406,12 +424,12 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         return !this.isInvisible() && !this.isMarker();
     }
 
-    protected void onBreak(DamageSource source) {
+    public void onBreak(DamageSource source) {
         this.playBreakSound();
         this.drop(source);
     }
 
-    protected void breakAndDropItem(DamageSource source) {
+    public void breakAndDropItem(DamageSource source) {
         Block.dropStack(this.world, this.getBlockPos(), new ItemStack(SpyglassPlusItems.SPYGLASS_STAND.get()));
         this.onBreak(source);
     }
@@ -432,11 +450,11 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         }
     }
 
-    protected void playBreakSound() {
+    public void playBreakSound() {
         this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SpyglassPlusSoundEvents.ENTITY_SPYGLASS_STAND_BREAK.get(), this.getSoundCategory(), 1.0f, 1.0f);
     }
 
-    protected void spawnBreakParticles() {
+    public void spawnBreakParticles() {
         if (this.world instanceof ServerWorld serverWorld) {
             serverWorld.spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SpyglassPlusItems.SPYGLASS_STAND.get())), this.getX(), this.getBodyY(0.6D), this.getZ(), 10, this.getWidth() / 4.0f, this.getHeight() / 4.0f, this.getWidth() / 4.0f, 0.05);
         }
@@ -621,6 +639,10 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     }
 
     /* Data */
+
+    protected static <T> TrackedData<T> registerDataTracker(TrackedDataHandler<T> handler) {
+        return DataTracker.registerData(SpyglassStandEntity.class, handler);
+    }
 
     @Override
     protected void initDataTracker() {

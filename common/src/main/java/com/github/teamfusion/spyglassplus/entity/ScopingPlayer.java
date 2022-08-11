@@ -4,6 +4,9 @@ import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Optional;
 
+/**
+ * An interface implemented into all {@link PlayerEntity} instances.
+ */
 public interface ScopingPlayer extends ScopingEntity {
     static ScopingPlayer cast(PlayerEntity player) {
         return (ScopingPlayer) player;
@@ -23,6 +26,9 @@ public interface ScopingPlayer extends ScopingEntity {
         return Optional.empty();
     }
 
+    /**
+     * Retrieves the {@link SpyglassStandEntity} instance attached to the result of {@link #getSpyglassStand()}.
+     */
     default Optional<SpyglassStandEntity> getSpyglassStandEntity() {
         return Optional.empty();
     }
