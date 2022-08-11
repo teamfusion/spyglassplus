@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
+import dev.architectury.platform.Platform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -125,6 +126,8 @@ public abstract class WorldRendererMixin {
 
     @Unique
     private boolean shouldForceRenderPlayer() {
+        if (Platform.isForge()) return false;
+
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(this.client.player);
         return scopingPlayer.hasSpyglassStand() && !this.client.options.getPerspective().isFirstPerson();
     }
