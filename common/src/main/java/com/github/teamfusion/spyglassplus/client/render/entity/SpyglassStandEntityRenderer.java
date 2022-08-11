@@ -58,7 +58,7 @@ public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends 
         // render spyglass, with glint conditionally
         SpyglassStandEntityModel<T> spyglassModel = this.getModel(entity, true);
         this.render(spyglassModel, layer, alpha, entity, tickDelta, matrices, vertices, light);
-        if (entity.getSpyglassStack().hasEnchantments()) this.render(spyglassModel, RenderLayer.getGlintTranslucent(), alpha, entity, tickDelta, matrices, vertices, light);
+        if (entity.getSpyglassStack().hasEnchantments()) this.render(spyglassModel, RenderLayer.getEntityGlint(), alpha, entity, tickDelta, matrices, vertices, light);
 
         matrices.pop();
 
