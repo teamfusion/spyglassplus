@@ -120,7 +120,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
 
                     return ActionResult.SUCCESS;
                 } else if (this.getUser().isEmpty()) { // use spyglass stand
-                    if (this.isOnGround() && player.isOnGround() && this.isWithinUseRange(player)) {
+                    if (this.isWithinUseRange(player)) {
                         if (this.world.isClient) this.useClient(player);
 
                         ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
