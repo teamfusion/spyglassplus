@@ -75,8 +75,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         SMALL = registerDataTracker(TrackedDataHandlerRegistry.BOOLEAN),
         MARKER = registerDataTracker(TrackedDataHandlerRegistry.BOOLEAN);
 
-    public static final TrackedData<ItemStack> SPYGLASS_STACK = registerDataTracker(TrackedDataHandlerRegistry.ITEM_STACK);
     public static final TrackedData<Optional<UUID>> USER = registerDataTracker(TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    public static final TrackedData<ItemStack> SPYGLASS_STACK = registerDataTracker(TrackedDataHandlerRegistry.ITEM_STACK);
     public static final TrackedData<Float> SPYGLASS_YAW = registerDataTracker(TrackedDataHandlerRegistry.FLOAT);
     public static final TrackedData<Float> SPYGLASS_PITCH = registerDataTracker(TrackedDataHandlerRegistry.FLOAT);
 
@@ -125,10 +125,10 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
                     this.playSound(spyglass.getStopUsingSound(), 1.0F, 1.0F);
 
                     return ActionResult.SUCCESS;
-                } else if (this.getUser().isEmpty()) { // use spyglass stand
-                    if (this.isWithinUseRange(player)) {
-                        if (this.world.isClient) this.useSpyglassClient(player);
+                } else {
+                    if (!this.hasUser() && this.isWithinUseRange(player)) { // use spyglass stand
                         this.useSpyglass(player, spyglass);
+                        if (this.world.isClient) this.useSpyglassClient(player);
                         return ActionResult.CONSUME;
                     }
                 }
@@ -145,7 +145,27 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
 
         super.tickMovement();
 
-        this.getUserPlayer().ifPresent(this::tickUser);
+        if (!this.world.isClient || this.isClientUser()) {
+            Optional<PlayerEntity> maybePlayer = this.getUserAsPlayer();
+            maybePlayer.ifPresent(this::tickUser);
+
+            if (!this.world.isClient && this.hasUser()) {
+                if (maybePlayer.isEmpty()) this.setUser(null);
+            }
+        }
+    }
+
+    public Optional<PlayerEntity> getUserAsPlayer() {
+        return this.getUser().map(this.world::getPlayerByUuid);
+    }
+
+    public boolean isUser(PlayerEntity player) {
+        return player.getUuid().equals(this.getUser().orElse(null));
+    }
+
+    @Environment(EnvType.CLIENT)
+    public boolean isClientUser() {
+        return this.isUser(MinecraftClient.getInstance().player);
     }
 
     /**
@@ -158,8 +178,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         if (player.isSneaking() || !this.isWithinUseRange(player) || this.doesNotMatch(player)
             || spyglassStack.isEmpty() || !(spyglassItem instanceof ISpyglass)
         ) {
-            if (this.world.isClient) this.stopUsingSpyglassClient(player);
             this.stopUsingSpyglass(player, spyglassItem instanceof ISpyglass spyglass ? spyglass : null);
+            if (this.world.isClient) this.stopUsingSpyglassClient(player);
             return;
         }
 
@@ -189,7 +209,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     public void useSpyglass(PlayerEntity player, ISpyglass spyglass) {
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
         scopingPlayer.setSpyglassStandEntity(this);
-        this.setUserPlayer(player);
+
+        this.setUser(player.getUuid());
 
         player.setYaw(this.getSpyglassYaw());
         player.setPitch(this.getSpyglassPitch());
@@ -551,24 +572,20 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         return this.dataTracker.get(SPYGLASS_STACK);
     }
 
-    public void setSpyglassStack(ItemStack stack) {
-        this.dataTracker.set(SPYGLASS_STACK, stack);
-    }
-
-    public void setUser(UUID user) {
-        this.dataTracker.set(USER, Optional.ofNullable(user));
-    }
-
-    public void setUserPlayer(PlayerEntity player) {
-        this.dataTracker.set(USER, Optional.of(player).map(PlayerEntity::getUuid));
-    }
-
     public Optional<UUID> getUser() {
         return this.dataTracker.get(USER);
     }
 
-    public Optional<PlayerEntity> getUserPlayer() {
-        return this.getUser().map(this.world::getPlayerByUuid);
+    public boolean hasUser() {
+        return this.getUser().isPresent();
+    }
+
+    public void setUser(@Nullable UUID uuid) {
+        this.dataTracker.set(USER, Optional.ofNullable(uuid));
+    }
+
+    public void setSpyglassStack(ItemStack stack) {
+        this.dataTracker.set(SPYGLASS_STACK, stack);
     }
 
     public float getSpyglassYaw() {
@@ -653,8 +670,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         super.initDataTracker();
         this.dataTracker.startTracking(SMALL, false);
         this.dataTracker.startTracking(MARKER, false);
-        this.dataTracker.startTracking(SPYGLASS_STACK, ItemStack.EMPTY);
         this.dataTracker.startTracking(USER, Optional.empty());
+        this.dataTracker.startTracking(SPYGLASS_STACK, ItemStack.EMPTY);
         this.dataTracker.startTracking(SPYGLASS_YAW, 0.0f);
         this.dataTracker.startTracking(SPYGLASS_PITCH, 0.0f);
     }
@@ -667,8 +684,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         nbt.putBoolean(MARKER_KEY, this.isMarker());
         nbt.putBoolean(INVISIBLE_KEY, this.isInvisible());
         nbt.put(SPYGLASS_STACK_KEY, this.getSpyglassStack().writeNbt(new NbtCompound()));
-        this.getUser().ifPresent(uuid -> nbt.putUuid(USER_KEY, uuid));
         nbt.put(SPYGLASS_ROTATION_KEY, this.toNbtList(this.getSpyglassYaw(), this.getSpyglassPitch()));
+        this.getUser().ifPresent(user -> nbt.putUuid(USER_KEY, user));
     }
 
     @Override
