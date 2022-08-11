@@ -80,7 +80,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     public static final TrackedData<Float> SPYGLASS_YAW = registerDataTracker(TrackedDataHandlerRegistry.FLOAT);
     public static final TrackedData<Float> SPYGLASS_PITCH = registerDataTracker(TrackedDataHandlerRegistry.FLOAT);
 
-    public long lastHitTime;
+    protected long lastHitTime;
     protected boolean invisible;
 
     /**
@@ -614,6 +614,10 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     public void setInvisible(boolean invisible) {
         this.invisible = invisible;
         super.setInvisible(invisible);
+    }
+
+    public long getLastHitTime() {
+        return this.lastHitTime;
     }
 
     /* Living Entity */

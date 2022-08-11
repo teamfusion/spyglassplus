@@ -46,7 +46,7 @@ public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends 
         matrices.scale(-1.0f, -1.0f, 1.0f);
         matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-180f));
 
-        float shake = (float)(entity.world.getTime() - entity.lastHitTime) + tickDelta;
+        float shake = (float)(entity.world.getTime() - entity.getLastHitTime()) + tickDelta;
         if (shake < 5.0f) matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.sin(shake / 1.5f * (float)Math.PI) * 3.0f));
 
         matrices.translate(0.0, -1.501f, 0.0);
