@@ -15,6 +15,6 @@ public class LivingEntityMixin {
     @Inject(method = "isImmobile", at = @At("HEAD"), cancellable = true)
     private void onIsImmobile(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity that = (LivingEntity) (Object) this;
-        if (that instanceof ScopingPlayer scopingPlayer && scopingPlayer.getSpyglassStand().isPresent()) cir.setReturnValue(true);
+        if (that instanceof ScopingPlayer scopingPlayer && scopingPlayer.hasSpyglassStand()) cir.setReturnValue(true);
     }
 }

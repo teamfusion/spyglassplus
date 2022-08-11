@@ -14,12 +14,14 @@
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
+    "client.EntityRendererMixin",
     "client.GameRendererMixin",
     "client.InGameHudMixin",
     "client.KeyBindingInvoker",
     "client.LightmapTextureManagerMixin",
     "client.MinecraftClientMixin",
-    "client.MouseMixin"
+    "client.MouseMixin",
+    "client.WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

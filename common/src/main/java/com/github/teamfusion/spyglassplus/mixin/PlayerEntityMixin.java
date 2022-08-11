@@ -43,6 +43,12 @@ public abstract class PlayerEntityMixin extends LivingEntity implements ScopingP
 
     @Unique
     @Override
+    public boolean hasSpyglassStand() {
+        return this.spyglassStand.isPresent();
+    }
+
+    @Unique
+    @Override
     public Optional<Integer> getSpyglassStand() {
         return this.spyglassStand;
     }

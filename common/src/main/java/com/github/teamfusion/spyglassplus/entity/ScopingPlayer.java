@@ -15,6 +15,10 @@ public interface ScopingPlayer extends ScopingEntity {
     default void setSpyglassStandEntity(SpyglassStandEntity entity) {
     }
 
+    default boolean hasSpyglassStand() {
+        return false;
+    }
+
     default Optional<Integer> getSpyglassStand() {
         return Optional.empty();
     }

@@ -34,7 +34,6 @@ public interface SpyglassPlus {
         SpyglassPlusEntityType.postRegister();
 
         NetworkManager.registerReceiver(Side.C2S, ISpyglass.UPDATE_LOCAL_SCRUTINY_PACKET, ISpyglass::updateLocalScrutinyServer);
-
         EnvExecutor.runInEnv(EnvType.CLIENT, () -> SpyglassPlusClient::commonClientInitialize);
     }
 }
