@@ -150,10 +150,10 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
             SPYGLASS,
             ModelPartBuilder.create()
                             .uv(0, 0)
-                            .cuboid(-1.0F, -3.0F, -7.0F, 2.0F, 2.0F, 11.0F)
+                            .cuboid(-1.0F, -1.0F, -6.5F, 2.0F, 2.0F, 11.0F)
                             .uv(5, 18)
-                            .cuboid(-1.0F, -3.0F, -7.0F, 2.0F, 2.0F, 6.0F, new Dilation(0.2F)),
-            ModelTransform.NONE
+                            .cuboid(-1.0F, -1.0F, -6.5F, 2.0F, 2.0F, 6.0F, new Dilation(0.2F)),
+            ModelTransform.pivot(0.0F, -2.0F, 0.5F)
         );
 
         ModelPartData tripod = root.addChild(TRIPOD, ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
@@ -175,10 +175,10 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
             SPYGLASS,
             ModelPartBuilder.create()
                             .uv(0, 0)
-                            .cuboid(-1.0F, -3.0F, -7.0F, 2.0F, 2.0F, 11.0F)
+                            .cuboid(-1.0F, -1.0F, -6.5F, 2.0F, 2.0F, 11.0F)
                             .uv(5, 18)
-                            .cuboid(-1.0F, -3.0F, -7.0F, 2.0F, 2.0F, 6.0F, new Dilation(0.2F)),
-            ModelTransform.NONE
+                            .cuboid(-1.0F, -1.0F, -6.5F, 2.0F, 2.0F, 6.0F, new Dilation(0.2F)),
+            ModelTransform.pivot(0.0F, -2.0F, 0.0F)
         );
 
         ModelPartData tripod = root.addChild(TRIPOD, ModelPartBuilder.create(), ModelTransform.of(0.0F, 41.0F, 0.0F, 0.0F, 0.0F, 0.0F));

@@ -53,6 +53,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+/**
+ * @see SpyglassPlusEntityType#SPYGLASS_STAND
+ */
 public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     public static final Predicate<Entity> RIDEABLE_MINECART_PREDICATE =
         entity -> entity instanceof AbstractMinecartEntity minecart && minecart.getMinecartType() == Type.RIDEABLE;
@@ -184,7 +187,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         }
 
         // calculate rotations
-        float bound = 30;
+        float bound = 35;
         float yaw = this.getYaw();
         float pitch = this.getPitch();
         float spyglassYaw = MathHelper.clamp(player.getYaw(), yaw - bound, yaw + bound);
