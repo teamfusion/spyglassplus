@@ -7,6 +7,6 @@ import java.util.function.Predicate;
 
 public final class SpyglassPlusEnchantmentTargetsImpl {
     public static EnchantmentTarget register(String id, Predicate<Item> predicate) {
-        return EnchantmentTarget.ARMOR;
+        return EnchantmentTarget.BREAKABLE; // TODO
     }
 }

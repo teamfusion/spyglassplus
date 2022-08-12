@@ -1,7 +1,7 @@
 package com.github.teamfusion.spyglassplus.enchantment.target.fabric;
 
+import com.github.teamfusion.spyglassplus.enchantment.ScopingEnchantment;
 import com.github.teamfusion.spyglassplus.fabric.SpyglassPlusASM;
-import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import com.github.teamfusion.spyglassplus.mixin.fabric.EnchantmentTargetMixin;
 import net.minecraft.item.Item;
 
@@ -12,6 +12,6 @@ import net.minecraft.item.Item;
 public class ScopingEnchantmentTarget extends EnchantmentTargetMixin {
     @Override
     public boolean isAcceptableItem(Item item) {
-        return item instanceof ISpyglass;
+        return ScopingEnchantment.isAcceptableItem(item);
     }
 }

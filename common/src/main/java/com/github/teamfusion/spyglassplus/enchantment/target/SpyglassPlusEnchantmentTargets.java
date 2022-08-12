@@ -1,6 +1,6 @@
 package com.github.teamfusion.spyglassplus.enchantment.target;
 
-import com.github.teamfusion.spyglassplus.item.ISpyglass;
+import com.github.teamfusion.spyglassplus.enchantment.ScopingEnchantment;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.item.Item;
@@ -8,7 +8,7 @@ import net.minecraft.item.Item;
 import java.util.function.Predicate;
 
 public final class SpyglassPlusEnchantmentTargets {
-    public static EnchantmentTarget SCOPING = register("scoping", item -> item instanceof ISpyglass);
+    public static final EnchantmentTarget SCOPING = register("scoping", ScopingEnchantment::isAcceptableItem);
 
     private SpyglassPlusEnchantmentTargets() {
     }
