@@ -1,6 +1,6 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
-import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
+import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -20,10 +20,8 @@ public class ClientPlayerInteractionManagerMixin {
     /**
      * Always remove experience bar if scoping.
      */
-    @Inject(method = "hasExperienceBar", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "hasExperienceBar", at = @At("HEAD"), cancellable = true)
     private void onhasExperienceBar(CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValueZ()) {
-            if (this.client.getCameraEntity() instanceof ScopingEntity scoping && scoping.isScoping()) cir.setReturnValue(false);
-        }
+        if (this.client.player instanceof ScopingPlayer scoping && scoping.hasSpyglassStand()) cir.setReturnValue(false);
     }
 }
