@@ -11,10 +11,10 @@ import static net.minecraft.enchantment.Enchantment.Rarity.*;
 public interface SpyglassPlusEnchantments {
     DeferredRegister<Enchantment> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, Registry.ENCHANTMENT_KEY);
 
-    RegistrySupplier<Enchantment> DISCOVERY = register("discovery", new DiscoveryEnchantment(UNCOMMON));
-    RegistrySupplier<Enchantment> INDICATE = register("indicate", new IndicateEnchantment(UNCOMMON));
-    RegistrySupplier<Enchantment> ILLUMINATE = register("illuminate", new IlluminateEnchantment(UNCOMMON));
     RegistrySupplier<Enchantment> SCRUTINY = register("scrutiny", new ScrutinyEnchantment(UNCOMMON));
+    RegistrySupplier<Enchantment> ILLUMINATE = register("illuminate", new IlluminateEnchantment(UNCOMMON));
+    RegistrySupplier<Enchantment> INDICATE = register("indicate", new IndicateEnchantment(UNCOMMON));
+    RegistrySupplier<Enchantment> DISCOVERY = register("discovery", new DiscoveryEnchantment(UNCOMMON));
     RegistrySupplier<Enchantment> COMMAND = register("command", new CommandEnchantment(COMMON));
 
     private static RegistrySupplier<Enchantment> register(String id, Enchantment enchantment) {

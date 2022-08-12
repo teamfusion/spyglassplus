@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.enchantment;
 
 /**
+ * An enchantment that notifies allied entities to attack the targeted entity when scoping.
  * @see SpyglassPlusEnchantments#COMMAND
  */
 public class CommandEnchantment extends ScopingEnchantment {
@@ -9,12 +10,7 @@ public class CommandEnchantment extends ScopingEnchantment {
     }
 
     @Override
-    public int getMinPower(int level) {
-        return 15;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return 1;
+    public boolean isTreasure() {
+        return true;
     }
 }

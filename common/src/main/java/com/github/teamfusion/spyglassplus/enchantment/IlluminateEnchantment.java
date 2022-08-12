@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.enchantment;
 
 /**
+ * An enchantment that applies a night vision effect on scoping items.
  * @see SpyglassPlusEnchantments#ILLUMINATE
  */
 public class IlluminateEnchantment extends ScopingEnchantment {
@@ -14,7 +15,7 @@ public class IlluminateEnchantment extends ScopingEnchantment {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 1;
+    public int getMaxPower(int level) {
+        return super.getMinPower(level) + 50;
     }
 }

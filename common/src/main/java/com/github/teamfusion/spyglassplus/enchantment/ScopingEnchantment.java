@@ -6,6 +6,9 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 
+/**
+ * Represents an enchantment applicable to an {@link Item} of {@link ISpyglass}.
+ */
 public class ScopingEnchantment extends Enchantment {
     public ScopingEnchantment(Rarity weight) {
         super(weight, SpyglassPlusEnchantmentTargets.SCOPING, new EquipmentSlot[]{ EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND });

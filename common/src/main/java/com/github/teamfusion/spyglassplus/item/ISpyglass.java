@@ -38,7 +38,7 @@ public interface ISpyglass {
     }
 
     default int getSpyglassEnchantability() {
-        return 0;
+        return 1;
     }
 
     default SoundEvent getUseSound() {

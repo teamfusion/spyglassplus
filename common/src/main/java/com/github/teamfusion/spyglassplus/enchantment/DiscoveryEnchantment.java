@@ -1,6 +1,9 @@
 package com.github.teamfusion.spyglassplus.enchantment;
 
 /**
+ * An enchantment that displays statistics about the targeted entity when scoping.
+ * <p>This information includes health, strength, behavior, name, etc. This depends on the level.</p>
+ *
  * @see SpyglassPlusEnchantments#DISCOVERY
  */
 public class DiscoveryEnchantment extends ScopingEnchantment {
@@ -9,12 +12,12 @@ public class DiscoveryEnchantment extends ScopingEnchantment {
     }
 
     @Override
-    public int getMinPower(int level) {
-        return level * 25;
+    public int getMaxLevel() {
+        return 3;
     }
 
     @Override
-    public int getMaxLevel() {
-        return 3;
+    public boolean isTreasure() {
+        return true;
     }
 }

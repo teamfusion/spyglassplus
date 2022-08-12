@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.enchantment;
 
 /**
+ * An enchantment that applies the glowing effect to entities within view when scoping.
  * @see SpyglassPlusEnchantments#INDICATE
  */
 public class IndicateEnchantment extends ScopingEnchantment {
@@ -14,7 +15,7 @@ public class IndicateEnchantment extends ScopingEnchantment {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 1;
+    public int getMaxPower(int level) {
+        return super.getMinPower(level) + 50;
     }
 }
