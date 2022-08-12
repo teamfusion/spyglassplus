@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
@@ -27,6 +28,17 @@ public class SpyglassStandItem extends Item {
     public SpyglassStandItem(Settings settings) {
         super(settings);
         DispenserBlock.registerBehavior(this, new SpyglassStandDispenserBehavior());
+    }
+
+    public static boolean isSmall(ItemStack stack) {
+        NbtCompound nbtEntityTag = stack.getSubNbt(EntityType.ENTITY_TAG_KEY);
+        return nbtEntityTag != null && nbtEntityTag.getBoolean(SpyglassStandEntity.SMALL_KEY);
+    }
+
+    @Override
+    public String getTranslationKey(ItemStack stack) {
+        String key = super.getTranslationKey(stack);
+        return isSmall(stack) ? key + ".small" : key;
     }
 
     @Override

@@ -25,8 +25,9 @@ public final class ModelProvider extends FabricModelProvider {
         ItemModelUploader uploader = ItemModelUploader.of(gen);
 
         Stream.of(
-            SpyglassPlusItems.BINOCULARS,
-            SpyglassPlusItems.SPYGLASS_STAND
+            SpyglassPlusItems.BINOCULARS
         ).map(RegistrySupplier::get).forEach(item -> uploader.register(Models.GENERATED, item));
+
+        gen.register(SpyglassPlusItems.SPYGLASS_STAND.get(), "_small", Models.GENERATED);
     }
 }

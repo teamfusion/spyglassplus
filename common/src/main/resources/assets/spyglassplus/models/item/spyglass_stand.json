@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "spyglassplus:item/spyglass_stand"
+  },
+  "overrides": [
+    { "predicate": { "spyglassplus:small": 1 }, "model": "spyglassplus:item/spyglass_stand_small" }
+  ]
+}

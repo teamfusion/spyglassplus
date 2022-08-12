@@ -454,7 +454,13 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     }
 
     public void breakAndDropItem(DamageSource source) {
-        Block.dropStack(this.world, this.getBlockPos(), new ItemStack(SpyglassPlusItems.SPYGLASS_STAND.get()));
+        ItemStack stack = new ItemStack(SpyglassPlusItems.SPYGLASS_STAND.get());
+        if (this.isSmall()) {
+            NbtCompound nbtEntityTag = stack.getOrCreateSubNbt(EntityType.ENTITY_TAG_KEY);
+            nbtEntityTag.putBoolean(SMALL_KEY, true);
+        }
+        Block.dropStack(this.world, this.getBlockPos(), stack);
+
         this.onBreak(source);
     }
 
