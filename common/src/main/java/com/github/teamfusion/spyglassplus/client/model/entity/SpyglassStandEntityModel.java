@@ -66,27 +66,27 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
             ModelTransform.pivot(0.0F, 24.0F, 0.0F)
         );
 
-        ModelPartData legLeft = tripod.addChild(
+        ModelPartData leftLeg = tripod.addChild(
             LEFT_LEG,
             ModelPartBuilder.create()
                             .uv(0, 26)
-                            .cuboid(7.0349F, -24.511F, -0.1156F, 2.0F, 27.0F, 2.0F),
-            ModelTransform.rotation(-0.2135F, 0.6227F, -0.3747F)
+                            .cuboid(7.0F, -24.5F, 0.0F, 2.0F, 27.0F, 2.0F),
+            ModelTransform.rotation(-0.2094F, 0.6196F, -0.3752F)
         );
 
-        ModelPartData legRight = tripod.addChild(
+        ModelPartData rightLeg = tripod.addChild(
             RIGHT_LEG,
             ModelPartBuilder.create()
                             .uv(0, 26)
-                            .cuboid(-9.0349F, -24.511F, -0.1156F, 2.0F, 27.0F, 2.0F),
-            ModelTransform.rotation(-0.2135F, -0.6227F, 0.3747F)
+                            .cuboid(-9.0F, -24.5F, 0.0F, 2.0F, 27.0F, 2.0F),
+            ModelTransform.rotation(-0.2094F, -0.6196F, 0.3752F)
         );
 
-        ModelPartData legBack = tripod.addChild(
+        ModelPartData backLeg = tripod.addChild(
             BACK_LEG,
             ModelPartBuilder.create()
                             .uv(0, 26)
-                            .cuboid(-0.6437F, -24.8677F, 6.3748F, 2.0F, 27.0F, 2.0F),
+                            .cuboid(-1.0F, -24.5F, 6.5F, 2.0F, 27.0F, 2.0F),
             ModelTransform.rotation(0.2618F, 0.0F, 0.0F)
         );
 
@@ -117,23 +117,23 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
             LEFT_LEG,
             ModelPartBuilder.create()
                             .uv(0, 26)
-                            .cuboid(7.0349F, -24.511F, -0.1156F, 2.0F, 9.0F, 2.0F),
-            ModelTransform.rotation(-0.2135F, 0.6227F, -0.3747F)
+                            .cuboid(7.0F, -24.5F, 0.0F, 2.0F, 9.0F, 2.0F),
+            ModelTransform.rotation(-0.2094F, 0.6196F, -0.3752F)
         );
 
         ModelPartData rightLeg = tripod.addChild(
             RIGHT_LEG,
             ModelPartBuilder.create()
                             .uv(0, 26)
-                            .cuboid(-9.0349F, -24.511F, -0.1156F, 2.0F, 9.0F, 2.0F),
-            ModelTransform.rotation(-0.2135F, -0.6227F, 0.3747F)
+                            .cuboid(-9.0F, -24.5F, 0.0F, 2.0F, 9.0F, 2.0F),
+            ModelTransform.rotation(-0.2094F, -0.6196F, 0.3752F)
         );
 
         ModelPartData backLeg = tripod.addChild(
             BACK_LEG,
             ModelPartBuilder.create()
                             .uv(0, 26)
-                            .cuboid(-0.6437F, -24.8677F, 6.3748F, 2.0F, 9.0F, 2.0F),
+                            .cuboid(-1.0F, -24.5F, 6.0F, 2.0F, 9.0F, 2.0F),
             ModelTransform.rotation(0.2618F, 0.0F, 0.0F)
         );
 
@@ -158,9 +158,9 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
 
         ModelPartData tripod = root.addChild(TRIPOD, ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
 
-        ModelPartData legLeft = tripod.addChild(LEFT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2135F, 0.6227F, -0.3747F));
-        ModelPartData legRight = tripod.addChild(RIGHT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2135F, -0.6227F, 0.3747F));
-        ModelPartData legBack = tripod.addChild(BACK_LEG, ModelPartBuilder.create(), ModelTransform.rotation(0.2618F, 0.0F, 0.0F));
+        ModelPartData leftLeg = tripod.addChild(LEFT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2094F, 0.6196F, -0.3752F));
+        ModelPartData rightLeg = tripod.addChild(RIGHT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2094F, -0.6196F, 0.3752F));
+        ModelPartData backLeg = tripod.addChild(BACK_LEG, ModelPartBuilder.create(), ModelTransform.rotation(0.2618F, 0.0F, 0.0F));
 
         return TexturedModelData.of(data, 64, 64);
     }
@@ -183,8 +183,8 @@ public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends Sin
 
         ModelPartData tripod = root.addChild(TRIPOD, ModelPartBuilder.create(), ModelTransform.of(0.0F, 41.0F, 0.0F, 0.0F, 0.0F, 0.0F));
 
-        ModelPartData leftLeg = tripod.addChild(LEFT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2135F, 0.6227F, -0.3747F));
-        ModelPartData rightLeg = tripod.addChild(RIGHT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2135F, -0.6227F, 0.3747F));
+        ModelPartData leftLeg = tripod.addChild(LEFT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2094F, 0.6196F, -0.3752F));
+        ModelPartData rightLeg = tripod.addChild(RIGHT_LEG, ModelPartBuilder.create(), ModelTransform.rotation(-0.2094F, -0.6196F, 0.3752F));
         ModelPartData backLeg = tripod.addChild(BACK_LEG, ModelPartBuilder.create(), ModelTransform.rotation(0.2618F, 0.0F, 0.0F));
 
         return TexturedModelData.of(data, 64, 64);
