@@ -28,7 +28,7 @@ public class MinecraftClientMixin {
     @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
     private void onDoAttack(CallbackInfoReturnable<Boolean> cir) {
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(this.player);
-        if (scopingPlayer.isScoping()) cir.setReturnValue(false);
+        if (scopingPlayer.hasSpyglassStand()) cir.setReturnValue(false);
     }
 
     /**
@@ -44,7 +44,7 @@ public class MinecraftClientMixin {
     )
     private boolean onHandleBlockBreaking(boolean input) {
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(this.player);
-        if (scopingPlayer.isScoping()) return false;
+        if (scopingPlayer.hasSpyglassStand()) return false;
         return input;
     }
 
@@ -54,7 +54,7 @@ public class MinecraftClientMixin {
     @Inject(method = "doItemUse", at = @At("HEAD"), cancellable = true)
     private void onDoItemUse(CallbackInfo ci) {
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(this.player);
-        if (scopingPlayer.isScoping()) ci.cancel();
+        if (scopingPlayer.hasSpyglassStand()) ci.cancel();
     }
 
     /**
@@ -63,6 +63,6 @@ public class MinecraftClientMixin {
     @Inject(method = "handleInputEvents", at = @At("HEAD"))
     private void onHandleInputEvents(CallbackInfo ci) {
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(this.player);
-        if (scopingPlayer.isScoping()) for (int i = 0; i < 9; ++i) ((KeyBindingInvoker) this.options.hotbarKeys[i]).invokeReset();
+        if (scopingPlayer.hasSpyglassStand()) for (int i = 0; i < 9; ++i) ((KeyBindingInvoker) this.options.hotbarKeys[i]).invokeReset();
     }
 }
