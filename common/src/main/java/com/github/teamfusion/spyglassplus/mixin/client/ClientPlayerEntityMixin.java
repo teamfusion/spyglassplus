@@ -1,5 +1,6 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
+import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import com.github.teamfusion.spyglassplus.entity.SpyglassStandEntity;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.api.EnvType;
@@ -19,11 +20,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Environment(EnvType.CLIENT)
 @Mixin(ClientPlayerEntity.class)
-public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
+public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity implements ScopingPlayer {
     @Shadow @Final protected MinecraftClient client;
 
     private ClientPlayerEntityMixin(ClientWorld world, GameProfile profile, PlayerPublicKey key) {
         super(world, profile, key);
+    }
+
+    /**
+     * If the player's spyglass stand does not agree that the player is its spyglass stand, stop using it.
+     */
+    @Inject(method = "tickMovement", at = @At("HEAD"))
+    private void onTickMovement(CallbackInfo ci) {
+        this.getSpyglassStandEntity().ifPresent(entity -> {
+            if (!entity.isUser(this)) {
+                this.setSpyglassStand(null);
+                entity.stopUsingSpyglassClient(this);
+            }
+        });
     }
 
     /**

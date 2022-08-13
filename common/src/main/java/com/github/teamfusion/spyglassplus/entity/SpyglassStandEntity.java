@@ -131,7 +131,6 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
                 } else {
                     if (!this.hasUser() && this.isWithinUseRange(player)) { // use spyglass stand
                         this.useSpyglass(player, spyglass);
-                        if (this.world.isClient) this.useSpyglassClient(player);
                         return ActionResult.CONSUME;
                     }
                 }
@@ -182,7 +181,6 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
             || spyglassStack.isEmpty() || !(spyglassItem instanceof ISpyglass)
         ) {
             this.stopUsingSpyglass(player, spyglassItem instanceof ISpyglass spyglass ? spyglass : null);
-            if (this.world.isClient) this.stopUsingSpyglassClient(player);
             return;
         }
 
@@ -221,12 +219,14 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         player.setVelocity(Vec3d.ZERO);
 
         this.playSound(spyglass.getUseSound(), 1.0F, 1.0F);
+
+        if (this.world.isClient) this.useSpyglassClient(this, player);
     }
 
     @Environment(EnvType.CLIENT)
-    public void useSpyglassClient(PlayerEntity player) {
+    public void useSpyglassClient(SpyglassStandEntity entity, PlayerEntity player) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == player) client.setCameraEntity(this);
+        if (client.player == player) client.setCameraEntity(entity);
     }
 
     /**
@@ -238,6 +238,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         this.setUser(null);
 
         this.playSound(spyglass != null ? spyglass.getStopUsingSound() : SoundEvents.ITEM_SPYGLASS_STOP_USING, 1.0F, 1.0F);
+
+        if (this.world.isClient) this.stopUsingSpyglassClient(player);
     }
 
     @Environment(EnvType.CLIENT)
@@ -247,7 +249,13 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     }
 
     public boolean isWithinUseRange(Entity entity) {
-        return entity.distanceTo(this) <= 3.0D;
+        if (entity.distanceTo(this) > 3.0D) return false;
+
+        Vec3d pos = entity.getPos();
+        Vec3d rotationVec = this.getRotationVec(1.0F);
+        Vec3d normalize = pos.relativize(this.getPos()).normalize();
+        normalize = new Vec3d(normalize.x, 0.0, normalize.z);
+        return !(normalize.dotProduct(rotationVec) < 0.0);
     }
 
     public boolean doesNotMatch(PlayerEntity player) {
