@@ -12,13 +12,12 @@ import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 
+import static com.github.teamfusion.spyglassplus.util.MathUtil.*;
 import static net.minecraft.client.render.entity.model.EntityModelPartNames.*;
 
 @SuppressWarnings({ "unused", "FieldCanBeLocal" })
 @Environment(EnvType.CLIENT)
 public class SpyglassStandEntityModel<T extends SpyglassStandEntity> extends SinglePartEntityModel<T> {
-    private static final float DEGREES_TO_RADIANS = (float) Math.PI / 180F;
-
     private static final String
         HOLDER = "holder",
         SPYGLASS = "spyglass",

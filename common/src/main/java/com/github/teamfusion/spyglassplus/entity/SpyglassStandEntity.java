@@ -40,8 +40,9 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -52,6 +53,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+
+import static net.minecraft.util.math.MathHelper.*;
 
 /**
  * @see SpyglassPlusEntityType#SPYGLASS_STAND
@@ -188,8 +191,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         float bound = 35;
         float yaw = this.getYaw();
         float pitch = this.getPitch();
-        float spyglassYaw = MathHelper.clamp(player.getYaw(), yaw - bound, yaw + bound);
-        float spyglassPitch = MathHelper.clamp(player.getPitch(), pitch - bound, pitch + bound);
+        float spyglassYaw = clamp(player.getYaw(), yaw - bound, yaw + bound);
+        float spyglassPitch = clamp(player.getPitch(), pitch - bound, pitch + bound);
 
         // update spyglass stand
         this.setSpyglassYaw(spyglassYaw);
@@ -198,6 +201,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         // update player
         player.setYaw(spyglassYaw);
         player.setPitch(spyglassPitch);
+        player.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), spyglassYaw, spyglassPitch);
 
         // update client
         this.spyglassYaw = spyglassYaw;
@@ -210,23 +214,24 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     public void useSpyglass(PlayerEntity player, ISpyglass spyglass) {
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
         scopingPlayer.setSpyglassStandEntity(this);
-
         this.setUser(player.getUuid());
 
-        player.setYaw(this.getSpyglassYaw());
-        player.setPitch(this.getSpyglassPitch());
+        if (this.world.isClient) {
+            this.useSpyglassClient(player);
+        } else {
+            this.playSound(spyglass.getUseSound(), 1.0F, 1.0F);
 
-        player.setVelocity(Vec3d.ZERO);
-
-        this.playSound(spyglass.getUseSound(), 1.0F, 1.0F);
-
-        if (this.world.isClient) this.useSpyglassClient(this, player);
+            Vec3d rotation = this.getRotationVec(1.0f);
+            Vec3i facing = Direction.getFacing(rotation.x, rotation.y, rotation.z).getVector();
+            Vec3d pos = this.getPos().subtract(facing.getX(), facing.getY(), facing.getZ());
+            player.teleport(pos.x, pos.y, pos.z);
+        }
     }
 
     @Environment(EnvType.CLIENT)
-    public void useSpyglassClient(SpyglassStandEntity entity, PlayerEntity player) {
+    public void useSpyglassClient(PlayerEntity player) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == player) client.setCameraEntity(entity);
+        if (client.player == player) client.setCameraEntity(this);
     }
 
     /**
@@ -237,9 +242,11 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         scopingPlayer.setSpyglassStand(null);
         this.setUser(null);
 
-        this.playSound(spyglass != null ? spyglass.getStopUsingSound() : SoundEvents.ITEM_SPYGLASS_STOP_USING, 1.0F, 1.0F);
-
-        if (this.world.isClient) this.stopUsingSpyglassClient(player);
+        if (this.world.isClient) {
+            this.stopUsingSpyglassClient(player);
+        } else {
+            this.playSound(spyglass != null ? spyglass.getStopUsingSound() : SoundEvents.ITEM_SPYGLASS_STOP_USING, 1.0F, 1.0F);
+        }
     }
 
     @Environment(EnvType.CLIENT)
@@ -372,7 +379,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
     @Override
     public float getYaw(float tickDelta) {
         if (tickDelta == 1.0f) return this.getYaw();
-        return MathHelper.lerp(tickDelta, this.prevYaw, this.getYaw());
+        return lerp(tickDelta, this.prevYaw, this.getYaw());
     }
 
     @Override
@@ -615,7 +622,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         if (this.doesNotMatch(client.player)) return this.getSpyglassYaw();
 
         if (tickDelta == 1.0f) return this.spyglassYaw;
-        return MathHelper.lerp(tickDelta, this.prevSpyglassYaw, this.spyglassYaw);
+        return lerp(tickDelta, this.prevSpyglassYaw, this.spyglassYaw);
     }
 
     public void setSpyglassYaw(float yaw) {
@@ -632,7 +639,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         if (this.doesNotMatch(client.player)) return this.getSpyglassPitch();
 
         if (tickDelta == 1.0f) return this.spyglassPitch;
-        return MathHelper.lerp(tickDelta, this.prevSpyglassPitch, this.spyglassPitch);
+        return lerp(tickDelta, this.prevSpyglassPitch, this.spyglassPitch);
     }
 
     public void setSpyglassPitch(float pitch) {

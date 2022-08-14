@@ -21,6 +21,7 @@
     "client.LightmapTextureManagerMixin",
     "client.MinecraftClientMixin",
     "client.MouseMixin",
+    "client.LivingEntityRendererMixin",
     "client.WorldRendererMixin"
   ],
   "injectors": {
