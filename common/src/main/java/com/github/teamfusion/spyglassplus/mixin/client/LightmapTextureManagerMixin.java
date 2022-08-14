@@ -34,7 +34,7 @@ public class LightmapTextureManagerMixin {
             long time = Util.getMeasuringTimeMs();
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.ILLUMINATE.get(), stack) > 0) {
                 long diff = time - lastOpenedSpyglassAt;
-                cir.setReturnValue(Math.max(cir.getReturnValueF(), diff / 1000f));
+                cir.setReturnValue(Math.min(1.0F, Math.max(cir.getReturnValueF(), diff / 1000f)));
             } else lastOpenedSpyglassAt = time;
         }
     }
