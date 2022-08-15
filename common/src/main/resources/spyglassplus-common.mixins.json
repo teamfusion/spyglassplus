@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
+    "EntityInvoker",
     "ItemGroupMixin",
     "ItemMixin",
     "LivingEntityMixin",
@@ -19,9 +20,10 @@
     "client.InGameHudMixin",
     "client.KeyBindingInvoker",
     "client.LightmapTextureManagerMixin",
-    "client.MinecraftClientMixin",
-    "client.MouseMixin",
     "client.LivingEntityRendererMixin",
+    "client.MinecraftClientMixin",
+    "client.ModelPredicateProviderRegistryMixin",
+    "client.MouseMixin",
     "client.WorldRendererMixin"
   ],
   "injectors": {

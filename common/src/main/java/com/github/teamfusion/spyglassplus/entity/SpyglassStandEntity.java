@@ -201,7 +201,6 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         // update player
         player.setYaw(spyglassYaw);
         player.setPitch(spyglassPitch);
-        player.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), spyglassYaw, spyglassPitch);
 
         // update client
         this.spyglassYaw = spyglassYaw;

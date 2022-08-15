@@ -19,7 +19,9 @@ public final class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
 
     @Override
     protected void generateTags() {
-        this.add(SpyglassPlusItemTags.SCOPING_ITEMS, BINOCULARS).add(SPYGLASS);
+        this.add(SpyglassPlusItemTags.SCOPING_ITEMS, BINOCULARS).add(
+            SPYGLASS
+        );
     }
 
     @SafeVarargs

@@ -12,5 +12,6 @@ public final class SpyglassPlusDataGenerator implements SpyglassPlus, DataGenera
 
         FabricTagProvider.BlockTagProvider blockTagProvider = null;
         gen.addProvider(g -> new ItemTagProvider(g, blockTagProvider));
+        gen.addProvider(EntityTypeTagProvider::new);
     }
 }

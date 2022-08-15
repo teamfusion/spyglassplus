@@ -1,6 +1,8 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
+import com.github.teamfusion.spyglassplus.client.gui.DiscoveryHudRenderer;
+import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.item.BinocularsItem;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -13,6 +15,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InGameHud.class)
 public abstract class InGameHudMixin {
     @Unique private static final Identifier BINOCULARS_SCOPE_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/misc/binoculars_scope.png");
+    @Unique private final DiscoveryHudRenderer discoveryHud = new DiscoveryHudRenderer();
 
     @Shadow @Final private MinecraftClient client;
     @Shadow private int scaledWidth;
@@ -40,6 +44,21 @@ public abstract class InGameHudMixin {
             this.renderBinocularsOverlay(scale);
             ci.cancel();
         }
+    }
+
+    /**
+     * Renders HUD for {@link SpyglassPlusEnchantments#DISCOVERY}.
+     */
+    @Inject(
+        method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;getFrozenTicks()I",
+            shift = At.Shift.BEFORE
+        )
+    )
+    private void renderDiscoveryHud(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        if (!this.discoveryHud.render(matrices, tickDelta, this.client.getCameraEntity())) this.discoveryHud.reset();
     }
 
     @Unique
