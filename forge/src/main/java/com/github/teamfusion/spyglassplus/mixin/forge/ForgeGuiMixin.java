@@ -10,6 +10,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.NamedGuiOverlay;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,9 +26,17 @@ public abstract class ForgeGuiMixin extends InGameHud implements InGameHudAccess
 
     /**
      * Renders HUD for {@link SpyglassPlusEnchantments#DISCOVERY}.
+     * @implNote Does not use Forge's events for simplier access to {@link #getDiscoveryHud()} and {@link #client this.client}.
      */
-    @Inject(method = "render", at = @At("TAIL"))
-    private void onRender(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        DiscoveryHudRenderer.render(this.getDiscoveryHud(), matrices, tickDelta, this.client.getCameraEntity());
+    @Inject(
+        method = "lambda$render$0",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraftforge/client/gui/overlay/ForgeGui;post(Lnet/minecraftforge/client/gui/overlay/NamedGuiOverlay;Lnet/minecraft/client/util/math/MatrixStack;)V",
+            shift = At.Shift.AFTER
+        )
+    )
+    private void onRender(MatrixStack matrices, float tickDelta, NamedGuiOverlay overlay, CallbackInfo ci) {
+        if (overlay == VanillaGuiOverlay.SPYGLASS.type()) DiscoveryHudRenderer.render(this.getDiscoveryHud(), matrices, tickDelta, this.client.getCameraEntity());
     }
 }
