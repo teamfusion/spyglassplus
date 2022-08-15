@@ -84,6 +84,10 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public DiscoveryHudRenderer() {
     }
 
+    public static void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera) {
+        if (!discoveryHud.render(matrices, tickDelta, camera)) discoveryHud.reset();
+    }
+
     /**
      * Called when the HUD is not being rendered (when {@link #render(MatrixStack, float, Entity)} returns false).
      */

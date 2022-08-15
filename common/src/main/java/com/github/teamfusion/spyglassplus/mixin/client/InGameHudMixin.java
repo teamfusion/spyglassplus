@@ -2,6 +2,7 @@ package com.github.teamfusion.spyglassplus.mixin.client;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.client.gui.DiscoveryHudRenderer;
+import com.github.teamfusion.spyglassplus.client.gui.InGameHudAccess;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.item.BinocularsItem;
@@ -27,13 +28,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Environment(EnvType.CLIENT)
 @Mixin(InGameHud.class)
-public abstract class InGameHudMixin {
+public abstract class InGameHudMixin implements InGameHudAccess {
     @Unique private static final Identifier BINOCULARS_SCOPE_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/misc/binoculars_scope.png");
     @Unique private final DiscoveryHudRenderer discoveryHud = new DiscoveryHudRenderer();
 
     @Shadow @Final private MinecraftClient client;
     @Shadow private int scaledWidth;
     @Shadow private int scaledHeight;
+
+    @Unique
+    @Override
+    public DiscoveryHudRenderer getDiscoveryHud() {
+        return this.discoveryHud;
+    }
 
     /**
      * Renders the Binoculars' overlay instead of the Spyglass' overlay on use.
@@ -58,7 +65,7 @@ public abstract class InGameHudMixin {
         )
     )
     private void renderDiscoveryHud(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (!this.discoveryHud.render(matrices, tickDelta, this.client.getCameraEntity())) this.discoveryHud.reset();
+        DiscoveryHudRenderer.render(this.discoveryHud, matrices, tickDelta, this.client.getCameraEntity());
     }
 
     @Unique
