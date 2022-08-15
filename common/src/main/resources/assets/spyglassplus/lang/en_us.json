@@ -4,6 +4,15 @@
 
   "itemGroup.spyglassplus.item_group": "Spyglass+",
 
+  "text.spyglassplus.discovery_hud.health": "Health",
+  "text.spyglassplus.discovery_hud.behavior": "Behavior",
+  "text.spyglassplus.discovery_hud.behavior_holder": "(%s)",
+  "text.spyglassplus.discovery_hud.behavior.passive": "Passive",
+  "text.spyglassplus.discovery_hud.behavior.neutral": "Neutral",
+  "text.spyglassplus.discovery_hud.behavior.hostile": "Hostile",
+  "text.spyglassplus.discovery_hud.behavior.boss": "Boss",
+  "text.spyglassplus.discovery_hud.strength": "Strength",
+
   "entity.spyglassplus.spyglass_stand": "Spyglass Stand",
 
   "item.spyglassplus.binoculars": "Binoculars",

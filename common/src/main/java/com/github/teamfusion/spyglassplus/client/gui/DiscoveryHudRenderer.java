@@ -27,7 +27,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -37,6 +39,8 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -52,6 +56,12 @@ import static net.minecraft.util.math.MathHelper.*;
 public class DiscoveryHudRenderer extends DrawableHelper {
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
 
+    public static final String
+        HEALTH_KEY   = translate("health"),
+        BEHAVIOR_KEY = translate("behavior"),
+        BEHAVIOR_HOLDER_KEY = translate("behavior_holder"),
+        STRENGTH_KEY = translate("strength");
+
     public static final int
         EYE_PHASES = 5, EYE_BLINK_TIME = 30,
         BOX_WIDTH = 97, BOX_HEIGHT = 124,
@@ -59,6 +69,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final TextRenderer textRenderer = this.client.textRenderer;
+
+    private int scaledWidth, scaledHeight;
 
     /**
      * The entity currently being rendered.
@@ -120,27 +132,27 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             }
 
             Window window = this.client.getWindow();
-            int scaledHeight = window.getScaledHeight();
-            int halfHeight = scaledHeight / 2;
+            this.scaledWidth = window.getScaledWidth();
+            this.scaledHeight = window.getScaledHeight();
+            int halfHeight = this.scaledHeight / 2;
+            int textHeight = this.textRenderer.fontHeight;
 
             int x = 14;
             int y = halfHeight - (BOX_HEIGHT / 2);
 
             /* Setup */
 
-            matrices.push();
-
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
 
-            /* Scaling */
+            /* Left */
+
+            matrices.push();
 
             double centerX = x + (BOX_WIDTH / 2d);
             matrices.translate(centerX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerX, -halfHeight, 0.0D);
-
-            /* Render */
 
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.openProgress);
@@ -166,14 +178,32 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 Text text = Optional.of(this.activeEntity.getDisplayName()).filter(t -> this.textRenderer.getWidth(t) < 90)
                                     .orElseGet(() -> Text.translatable(type.getTranslationKey()));
                 int textWidth = this.textRenderer.getWidth(text);
-                int textHeight = this.textRenderer.fontHeight;
-                this.textRenderer.draw(matrices, text, (int) (x + (BOX_WIDTH / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1, 0x000000);
+                this.draw(matrices, text, (int) (x + (BOX_WIDTH / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
             }
+
+            matrices.pop();
+
+            /* Right */
+
+            matrices.push();
+
+            double centerRightX = x + this.scaledWidth - 14;
+            matrices.translate(centerRightX, halfHeight, 0.0D);
+            matrices.scale(this.openProgress, this.openProgress, this.openProgress);
+            matrices.translate(-centerRightX, -halfHeight, 0.0D);
+
+            // stats
+            Text behaviorText = EntityBehavior.getText(this.activeEntity);
+            if (behaviorText != null) {
+                this.drawFromRight(matrices, Text.translatable(BEHAVIOR_KEY), 14, halfHeight);
+                this.drawFromRight(matrices, Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText).formatted(Formatting.GRAY), 14, halfHeight + 1 + textHeight);
+            }
+
+            matrices.pop();
 
             /* Cleanup */
 
             RenderSystem.disableBlend();
-            matrices.pop();
 
             if (targeted != null) this.activeEntity = targeted;
 
@@ -251,6 +281,14 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         drawTexture(matrices, x, y, this.getZOffset(), (float)u, (float)v, width, height, 128, 128);
     }
 
+    public void draw(MatrixStack matrices, Text text, int x, int y) {
+        this.textRenderer.draw(matrices, text, x, y, 0x000000);
+    }
+
+    public void drawFromRight(MatrixStack matrices, Text text, int x, int y) {
+        int width = this.textRenderer.getWidth(text);
+        this.textRenderer.draw(matrices, text, this.scaledWidth - x - width, y, 0xFFFFFF);
+    }
 
     /**
      * Retrieves the rotation from the camera, dependent on whether it is a {@link SpyglassStandEntity}.
@@ -326,5 +364,49 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         }
 
         return resultEntity == null ? null : new EntityHitResult(resultEntity, resultPos);
+    }
+
+    public static String translate(String suffix) {
+        return "text.%s.discovery_hud.%s".formatted(SpyglassPlus.MOD_ID, suffix);
+    }
+
+    public enum EntityBehavior {
+        PASSIVE(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE),
+        NEUTRAL(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_NEUTRAL),
+        HOSTILE(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_HOSTILE),
+        BOSS(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_BOSS);
+
+        private final Predicate<EntityType<?>> predicate;
+        private final String translationKey;
+
+        EntityBehavior(TagKey<EntityType<?>> tag) {
+            this.predicate = type -> type.isIn(tag);
+            this.translationKey = BEHAVIOR_KEY + "." + this.name().toLowerCase(Locale.ROOT);
+        }
+
+        public String getTranslationKey() {
+            return this.translationKey;
+        }
+
+        public boolean matches(EntityType<?> entity) {
+            return this.predicate.test(entity);
+        }
+
+        /**
+         * @implNote I would implement some fancy caching stuff, but this runs on tags that can be modified at runtime
+         */
+        public static EntityBehavior get(Entity entity) {
+            return Arrays.stream(values())
+                         .filter(behavior -> behavior.matches(entity.getType()))
+                         .findFirst()
+                         .orElse(null);
+        }
+
+        public static Text getText(Entity entity) {
+            return Optional.ofNullable(EntityBehavior.get(entity))
+                           .map(EntityBehavior::getTranslationKey)
+                           .map(Text::translatable)
+                           .orElse(null);
+        }
     }
 }
