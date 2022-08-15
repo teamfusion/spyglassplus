@@ -42,7 +42,7 @@
     "minecraft": ">=1.19",
     "fabricloader": ">=0.14",
     "fabric-api": ">=0.59",
-    "architectury": ">=6.1",
+    "architectury": ">=6.2",
     "frame-enchantments-v0": "*"
   }
 }
