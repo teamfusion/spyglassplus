@@ -126,22 +126,26 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             int x = 14;
             int y = halfHeight - (BOX_HEIGHT / 2);
 
-            // scale
+            /* Setup */
+
             matrices.push();
+
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+
+            /* Scaling */
 
             double centerX = x + (BOX_WIDTH / 2d);
             matrices.translate(centerX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerX, -halfHeight, 0.0D);
 
-            // setup
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+            /* Render */
 
-            // render
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.openProgress); // transparency
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.openProgress);
 
+            // box
             RenderSystem.setShaderTexture(0, ICONS_TEXTURE);
             this.drawTexture(matrices, x, y, 0, 0, BOX_WIDTH, BOX_HEIGHT);
 
@@ -163,10 +167,11 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                                     .orElseGet(() -> Text.translatable(type.getTranslationKey()));
                 int textWidth = this.textRenderer.getWidth(text);
                 int textHeight = this.textRenderer.fontHeight;
-                this.textRenderer.draw(matrices, text, (int) (x + (BOX_WIDTH / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)), 0x000000);
+                this.textRenderer.draw(matrices, text, (int) (x + (BOX_WIDTH / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1, 0x000000);
             }
 
-            // post
+            /* Cleanup */
+
             RenderSystem.disableBlend();
             matrices.pop();
 
