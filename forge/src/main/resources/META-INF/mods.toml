@@ -8,6 +8,8 @@ modId = "spyglassplus"
 version = "${version}"
 displayName = "Spyglass+"
 authors = "Team Fusion"
+displayURL = "https://curseforge.com/minecraft/mc-mods/spyglassplus"
+updateJSONURL = "https://gist.githubusercontent.com/andantet/1e2d4b00f3f6fa88c5118aff7d7c0f08/raw/spyglassplus.json"
 description = '''
 A Minecraft mod that adds to and improves the Spyglass experience!
 '''
