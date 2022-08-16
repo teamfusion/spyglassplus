@@ -160,7 +160,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
                 if (this.eyePhase == 1.2F) {
                     this.eyeClosing = true;
-                } else if (this.eyePhase == -0.2F) this.eyeClosing = false;
+                } else if (this.eyePhase == -0.2F) {
+                    this.eyeClosing = false;
+                }
 
                 // opening
                 this.openProgress = lerp(0.5F * lastFrameDuration, this.openProgress, targeted == null ? 0.0F : 1.0F);
@@ -199,8 +201,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             RenderSystem.setShaderTexture(0, ICONS_TEXTURE);
             this.drawTexture(matrices, x, y, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
 
-            int eyeTextureVOffset = floor(clamp(this.eyePhase, 0.0F, 1.0F) * (EYE_PHASES - 1));
-            this.drawTexture(matrices, (int) (centerX - (EYE_WIDTH / 2d)) + 1, y + 3, boxWidth, eyeTextureVOffset * EYE_HEIGHT, EYE_WIDTH, EYE_HEIGHT);
+            int eyeTextureVOffset = floor(clamp(this.eyePhase, 0.0F, 1.0F) * (EYE_PHASES - 1)) * EYE_HEIGHT;
+            this.drawTexture(matrices, (int) (centerX - (EYE_WIDTH / 2d)) + 1, y + 3, boxWidth, eyeTextureVOffset, EYE_WIDTH, EYE_HEIGHT);
 
             if (this.openProgress > 0.5F) {
                 if (hasRenderBox) {
