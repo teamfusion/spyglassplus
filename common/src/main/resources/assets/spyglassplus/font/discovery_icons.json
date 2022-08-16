@@ -1,0 +1,13 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "spyglassplus:gui/discovery_font_icons.png",
+      "ascent": 7,
+      "height": 8,
+      "chars": [
+        "❤⚔"
+      ]
+    }
+  ]
+}

@@ -25,10 +25,13 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.TagKey;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -39,6 +42,7 @@ import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.random.Random;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -59,20 +63,34 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
     public static final String
         HEALTH_KEY   = translate("health"),
+        HEALTH_HOLDER_KEY   = translate("health_holder"),
         BEHAVIOR_KEY = translate("behavior"),
         BEHAVIOR_HOLDER_KEY = translate("behavior_holder"),
-        STRENGTH_KEY = translate("strength");
+        STRENGTH_KEY = translate("strength"),
+        STRENGTH_HOLDER_KEY = translate("strength_holder");
+
+    public static final Identifier DISCOVERY_FONT = new Identifier(SpyglassPlus.MOD_ID, "discovery_icons");
+    public static final Style DISCOVERY_FONT_STYLE = Style.EMPTY.withColor(0xFFFFFF).withFont(DISCOVERY_FONT);
+
+    public static final Text
+        HEART_TEXT = Text.literal("❤").setStyle(DISCOVERY_FONT_STYLE),
+        STRENGTH_TEXT = Text.literal("⚔").setStyle(DISCOVERY_FONT_STYLE);
 
     public static final int
-        EYE_PHASES = 5, EYE_BLINK_TIME = 30,
         BOX_WIDTH = 97, BOX_HEIGHT = 124,
         TITLE_BOX_WIDTH = 97, TITLE_BOX_HEIGHT = 32,
-        EYE_WIDTH = 20, EYE_HEIGHT = 16;
+        EYE_WIDTH = 20, EYE_HEIGHT = 16,
+        EYE_PHASES = 5;
+
+    public static final float
+        EYE_BLINK_FREQUENCY = 0.0075F,
+        EYE_BLINK_SPEED = 0.15F;
 
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final TextRenderer textRenderer = this.client.textRenderer;
+    private final Random random = Random.create();
 
-    private int scaledWidth, scaledHeight;
+    private int scaledWidth;
 
     /**
      * The entity currently being rendered.
@@ -98,6 +116,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public DiscoveryHudRenderer() {
     }
 
+    /**
+     * @see InGameHudMixin
+     */
     public static void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera) {
         if (!discoveryHud.render(matrices, tickDelta, camera)) discoveryHud.reset();
     }
@@ -110,6 +131,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         this.eyePhase = -0.2F;
     }
 
+    /**
+     * @see DiscoveryHudRenderer#render(DiscoveryHudRenderer, MatrixStack, float, Entity)
+     */
     public boolean render(MatrixStack matrices, float tickDelta, Entity camera) {
         if (!this.client.options.getPerspective().isFirstPerson() || !(camera instanceof ScopingEntity scopingEntity) || !scopingEntity.isScoping()) {
             this.activeEntity = null;
@@ -122,21 +146,29 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         Entity targeted = this.raycast(camera, tickDelta, 64.0D);
         if (this.activeEntity != null) {
+            EntityType<?> type = this.activeEntity.getType();
+
             if (!this.client.isPaused()) {
                 float lastFrameDuration = this.client.getLastFrameDuration();
 
-                this.eyePhase = clamp(this.eyePhase + ((1.0F / (EYE_BLINK_TIME * 20)) * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration)), -0.2F, 1.2F);
-                if (this.eyePhase >= 1.2F) {
-                    this.eyeClosing = true;
-                } else if (this.eyePhase <= -0.2F) this.eyeClosing = false;
+                // eye
+                float delta = this.eyePhase < 0
+                    ? this.random.nextFloat() * EYE_BLINK_FREQUENCY
+                    : 1.0F / (EYE_BLINK_SPEED * 20);
 
+                this.eyePhase = clamp(this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration)), -0.2F, 1.2F);
+
+                if (this.eyePhase == 1.2F) {
+                    this.eyeClosing = true;
+                } else if (this.eyePhase == -0.2F) this.eyeClosing = false;
+
+                // opening
                 this.openProgress = lerp(0.5F * lastFrameDuration, this.openProgress, targeted == null ? 0.0F : 1.0F);
             }
 
             Window window = this.client.getWindow();
             this.scaledWidth = window.getScaledWidth();
-            this.scaledHeight = window.getScaledHeight();
-            int halfHeight = this.scaledHeight / 2;
+            int halfHeight = window.getScaledHeight() / 2;
             int textHeight = this.textRenderer.fontHeight;
 
             boolean hasRenderBox = this.hasRenderBox(this.activeEntity);
@@ -171,8 +203,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             this.drawTexture(matrices, (int) (centerX - (EYE_WIDTH / 2d)) + 1, y + 3, boxWidth, eyeTextureVOffset * EYE_HEIGHT, EYE_WIDTH, EYE_HEIGHT);
 
             if (this.openProgress > 0.5F) {
-                EntityType<?> type = this.activeEntity.getType();
-
                 if (hasRenderBox) {
                     int entityX = (int) centerX;
                     int entityY = y + boxHeight - 15;
@@ -184,7 +214,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 Text text = Optional.of(this.activeEntity.getDisplayName()).filter(t -> this.textRenderer.getWidth(t) < 90)
                                     .orElseGet(() -> Text.translatable(type.getTranslationKey()));
                 int textWidth = this.textRenderer.getWidth(text);
-                this.draw(matrices, text, (int) (x + (boxWidth / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
+                this.drawText(matrices, text, (int) (x + (boxWidth / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
             }
 
             matrices.pop();
@@ -193,16 +223,37 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             matrices.push();
 
-            double centerRightX = x + this.scaledWidth - 28;
+            double centerRightX = this.scaledWidth - x;
             matrices.translate(centerRightX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerRightX, -halfHeight, 0.0D);
 
             // stats
-            Text behaviorText = EntityBehavior.getText(this.activeEntity);
-            if (behaviorText != null) {
-                this.drawFromRight(matrices, Text.translatable(BEHAVIOR_KEY), 14, halfHeight);
-                this.drawFromRight(matrices, Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText).formatted(Formatting.GRAY), 14, halfHeight + 1 + textHeight);
+            if (!type.isIn(SpyglassPlusEntityTypeTags.IGNORE_STATS_DISCOVERY)) {
+                if (level >= 2) {
+                    // behavior
+                    Text behaviorText = EntityBehavior.getText(this.activeEntity);
+                    if (behaviorText != null) {
+                        this.drawFromRight(matrices, Text.translatable(BEHAVIOR_KEY), x, halfHeight);
+                        this.drawFromRight(matrices, Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText).formatted(Formatting.GRAY), x, halfHeight + 1 + textHeight);
+                    }
+                }
+
+                if (this.activeEntity instanceof LivingEntity livingEntity) {
+                    if (level >= 3) {
+                        // health
+                        int healthY = halfHeight - (textHeight * 4) - 1;
+                        this.drawFromRight(matrices, Text.translatable(HEALTH_KEY), x, healthY);
+                        this.drawFromRight(matrices, this.createHeartHolderText(HEALTH_HOLDER_KEY, HEART_TEXT, livingEntity.getHealth()), x, healthY + textHeight + 1);
+
+                        if (livingEntity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE) != null) {
+                            // strength
+                            int strengthY = halfHeight + (textHeight * 4) + 1;
+                            this.drawFromRight(matrices, Text.translatable(STRENGTH_KEY), x, strengthY);
+                            this.drawFromRight(matrices, this.createHeartHolderText(STRENGTH_HOLDER_KEY, STRENGTH_TEXT, (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE)), x, strengthY + textHeight + 1);
+                        }
+                    }
+                }
             }
 
             matrices.pop();
@@ -221,6 +272,23 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         return false;
     }
 
+    /**
+     * Constructs text that is displayed below a statistic.
+     */
+    public Text createHeartHolderText(String key, Text icon, float health) {
+        return Text.translatable(key, icon, this.formatHearts(health)).formatted(Formatting.GRAY);
+    }
+
+    /**
+     * Transforms a given health value into its representation as hearts, to 2 decimal places.
+     */
+    public String formatHearts(double health) {
+        return String.format("%.2f", health / 2);
+    }
+
+    /**
+     * Whether an entity renders inside of its box.
+     */
     public boolean hasRenderBox(Entity entity) {
         return !entity.getType().isIn(SpyglassPlusEntityTypeTags.DO_NOT_RENDER_BOX_DISCOVERY);
     }
@@ -284,10 +352,13 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         DiffuseLighting.enableGuiDepthLighting();
     }
 
-    public void draw(MatrixStack matrices, Text text, int x, int y) {
+    public void drawText(MatrixStack matrices, Text text, int x, int y) {
         this.textRenderer.draw(matrices, text, x, y, 0x000000);
     }
 
+    /**
+     * Draws text leftwards from the right side of the screen.
+     */
     public void drawFromRight(MatrixStack matrices, Text text, int x, int y) {
         int width = this.textRenderer.getWidth(text);
         this.textRenderer.draw(matrices, text, this.scaledWidth - x - width, y, 0xFFFFFF);
@@ -373,6 +444,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         return "text.%s.discovery_hud.%s".formatted(SpyglassPlus.MOD_ID, suffix);
     }
 
+    /**
+     * Represents an entity's overall behavior.
+     */
     public enum EntityBehavior {
         PASSIVE(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE),
         NEUTRAL(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_NEUTRAL),

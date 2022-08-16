@@ -21,6 +21,11 @@ public interface SpyglassPlusEntityTypeTags {
     TagKey<EntityType<?>> IGNORE_MARGIN_EXPANSION_DISCOVERY = create("ignore_margin_expansion_discovery");
 
     /**
+     * Contains entities that should ignore rendering stats for {@link SpyglassPlusEnchantments#DISCOVERY}.
+     */
+    TagKey<EntityType<?>> IGNORE_STATS_DISCOVERY = create("ignore_stats_discovery");
+
+    /**
      * Contains entities to be rendered in the box for {@link SpyglassPlusEnchantments#DISCOVERY}.
      */
     TagKey<EntityType<?>> DO_NOT_RENDER_BOX_DISCOVERY = create("do_not_render_box_discovery");

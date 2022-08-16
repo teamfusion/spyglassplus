@@ -4,6 +4,7 @@ import com.github.teamfusion.spyglassplus.tag.SpyglassPlusEntityTypeTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 
+import static com.github.teamfusion.spyglassplus.entity.SpyglassPlusEntityType.*;
 import static net.minecraft.entity.EntityType.*;
 
 public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvider {
@@ -21,6 +22,12 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
         this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_DISCOVERY).add(
             SHULKER,
             ITEM_FRAME
+        );
+
+        this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.IGNORE_STATS_DISCOVERY).add(
+            SPYGLASS_STAND.get(),
+            ARMOR_STAND,
+            PLAYER
         );
 
         this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.DO_NOT_RENDER_BOX_DISCOVERY).add(
