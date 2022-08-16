@@ -2,6 +2,7 @@ package com.github.teamfusion.spyglassplus.client.gui;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
+import com.github.teamfusion.spyglassplus.entity.DiscoveryHudEntitySetup;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.SpyglassStandEntity;
 import com.github.teamfusion.spyglassplus.mixin.EntityInvoker;
@@ -24,9 +25,9 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -65,6 +66,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public static final int
         EYE_PHASES = 5, EYE_BLINK_TIME = 30,
         BOX_WIDTH = 97, BOX_HEIGHT = 124,
+        TITLE_BOX_WIDTH = 97, TITLE_BOX_HEIGHT = 32,
         EYE_WIDTH = 20, EYE_HEIGHT = 16;
 
     private final MinecraftClient client = MinecraftClient.getInstance();
@@ -137,8 +139,12 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             int halfHeight = this.scaledHeight / 2;
             int textHeight = this.textRenderer.fontHeight;
 
+            boolean hasRenderBox = this.hasRenderBox(this.activeEntity);
+            int boxWidth = hasRenderBox ? BOX_WIDTH : TITLE_BOX_WIDTH;
+            int boxHeight = hasRenderBox ? BOX_HEIGHT : TITLE_BOX_HEIGHT;
+
             int x = 14;
-            int y = halfHeight - (BOX_HEIGHT / 2);
+            int y = halfHeight - (boxHeight / 2);
 
             /* Setup */
 
@@ -149,7 +155,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             matrices.push();
 
-            double centerX = x + (BOX_WIDTH / 2d);
+            double centerX = x + (boxWidth / 2d);
             matrices.translate(centerX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerX, -halfHeight, 0.0D);
@@ -159,26 +165,26 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             // box
             RenderSystem.setShaderTexture(0, ICONS_TEXTURE);
-            this.drawTexture(matrices, x, y, 0, 0, BOX_WIDTH, BOX_HEIGHT);
+            this.drawTexture(matrices, x, y, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
 
             int eyeTextureVOffset = floor(clamp(this.eyePhase, 0.0F, 1.0F) * (EYE_PHASES - 1));
-            this.drawTexture(matrices, (int) (centerX - (EYE_WIDTH / 2d)) + 1, y + 3, BOX_WIDTH, eyeTextureVOffset * EYE_HEIGHT, EYE_WIDTH, EYE_HEIGHT);
+            this.drawTexture(matrices, (int) (centerX - (EYE_WIDTH / 2d)) + 1, y + 3, boxWidth, eyeTextureVOffset * EYE_HEIGHT, EYE_WIDTH, EYE_HEIGHT);
 
             if (this.openProgress > 0.5F) {
                 EntityType<?> type = this.activeEntity.getType();
 
-                if (this.activeEntity instanceof LivingEntity livingEntity) {
+                if (hasRenderBox) {
                     int entityX = (int) centerX;
-                    int entityY = y + BOX_HEIGHT - 15;
+                    int entityY = y + boxHeight - 15;
                     EntityDimensions base = EntityDimensions.fixed(1.0F, 1.0F);
                     EntityDimensions edim = type.getDimensions();
-                    this.drawEntity(entityX, entityY, edim.width / base.width, edim.height / base.height, 40, livingEntity);
+                    this.drawEntity(entityX, entityY, edim.width / base.width, edim.height / base.height, 40, this.activeEntity);
                 }
 
                 Text text = Optional.of(this.activeEntity.getDisplayName()).filter(t -> this.textRenderer.getWidth(t) < 90)
                                     .orElseGet(() -> Text.translatable(type.getTranslationKey()));
                 int textWidth = this.textRenderer.getWidth(text);
-                this.draw(matrices, text, (int) (x + (BOX_WIDTH / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
+                this.draw(matrices, text, (int) (x + (boxWidth / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
             }
 
             matrices.pop();
@@ -187,7 +193,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             matrices.push();
 
-            double centerRightX = x + this.scaledWidth - 14;
+            double centerRightX = x + this.scaledWidth - 28;
             matrices.translate(centerRightX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerRightX, -halfHeight, 0.0D);
@@ -215,8 +221,12 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         return false;
     }
 
+    public boolean hasRenderBox(Entity entity) {
+        return !entity.getType().isIn(SpyglassPlusEntityTypeTags.DO_NOT_RENDER_BOX_DISCOVERY);
+    }
+
     @SuppressWarnings("deprecation")
-    public void drawEntity(int x, int y, float xScale, float yScale, int scale, LivingEntity entity) {
+    public void drawEntity(int x, int y, float xScale, float yScale, int scale, Entity entity) {
         float yawOffset = (float) Math.atan(-300 / 40.0f);
         float pitchOffset = (float) Math.atan(0 / 40.0f);
 
@@ -239,19 +249,18 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         matricesSub.multiply(yawQuaternion);
         matricesSub.translate(0.0D, (1F - this.openProgress) * 2, 0.0D);
 
-        float bodyYaw = entity.bodyYaw;
         float yaw = entity.getYaw();
         float pitch = entity.getPitch();
-        float prevHeadYaw = entity.prevHeadYaw;
-        float headYaw = entity.headYaw;
         Text customName = entity.getCustomName();
 
-        entity.bodyYaw = 180.0f + yawOffset * 20.0f;
-        entity.setYaw(180.0f + yawOffset * 40.0f);
-        entity.setPitch(-pitchOffset * 20.0f);
-        entity.headYaw = entity.getYaw();
-        entity.prevHeadYaw = entity.getYaw();
+        float renderYaw = 180.0f + yawOffset * 40.0f;
+        float renderPitch = -pitchOffset * 20.0f;
+        entity.setYaw(renderYaw);
+        entity.setPitch(renderPitch);
         entity.setCustomName(null);
+
+        NbtCompound setupNbt = new NbtCompound();
+        if (entity instanceof DiscoveryHudEntitySetup setup) setup.setupBeforeDiscoveryHud(setupNbt, renderYaw, renderPitch, yawOffset, pitchOffset);
 
         DiffuseLighting.method_34742();
         EntityRenderDispatcher dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
@@ -264,21 +273,15 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         immediate.draw();
 
         dispatcher.setRenderShadows(true);
-        entity.bodyYaw = bodyYaw;
         entity.setYaw(yaw);
         entity.setPitch(pitch);
-        entity.prevHeadYaw = prevHeadYaw;
-        entity.headYaw = headYaw;
         entity.setCustomName(customName);
+
+        if (entity instanceof DiscoveryHudEntitySetup setup) setup.cleanupAfterDiscoveryHud(setupNbt);
 
         matrices.pop();
         RenderSystem.applyModelViewMatrix();
         DiffuseLighting.enableGuiDepthLighting();
-    }
-
-    @Override
-    public void drawTexture(MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
-        drawTexture(matrices, x, y, this.getZOffset(), (float)u, (float)v, width, height, 128, 128);
     }
 
     public void draw(MatrixStack matrices, Text text, int x, int y) {
@@ -312,7 +315,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         Vec3d max = min.add(rotationVector.x * distance, rotationVector.y * distance, rotationVector.z * distance);
 
         Box box = camera.getBoundingBox().stretch(rotationVector.multiply(distance)).expand(1.0F);
-        EntityHitResult entityHit = this.raycast(camera, min, max, box, entity -> !entity.isSpectator() && entity.canHit() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_FOR_DISCOVERY_ENCHANTMENT), distance);
+        EntityHitResult entityHit = this.raycast(camera, min, max, box, entity -> !entity.isSpectator() && entity.canHit() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY), distance);
         if (entityHit != null) {
             Entity entity = entityHit.getEntity();
             Vec3d pos = entityHit.getPos();
@@ -335,7 +338,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         for (Entity candidate : entity.world.getOtherEntities(entity, box, predicate)) {
             float margin = candidate.getTargetingMargin();
             Box candidateBoundingBox = candidate.getBoundingBox().expand(
-                margin == 0.0F && !candidate.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_FOR_DISCOVERY_ENCHANTMENT)
+                margin == 0.0F && !candidate.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_DISCOVERY)
                     ? 0.175F : margin
             );
 

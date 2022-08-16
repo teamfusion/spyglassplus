@@ -59,7 +59,7 @@ import static net.minecraft.util.math.MathHelper.*;
 /**
  * @see SpyglassPlusEntityType#SPYGLASS_STAND
  */
-public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
+public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, DiscoveryHudEntitySetup {
     public static final Predicate<Entity> RIDEABLE_MINECART_PREDICATE =
         entity -> entity instanceof AbstractMinecartEntity minecart && minecart.getMinecartType() == Type.RIDEABLE;
 
@@ -69,7 +69,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
         INVISIBLE_KEY = "Invisible",
         SPYGLASS_STACK_KEY = "Spyglass",
         USER_KEY = "User",
-        SPYGLASS_ROTATION_KEY = "SpyglassRotation";
+        SPYGLASS_ROTATION_KEY = "SpyglassRotation",
+        PREV_SPYGLASS_ROTATION_KEY = "PrevSpyglassRotation";
 
     public static final EntityDimensions
         MARKER_DIMENSIONS = new EntityDimensions(0.0f, 0.0f, false),
@@ -347,6 +348,30 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity {
                 this.lastHitTime = this.world.getTime();
             }
         } else super.handleStatus(status);
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public void setupBeforeDiscoveryHud(NbtCompound nbt, float yaw, float pitch, float yawOffset, float pitchOffset) {
+        nbt.put(SPYGLASS_ROTATION_KEY, this.toNbtList(this.getSpyglassYaw(), this.getSpyglassPitch()));
+        nbt.put(PREV_SPYGLASS_ROTATION_KEY, this.toNbtList(this.prevSpyglassYaw, this.prevSpyglassPitch));
+
+        this.setSpyglassYaw(yaw);
+        this.setSpyglassPitch(pitch);
+        this.prevSpyglassYaw = yaw;
+        this.prevSpyglassPitch = pitch;
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public void cleanupAfterDiscoveryHud(NbtCompound nbt) {
+        NbtList spyglassRotation = nbt.getList(SPYGLASS_ROTATION_KEY, NbtElement.FLOAT_TYPE);
+        this.setSpyglassYaw(spyglassRotation.getFloat(0));
+        this.setSpyglassPitch(spyglassRotation.getFloat(1));
+
+        NbtList prevSpyglassRotation = nbt.getList(PREV_SPYGLASS_ROTATION_KEY, NbtElement.FLOAT_TYPE);
+        this.prevSpyglassYaw = prevSpyglassRotation.getFloat(0);
+        this.prevSpyglassPitch = prevSpyglassRotation.getFloat(1);
     }
 
     @Override

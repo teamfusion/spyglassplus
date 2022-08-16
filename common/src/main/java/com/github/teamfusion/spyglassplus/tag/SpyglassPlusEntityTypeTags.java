@@ -10,15 +10,20 @@ import net.minecraft.util.registry.Registry;
 
 public interface SpyglassPlusEntityTypeTags {
     /**
+     * Contains entities to be ignored by {@link SpyglassPlusEnchantments#DISCOVERY}.
+     */
+    TagKey<EntityType<?>> IGNORE_DISCOVERY = create("ignore_discovery");
+
+    /**
      * Contains entities that specifically implement {@link Entity#getTargetingMargin()}.
      * <p>By default includes {@link EntityType#SHULKER} and {@link EntityType#ITEM_FRAME}.</p>
      */
-    TagKey<EntityType<?>> IGNORE_MARGIN_EXPANSION_FOR_DISCOVERY_ENCHANTMENT = create("ignore_margin_expansion_for_discovery_enchantment");
+    TagKey<EntityType<?>> IGNORE_MARGIN_EXPANSION_DISCOVERY = create("ignore_margin_expansion_discovery");
 
     /**
-     * Contains entities to be ignored by {@link SpyglassPlusEnchantments#DISCOVERY}.
+     * Contains entities to be rendered in the box for {@link SpyglassPlusEnchantments#DISCOVERY}.
      */
-    TagKey<EntityType<?>> IGNORE_FOR_DISCOVERY_ENCHANTMENT = create("ignore_for_discovery_enchantment");
+    TagKey<EntityType<?>> DO_NOT_RENDER_BOX_DISCOVERY = create("do_not_render_box_discovery");
 
     /**
      * Contains entities pertaining to this behavior.

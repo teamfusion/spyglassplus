@@ -4,7 +4,6 @@ import com.github.teamfusion.spyglassplus.tag.SpyglassPlusEntityTypeTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 
-import static com.github.teamfusion.spyglassplus.entity.SpyglassPlusEntityType.*;
 import static net.minecraft.entity.EntityType.*;
 
 public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvider {
@@ -14,14 +13,18 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
 
     @Override
     protected void generateTags() {
-        this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_FOR_DISCOVERY_ENCHANTMENT).add(
+        this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY).add(
+            LEASH_KNOT,
+            PAINTING
+        );
+
+        this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_DISCOVERY).add(
             SHULKER,
             ITEM_FRAME
         );
 
-        this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.IGNORE_FOR_DISCOVERY_ENCHANTMENT).add(
-            SPYGLASS_STAND.get(),
-            ITEM_FRAME
+        this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.DO_NOT_RENDER_BOX_DISCOVERY).add(
+            ENDER_DRAGON
         );
 
         this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE).add(
