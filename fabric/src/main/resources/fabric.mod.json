@@ -29,8 +29,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [ "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusFabric" ],
-    "mm:early_risers": [ "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusASM" ],
-    "fabric-datagen": [ "com.github.teamfusion.spyglassplus.datagen.SpyglassPlusDataGenerator" ]
+    "mm:early_risers": [ "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusASM" ]
   },
   "mixins": [
     "spyglassplus.mixins.json",
