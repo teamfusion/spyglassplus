@@ -102,7 +102,7 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
             RAVAGER,
             SHULKER,
             SILVERFISH,
-            SKELETON_HORSE,
+            SKELETON,
             SLIME,
             STRAY,
             VEX,
