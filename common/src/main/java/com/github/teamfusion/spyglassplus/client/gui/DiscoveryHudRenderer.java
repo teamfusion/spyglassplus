@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.client.gui;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
+import com.github.teamfusion.spyglassplus.client.event.DiscoveryHudRenderEvent;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.DiscoveryHudEntitySetup;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
@@ -57,6 +58,7 @@ import static net.minecraft.util.math.MathHelper.*;
  * Responsible for rendering the HUD elements created by {@link SpyglassPlusEnchantments#DISCOVERY}.
  * @see InGameHudMixin
  */
+@SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
 public class DiscoveryHudRenderer extends DrawableHelper {
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
@@ -120,7 +122,13 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * @see InGameHudMixin
      */
     public static void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera) {
-        if (!discoveryHud.render(matrices, tickDelta, camera)) discoveryHud.reset();
+        if (DiscoveryHudRenderEvent.PRE.invoker().render(discoveryHud, matrices, tickDelta, camera).isFalse()) return;
+
+        if (discoveryHud.render(matrices, tickDelta, camera)) {
+            DiscoveryHudRenderEvent.POST.invoker().render(discoveryHud, matrices, tickDelta, camera);
+        } else {
+            discoveryHud.reset();
+        }
     }
 
     /**
@@ -444,6 +452,22 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
     public static String translate(String suffix) {
         return "text.%s.discovery_hud.%s".formatted(SpyglassPlus.MOD_ID, suffix);
+    }
+
+    public Entity getActiveEntity() {
+        return this.activeEntity;
+    }
+
+    public float getOpenProgress() {
+        return this.openProgress;
+    }
+
+    public float getEyePhase() {
+        return this.eyePhase;
+    }
+
+    public boolean isEyeClosing() {
+        return this.eyeClosing;
     }
 
     /**

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "spyglassplus-test",
+  "name": "Spyglass Plus Test Mod",
+  "version": "${version}",
+  "environment": "*",
+  "custom": { "modmenu": { "parent": "spyglassplus" } },
+  "entrypoints": {
+    "main": [ "com.github.teamfusion.spyglassplus.test.SpyglassPlusTest" ],
+    "client": [ "com.github.teamfusion.spyglassplus.test.client.SpyglassPlusClientTest" ]
+  }
+}

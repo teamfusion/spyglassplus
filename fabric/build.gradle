@@ -13,6 +13,13 @@ loom {
 
 sourceSets.main.resources.srcDirs += project(":common").file(project.output_datagen)
 
+sourceSets {
+  test {
+    compileClasspath += main.compileClasspath
+    runtimeClasspath += main.runtimeClasspath
+  }
+}
+
 configurations {
   common
   shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
@@ -67,6 +74,18 @@ loom {
       vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file(project.output_datagen)}"
 
       runDir "build/datagen"
+    }
+
+    testClient {
+      client()
+      name "Minecraft Client (Test)"
+      source sourceSets.test
+    }
+
+    testServer {
+      server()
+      name "Minecraft Server (Test)"
+      source sourceSets.test
     }
   }
 }
