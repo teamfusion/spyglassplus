@@ -1,3 +1,5 @@
+buildscript { dependencies { classpath 'org.kohsuke:github-api:1.307' } }
+
 plugins {
   id 'architectury-plugin' version '3.4-SNAPSHOT'
   id 'dev.architectury.loom' version '0.12.0-SNAPSHOT' apply false
@@ -25,7 +27,7 @@ allprojects {
   apply plugin: 'architectury-plugin'
   apply plugin: 'maven-publish'
 
-  archivesBaseName = rootProject.mod_id + "-" + project.name
+  archivesBaseName = project.name == rootProject.name ? rootProject.mod_id : rootProject.mod_id + "-" + project.name
   group = rootProject.maven_group
 
   def ENV = System.getenv()
@@ -42,5 +44,39 @@ allprojects {
 
   java {
     withSourcesJar()
+  }
+}
+
+/* Releasing */
+
+def ENV = System.getenv()
+def VER_NAME = "[$rootProject.major_version] $rootProject.mod_name $rootProject.version_id"
+def CHANGELOG = new File("./gradle", "CHANGELOG.md").text
+def SUPPORTED_VERSIONS = rootProject.supported_versions.split(',')
+def PLATFORMS = rootProject.enabled_platforms.split(",")
+
+import org.kohsuke.github.*
+task github(dependsOn: build) {
+  onlyIf { ENV.GITHUB_TOKEN }
+  doLast {
+    def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN)
+    def repository = github.getRepository(rootProject.github_repository)
+
+    def builder = new GHReleaseBuilder(repository, version)
+    builder.name(VER_NAME)
+    builder.body(CHANGELOG)
+    builder.commitish(rootProject.github_branch)
+    builder.prerelease(rootProject.beta)
+
+    def release = builder.create()
+    for (final def platform in PLATFORMS) {
+      release.uploadAsset(
+              new File(
+                      "./$platform/build/libs",
+                      "${archivesBaseName}-${platform}-${version}.jar"
+              ),
+              "application/java-archive"
+      )
+    }
   }
 }
