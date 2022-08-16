@@ -156,11 +156,11 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     ? this.random.nextFloat() * EYE_BLINK_FREQUENCY
                     : 1.0F / (EYE_BLINK_SPEED * 20);
 
-                this.eyePhase = clamp(this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration)), -0.2F, 1.2F);
+                this.eyePhase = this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration));
 
-                if (this.eyePhase == 1.2F) {
+                if (this.eyePhase >= 1.2F) {
                     this.eyeClosing = true;
-                } else if (this.eyePhase == -0.2F) {
+                } else if (this.eyePhase <= -0.2F) {
                     this.eyeClosing = false;
                 }
 
