@@ -4,16 +4,21 @@
 
   "itemGroup.spyglassplus.item_group": "Spyglass+",
 
-  "text.spyglassplus.discovery_hud.health": "Health",
-  "text.spyglassplus.discovery_hud.health_holder": "(%s* %s)",
   "text.spyglassplus.discovery_hud.behavior": "Behavior",
-  "text.spyglassplus.discovery_hud.behavior_holder": "(%s)",
-  "text.spyglassplus.discovery_hud.behavior.passive": "Passive",
-  "text.spyglassplus.discovery_hud.behavior.neutral": "Neutral",
-  "text.spyglassplus.discovery_hud.behavior.hostile": "Hostile",
-  "text.spyglassplus.discovery_hud.behavior.boss": "Boss",
+  "text.spyglassplus.discovery_hud.behavior.icon": "\uD83E\uDDE0",
+  "text.spyglassplus.discovery_hud.behavior.holder": "(%s)",
+  "text.spyglassplus.discovery_hud.behavior.type.passive": "Passive",
+  "text.spyglassplus.discovery_hud.behavior.type.neutral": "Neutral",
+  "text.spyglassplus.discovery_hud.behavior.type.hostile": "Hostile",
+  "text.spyglassplus.discovery_hud.behavior.type.boss": "Boss",
+
+  "text.spyglassplus.discovery_hud.health": "Health",
+  "text.spyglassplus.discovery_hud.health.icon": "❤",
+  "text.spyglassplus.discovery_hud.health.holder": "(%s* %s)",
+
   "text.spyglassplus.discovery_hud.strength": "Strength",
-  "text.spyglassplus.discovery_hud.strength_holder": "(%s* %s)",
+  "text.spyglassplus.discovery_hud.strength.icon": "💗",
+  "text.spyglassplus.discovery_hud.strength.holder": "(%s* %s)",
 
   "entity.spyglassplus.spyglass_stand": "Spyglass Stand",
 

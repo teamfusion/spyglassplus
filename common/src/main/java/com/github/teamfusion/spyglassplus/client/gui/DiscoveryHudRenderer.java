@@ -16,9 +16,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
@@ -39,6 +44,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
@@ -50,6 +56,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static net.minecraft.util.math.MathHelper.*;
 
@@ -64,30 +71,40 @@ import static net.minecraft.util.math.MathHelper.*;
 public class DiscoveryHudRenderer extends DrawableHelper {
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
 
+    /**
+     * A translation key.
+     */
     public static final String
-        HEALTH_KEY   = translate("health"),
-        HEALTH_HOLDER_KEY   = translate("health_holder"),
-        BEHAVIOR_KEY = translate("behavior"),
-        BEHAVIOR_HOLDER_KEY = translate("behavior_holder"),
-        STRENGTH_KEY = translate("strength"),
-        STRENGTH_HOLDER_KEY = translate("strength_holder");
+        HEALTH_KEY          = translate("health"),
+        HEALTH_ICON_KEY     = HEALTH_KEY + ".icon",
+        HEALTH_HOLDER_KEY   = HEALTH_KEY + ".holder",
+
+        BEHAVIOR_KEY        = translate("behavior"),
+        BEHAVIOR_ICON_KEY   = BEHAVIOR_KEY + ".icon",
+        BEHAVIOR_HOLDER_KEY = BEHAVIOR_KEY + ".holder",
+
+        STRENGTH_KEY        = translate("strength"),
+        STRENGTH_ICON_KEY   = STRENGTH_KEY + ".icon",
+        STRENGTH_HOLDER_KEY = STRENGTH_KEY + ".holder";
 
     public static final Identifier DISCOVERY_FONT = new Identifier(SpyglassPlus.MOD_ID, "discovery_icons");
-    public static final Style DISCOVERY_FONT_STYLE = Style.EMPTY.withColor(0xFFFFFF).withFont(DISCOVERY_FONT);
+    public static final Style DISCOVERY_FONT_STYLE = Style.EMPTY.withFont(DISCOVERY_FONT).withFormatting(Formatting.RED);
 
     public static final Text
-        HEART_TEXT = Text.literal("❤").setStyle(DISCOVERY_FONT_STYLE),
-        STRENGTH_TEXT = Text.literal("⚔").setStyle(DISCOVERY_FONT_STYLE);
+        BEHAVIOR_ICON = Text.translatable(BEHAVIOR_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
+        HEALTH_ICON = Text.translatable(HEALTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
+        STRENGTH_ICON = Text.translatable(STRENGTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE);
 
     public static final int
         BOX_WIDTH = 97, BOX_HEIGHT = 124,
         TITLE_BOX_WIDTH = 97, TITLE_BOX_HEIGHT = 32,
-        EYE_WIDTH = 20, EYE_HEIGHT = 16,
-        EYE_PHASES = 5;
+        EYE_WIDTH = 20, EYE_HEIGHT = 16, EYE_PHASES = 5,
+        RIGHT_SIDEBAR_TEXT_BORDER_SIZE = 4;
 
     public static final float
         EYE_BLINK_FREQUENCY = 0.0075F,
-        EYE_BLINK_SPEED = 0.15F;
+        EYE_BLINK_SPEED = 0.15F,
+        BLACK_OPACITY = 1 - 0.2F;
 
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final TextRenderer textRenderer = this.client.textRenderer;
@@ -245,23 +262,32 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     // behavior
                     Text behaviorText = EntityBehavior.getText(this.activeEntity);
                     if (behaviorText != null) {
-                        this.drawFromRight(matrices, Text.translatable(BEHAVIOR_KEY), x, halfHeight);
-                        this.drawFromRight(matrices, Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText).formatted(Formatting.GRAY), x, halfHeight + 1 + textHeight);
+                        int behaviorY = halfHeight - (textHeight * 3) - 1;
+                        this.drawTextClusterFromRight(matrices, x + 1, behaviorY,
+                            Text.translatable(BEHAVIOR_KEY, BEHAVIOR_ICON),
+                            Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText, BEHAVIOR_ICON).formatted(Formatting.GRAY)
+                        );
                     }
                 }
 
                 if (this.activeEntity instanceof LivingEntity livingEntity) {
                     if (level >= 3) {
                         // health
-                        int healthY = halfHeight - (textHeight * 4) - 1;
-                        this.drawFromRight(matrices, Text.translatable(HEALTH_KEY), x, healthY);
-                        this.drawFromRight(matrices, this.createHeartHolderText(HEALTH_HOLDER_KEY, HEART_TEXT, livingEntity.getHealth()), x, healthY + textHeight + 1);
+                        float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;
+                        this.drawTextClusterFromRight(matrices, x + 1, halfHeight, ((Float.isNaN(hurt) ? 0 : hurt) * (1 - BLACK_OPACITY)) + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
+                            Text.translatable(HEALTH_KEY, HEALTH_ICON),
+                            this.createHeartHolderText(HEALTH_HOLDER_KEY, HEALTH_ICON, livingEntity.getHealth())
+                        );
 
                         if (livingEntity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE) != null) {
                             // strength
-                            int strengthY = halfHeight + (textHeight * 4) + 1;
-                            this.drawFromRight(matrices, Text.translatable(STRENGTH_KEY), x, strengthY);
-                            this.drawFromRight(matrices, this.createHeartHolderText(STRENGTH_HOLDER_KEY, STRENGTH_TEXT, (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE)), x, strengthY + textHeight + 1);
+                            int strengthY = halfHeight + (textHeight * 3) + 1;
+                            this.drawTextClusterFromRight(matrices, x + 1, strengthY,
+                                Text.translatable(STRENGTH_KEY, STRENGTH_ICON),
+                                this.createHeartHolderText(STRENGTH_HOLDER_KEY, STRENGTH_ICON,
+                                    (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE)
+                                )
+                            );
                         }
                     }
                 }
@@ -283,6 +309,74 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         return false;
     }
 
+    public void drawText(MatrixStack matrices, Text text, int x, int y) {
+        this.textRenderer.draw(matrices, text, x, y, 0x000000);
+    }
+
+    /**
+     * Draws text leftwards from the right side of the screen, with a transparent background.
+     */
+    public void drawTextClusterFromRight(MatrixStack matrices, int rawX, int y, float br, float bg, float bb, Text... texts) {
+        int x = this.scaledWidth - rawX;
+        int l = texts.length;
+
+        // background
+        int longestWidth = Stream.of(texts).mapToInt(this.textRenderer::getWidth).max().orElse(0);
+        fill(matrices,
+            x - longestWidth - RIGHT_SIDEBAR_TEXT_BORDER_SIZE,
+            y - RIGHT_SIDEBAR_TEXT_BORDER_SIZE,
+            x + RIGHT_SIDEBAR_TEXT_BORDER_SIZE - 1,
+            (y + (l * (this.textRenderer.fontHeight + 1))) + RIGHT_SIDEBAR_TEXT_BORDER_SIZE - 3,
+            br, bg, bb, 0.5F
+        );
+
+        // text
+        for (int i = 0; i < texts.length; i++) {
+            Text text = texts[i];
+            int width = this.textRenderer.getWidth(text);
+            this.textRenderer.draw(matrices, text, x - width, y + (i * (this.textRenderer.fontHeight + 1)), 0xFFFFFF);
+        }
+    }
+
+    public void drawTextClusterFromRight(MatrixStack matrices, int rawX, int y, Text... texts) {
+        this.drawTextClusterFromRight(matrices, rawX, y, BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY, texts);
+    }
+
+    /**
+     * Implementation of {@link #fill(MatrixStack, int, int, int, int, int)} for RGB.
+     */
+    public void fill(MatrixStack matrices, int x1, int y1, int x2, int y2, float r, float g, float b, float alpha) {
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+
+        if (x1 < x2) {
+            int i = x1;
+            x1 = x2;
+            x2 = i;
+        }
+
+        if (y1 < y2) {
+            int i = y1;
+            y1 = y2;
+            y2 = i;
+        }
+
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        RenderSystem.enableBlend();
+        RenderSystem.disableTexture();
+        RenderSystem.defaultBlendFunc();
+
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(matrix, (float)x1, (float)y2, 0.0F).color(r, g, b, alpha).next();
+        bufferBuilder.vertex(matrix, (float)x2, (float)y2, 0.0F).color(r, g, b, alpha).next();
+        bufferBuilder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(r, g, b, alpha).next();
+        bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(r, g, b, alpha).next();
+        BufferRenderer.drawWithShader(bufferBuilder.end());
+
+        RenderSystem.enableTexture();
+        RenderSystem.disableBlend();
+    }
+
     /**
      * Constructs text that is displayed below a statistic.
      */
@@ -294,7 +388,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * Transforms a given health value into its representation as hearts, to 2 decimal places.
      */
     public String formatHearts(double health) {
-        return String.format("%.2f", health / 2);
+        return String.format("%.1f", 0.5D * Math.round(health));
     }
 
     /**
@@ -361,18 +455,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         matrices.pop();
         RenderSystem.applyModelViewMatrix();
         DiffuseLighting.enableGuiDepthLighting();
-    }
-
-    public void drawText(MatrixStack matrices, Text text, int x, int y) {
-        this.textRenderer.draw(matrices, text, x, y, 0x000000);
-    }
-
-    /**
-     * Draws text leftwards from the right side of the screen.
-     */
-    public void drawFromRight(MatrixStack matrices, Text text, int x, int y) {
-        int width = this.textRenderer.getWidth(text);
-        this.textRenderer.draw(matrices, text, this.scaledWidth - x - width, y, 0xFFFFFF);
     }
 
     /**
@@ -495,7 +577,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         EntityBehavior(TagKey<EntityType<?>> tag) {
             this.predicate = type -> type.isIn(tag);
-            this.translationKey = BEHAVIOR_KEY + "." + this.name().toLowerCase(Locale.ROOT);
+            this.translationKey = BEHAVIOR_KEY + ".type." + this.name().toLowerCase(Locale.ROOT);
         }
 
         public String getTranslationKey() {
