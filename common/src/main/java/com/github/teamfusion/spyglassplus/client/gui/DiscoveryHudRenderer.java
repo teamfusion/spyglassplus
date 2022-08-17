@@ -276,7 +276,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                         float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;
                         this.drawTextClusterFromRight(matrices, x + 1, halfHeight, ((Float.isNaN(hurt) ? 0 : hurt) * (1 - BLACK_OPACITY)) + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
                             Text.translatable(HEALTH_KEY, HEALTH_ICON),
-                            this.createHeartHolderText(HEALTH_HOLDER_KEY, HEALTH_ICON, livingEntity.getHealth())
+                            this.createHealthHolderText(HEALTH_HOLDER_KEY, HEALTH_ICON, livingEntity.getHealth())
                         );
 
                         if (livingEntity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE) != null) {
@@ -284,7 +284,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                             int strengthY = halfHeight + (textHeight * 3) + 1;
                             this.drawTextClusterFromRight(matrices, x + 1, strengthY,
                                 Text.translatable(STRENGTH_KEY, STRENGTH_ICON),
-                                this.createHeartHolderText(STRENGTH_HOLDER_KEY, STRENGTH_ICON,
+                                this.createHealthHolderText(STRENGTH_HOLDER_KEY, STRENGTH_ICON,
                                     (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE)
                                 )
                             );
@@ -380,8 +380,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     /**
      * Constructs text that is displayed below a statistic.
      */
-    public Text createHeartHolderText(String key, Text icon, float health) {
-        return Text.translatable(key, icon, this.formatHearts(health)).formatted(Formatting.GRAY);
+    public Text createHealthHolderText(String key, Text icon, float health) {
+        return Text.translatable(key, this.formatHearts(health), icon).formatted(Formatting.GRAY);
     }
 
     /**
