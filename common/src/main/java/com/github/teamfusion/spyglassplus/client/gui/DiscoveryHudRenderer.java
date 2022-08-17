@@ -44,6 +44,7 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.RaycastContext;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -387,24 +388,34 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * Retrieves the entity that the camera is looking at.
      */
     public Entity raycast(Entity camera, float tickDelta, double distance) {
-        HitResult hit = camera.raycast(distance, tickDelta, false);
+        // calculate a position vector from the camera's rotation
+        Vec2f rotation = this.getRotation(camera, tickDelta);
+        Vec3d vector = ((EntityInvoker) camera).invokeGetRotationVector(rotation.y, rotation.x);
+
+        // calculate minimum and maximum points of raycast
         Vec3d min = camera.getCameraPosVec(tickDelta);
+        Vec3d max = min.add(vector.x * distance, vector.y * distance, vector.z * distance);
+
+        // grab default hit result
+        HitResult hit = camera.world.raycast(new RaycastContext(min, max, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, camera));
         if (hit != null) distance = hit.getPos().squaredDistanceTo(min);
 
-        Vec2f rotation = this.getRotation(camera, tickDelta);
-        Vec3d rotationVector = ((EntityInvoker) camera).invokeGetRotationVector(rotation.y, rotation.x);
-        Vec3d max = min.add(rotationVector.x * distance, rotationVector.y * distance, rotationVector.z * distance);
+        // calculate entity hit result
+        Box net = camera.getBoundingBox().stretch(vector.multiply(distance)).expand(1.0F);
+        EntityHitResult entityHit = this.raycast(camera, min, max, net, this::isVisibleToRaycast, distance);
 
-        Box box = camera.getBoundingBox().stretch(rotationVector.multiply(distance)).expand(1.0F);
-        EntityHitResult entityHit = this.raycast(camera, min, max, box, entity -> !entity.isSpectator() && entity.canHit() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY), distance);
         if (entityHit != null) {
             Entity entity = entityHit.getEntity();
             Vec3d pos = entityHit.getPos();
-            double distanceTo = min.squaredDistanceTo(pos);
-            if (distanceTo < distance || hit == null) return entity;
+            double entityDistance = min.squaredDistanceTo(pos);
+            if (entityDistance < distance || hit == null) return entity;
         }
 
         return null;
+    }
+
+    public boolean isVisibleToRaycast(Entity entity) {
+        return !entity.isSpectator() && entity.canHit() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY);
     }
 
     /**
