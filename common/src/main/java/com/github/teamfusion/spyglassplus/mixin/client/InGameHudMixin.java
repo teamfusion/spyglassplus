@@ -54,6 +54,14 @@ public abstract class InGameHudMixin implements InGameHudAccess {
     }
 
     /**
+     * Cancels rendering off the crosshair when using binoculars.
+     */
+    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
+    private void onRenderCrosshair(MatrixStack matrices, CallbackInfo ci) {
+        if (this.client.getCameraEntity() instanceof ScopingEntity scoping && scoping.getScopingStack().getItem() instanceof BinocularsItem) ci.cancel();
+    }
+
+    /**
      * Renders HUD for {@link SpyglassPlusEnchantments#DISCOVERY}.
      */
     @Inject(
