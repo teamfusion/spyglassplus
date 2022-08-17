@@ -104,7 +104,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public static final float
         EYE_BLINK_FREQUENCY = 0.0075F,
         EYE_BLINK_SPEED = 0.15F,
-        BLACK_OPACITY = 1 - 0.2F;
+        BLACK_OPACITY = 0.2F;
 
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final TextRenderer textRenderer = this.client.textRenderer;
