@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.test.client;
 
 import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
+import com.github.teamfusion.spyglassplus.client.event.BinocularsHudOverlayRenderEvent;
 import com.github.teamfusion.spyglassplus.client.event.DiscoveryHudRenderEvent;
 import dev.architectury.event.EventResult;
 import net.fabricmc.api.ClientModInitializer;
@@ -26,6 +27,11 @@ public class SpyglassPlusClientTest implements ClientModInitializer, SpyglassPlu
             client.player.sendMessage(Text.literal(String.format(
                 "Closing: %s | %.2f", discoveryHud.isEyeClosing() ? "Y" : "N", discoveryHud.getEyePhase()
             )), true);
+        });
+
+        BinocularsHudOverlayRenderEvent.PRE.register((binocularsOverlay, scale, scaledWidth, scaledHeight) -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+            return client.player.hasStatusEffect(StatusEffects.UNLUCK) ? EventResult.interruptFalse() : EventResult.pass();
         });
     }
 }

@@ -26,7 +26,7 @@ public abstract class ForgeGuiMixin extends InGameHud implements InGameHudAccess
 
     /**
      * Renders HUD for {@link SpyglassPlusEnchantments#DISCOVERY}.
-     * @implNote Does not use Forge's events for simplier access to {@link #getDiscoveryHud()} and {@link #client this.client}.
+     * @implNote Does not use Forge's events for simplier access to {@link #getDiscoveryHudRenderer()} and {@link #client this.client}.
      */
     @Inject(
         method = "lambda$render$0",
@@ -37,6 +37,6 @@ public abstract class ForgeGuiMixin extends InGameHud implements InGameHudAccess
         )
     )
     private void onRender(MatrixStack matrices, float tickDelta, NamedGuiOverlay overlay, CallbackInfo ci) {
-        if (overlay == VanillaGuiOverlay.SPYGLASS.type()) DiscoveryHudRenderer.render(this.getDiscoveryHud(), matrices, tickDelta, this.client.getCameraEntity());
+        if (overlay == VanillaGuiOverlay.SPYGLASS.type()) DiscoveryHudRenderer.render(this.getDiscoveryHudRenderer(), matrices, tickDelta, this.client.getCameraEntity());
     }
 }

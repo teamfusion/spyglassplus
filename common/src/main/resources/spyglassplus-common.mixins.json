@@ -18,13 +18,18 @@
     "client.EntityRendererMixin",
     "client.GameRendererMixin",
     "client.InGameHudMixin",
+    "client.ItemEntityRendererMixin",
+    "client.ItemModelsMixin",
+    "client.ItemRendererMixin",
     "client.KeyBindingInvoker",
     "client.LightmapTextureManagerMixin",
     "client.LivingEntityMixin",
     "client.LivingEntityRendererMixin",
     "client.MinecraftClientMixin",
+    "client.ModelLoaderMixin",
     "client.ModelPredicateProviderRegistryMixin",
     "client.MouseMixin",
+    "client.PlayerHeldItemFeatureRendererMixin",
     "client.WorldRendererMixin"
   ],
   "injectors": {

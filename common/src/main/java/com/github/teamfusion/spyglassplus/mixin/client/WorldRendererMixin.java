@@ -39,7 +39,7 @@ public abstract class WorldRendererMixin {
     @Shadow private int regularEntityCount;
 
     @Shadow protected abstract boolean canDrawEntityOutlines();
-    @Shadow protected abstract void renderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers);
+    @Shadow protected abstract void renderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertices);
 
     /**
      * Carries spoofed bl4 across afterRenderEntities to beforeTryRenderOutlines.
