@@ -12,6 +12,7 @@
     "SpyglassItemMixin"
   ],
   "client": [
+    "client.BipedEntityModelMixin",
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
