@@ -232,13 +232,16 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             if (this.openProgress > 0.5F) {
                 if (hasRenderBox) {
+                    // draw entity
                     int entityX = (int) centerX;
                     int entityY = y + boxHeight - 15;
-                    EntityDimensions base = EntityDimensions.fixed(1.0F, 1.0F);
-                    EntityDimensions edim = type.getDimensions();
-                    this.drawEntity(entityX, entityY, edim.width / base.width, edim.height / base.height, 40, this.activeEntity);
+                    EntityDimensions baseDimensions = EntityDimensions.fixed(2.0F, 2.0F);
+                    EntityDimensions entityDimensions = type.getDimensions();
+                    float scale = entityDimensions.height > baseDimensions.height ? 1 / entityDimensions.height / baseDimensions.height : 1;
+                    this.drawEntity(entityX, entityY, scale, scale, 30, this.activeEntity);
                 }
 
+                // draw entity name
                 Text text = Optional.of(this.activeEntity.getDisplayName()).filter(t -> this.textRenderer.getWidth(t) < 90)
                                     .orElseGet(() -> Text.translatable(type.getTranslationKey()));
                 int textWidth = this.textRenderer.getWidth(text);
@@ -413,8 +416,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         MatrixStack matricesSub = new MatrixStack();
         matricesSub.translate(0.0, 0.0, 1000.0);
 
-        float xyScale = Math.min(xScale, yScale);
-        matricesSub.scale(xyScale * scale, xyScale * scale, scale);
+        matricesSub.scale(xScale * scale, yScale * scale, scale);
 
         Quaternion yawQuaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f);
         Quaternion rotationQuaternion = Vec3f.POSITIVE_X.getDegreesQuaternion(pitchOffset * 20.0f);
