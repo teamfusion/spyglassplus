@@ -106,6 +106,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         EYE_BLINK_SPEED = 0.15F,
         BLACK_OPACITY = 0.2F;
 
+    public static final EntityDimensions BASE_RENDER_BOX_DIMENSIONS = EntityDimensions.fixed(2.0F, 2.0F);
+
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final TextRenderer textRenderer = this.client.textRenderer;
     private final Random random = Random.create();
@@ -235,9 +237,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     // draw entity
                     int entityX = (int) centerX;
                     int entityY = y + boxHeight - 15;
-                    EntityDimensions baseDimensions = EntityDimensions.fixed(2.0F, 2.0F);
                     EntityDimensions entityDimensions = type.getDimensions();
-                    float scale = entityDimensions.height > baseDimensions.height ? 1 / entityDimensions.height / baseDimensions.height : 1;
+                    float scale = entityDimensions.height > BASE_RENDER_BOX_DIMENSIONS.height ? 1 / (entityDimensions.height / BASE_RENDER_BOX_DIMENSIONS.height) : 1;
                     this.drawEntity(entityX, entityY, scale, scale, 30, this.activeEntity);
                 }
 
