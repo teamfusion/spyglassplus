@@ -1,0 +1,42 @@
+{
+  "mod.spyglassplus.name": "I C U MORE",
+  "mod.spyglassplus.contact.discord": "Discawd",
+
+  "itemGroup.spyglassplus.item_group": "I C U MORE",
+
+  "text.spyglassplus.discovery_hud.behavior": "%s Behavwa",
+  "text.spyglassplus.discovery_hud.behavior.type.passive": "idc",
+  "text.spyglassplus.discovery_hud.behavior.type.neutral": "hmmm",
+  "text.spyglassplus.discovery_hud.behavior.type.hostile": "grrr",
+  "text.spyglassplus.discovery_hud.behavior.type.boss": "big bad",
+
+  "text.spyglassplus.discovery_hud.health": "%s helth",
+
+  "text.spyglassplus.discovery_hud.strength": "%s powah",
+
+  "entity.spyglassplus.spyglass_stand": "3 leg hooman c u",
+
+  "item.spyglassplus.binoculars": "I C U x 2",
+  "item.spyglassplus.binoculars.spyglassplus.local_scrutiny_level_tooltip": "zoomies: -%s",
+  "item.spyglassplus.spyglass_stand": "3 leg hooman c u",
+  "item.spyglassplus.spyglass_stand.small": "3 leg baby hooman c u",
+
+  "item.minecraft.spyglass.spyglassplus.local_scrutiny_level_tooltip": "zoomies: -%s",
+
+  "subtitles.item.spyglassplus.binoculars.use": "now i can c u",
+  "subtitles.item.spyglassplus.binoculars.stop_using": "i cnt c u anymoar",
+  "subtitles.item.spyglassplus.binoculars.adjust": "tryna c u",
+  "subtitles.item.spyglassplus.binoculars.reset_adjust": "I C U THA BEST",
+
+  "subtitles.item.spyglassplus.spyglass.adjust": "tryna c u",
+  "subtitles.item.spyglassplus.spyglass.reset_adjust": "I C U THA BEST",
+  "subtitles.entity.spyglassplus.spyglass_stand.fall": "Sumthign fell",
+  "subtitles.entity.spyglassplus.spyglass_stand.shrink": "tiny!!!",
+  "subtitles.entity.spyglassplus.spyglass_stand.enlarge": "HOOG!!!",
+
+  "enchantment.spyglassplus.discovery": "spy mode",
+  "enchantment.spyglassplus.indicate": "shiny ⭐",
+  "enchantment.spyglassplus.illuminate": "cat vishun when i c u",
+  "enchantment.spyglassplus.scrutiny": "zooooom",
+  "enchantment.spyglassplus.command": "CAT ARMY"
+}
