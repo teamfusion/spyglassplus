@@ -452,7 +452,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         float pitch = entity.getPitch();
         Text customName = entity.getCustomName();
 
-        this.client.setCameraEntity(entity);
+        this.client.cameraEntity = entity;
         float renderYaw = 180.0f + yawOffset * 40.0f;
         float renderPitch = -pitchOffset * 20.0f;
         entity.setYaw(renderYaw);
@@ -473,7 +473,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         immediate.draw();
 
         dispatcher.setRenderShadows(true);
-        this.client.setCameraEntity(camera);
+        this.client.cameraEntity = camera;
         entity.setYaw(yaw);
         entity.setPitch(pitch);
         entity.setCustomName(customName);
