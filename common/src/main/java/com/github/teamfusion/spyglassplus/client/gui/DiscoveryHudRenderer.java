@@ -37,6 +37,7 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.TagKey;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -53,6 +54,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -75,6 +77,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * A translation key.
      */
     public static final String
+        DOTS_KEY            = translate("dots"),
+
         HEALTH_KEY          = translate("health"),
         HEALTH_ICON_KEY     = HEALTH_KEY + ".icon",
         HEALTH_HOLDER_KEY   = HEALTH_KEY + ".holder",
@@ -91,13 +95,14 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public static final Style DISCOVERY_FONT_STYLE = Style.EMPTY.withFont(DISCOVERY_FONT).withFormatting(Formatting.RED);
 
     public static final Text
+        DOTS_TEXT = Text.translatable(DOTS_KEY),
         BEHAVIOR_ICON = Text.translatable(BEHAVIOR_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
         HEALTH_ICON = Text.translatable(HEALTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
         STRENGTH_ICON = Text.translatable(STRENGTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE);
 
     public static final int
-        BOX_WIDTH = 97, BOX_HEIGHT = 124,
-        TITLE_BOX_WIDTH = 97, TITLE_BOX_HEIGHT = 32,
+        BOX_WIDTH = 109, BOX_HEIGHT = 124,
+        TITLE_BOX_WIDTH = BOX_WIDTH, TITLE_BOX_HEIGHT = 32,
         EYE_WIDTH = 20, EYE_HEIGHT = 16, EYE_PHASES = 5,
         RIGHT_SIDEBAR_TEXT_BORDER_SIZE = 4;
 
@@ -205,7 +210,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             int boxWidth = hasRenderBox ? BOX_WIDTH : TITLE_BOX_WIDTH;
             int boxHeight = hasRenderBox ? BOX_HEIGHT : TITLE_BOX_HEIGHT;
 
-            int x = 14;
             int y = halfHeight - (boxHeight / 2);
 
             /* Setup */
@@ -217,7 +221,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             matrices.push();
 
-            double centerX = x + (boxWidth / 2d);
+            int leftX = 10;
+            double centerX = leftX + (boxWidth / 2d);
             matrices.translate(centerX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerX, -halfHeight, 0.0D);
@@ -227,7 +232,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             // box
             RenderSystem.setShaderTexture(0, ICONS_TEXTURE);
-            this.drawTexture(matrices, x, y, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
+            this.drawTexture(matrices, leftX, y, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
 
             int eyeTextureVOffset = floor(clamp(this.eyePhase, 0.0F, 1.0F) * (EYE_PHASES - 1)) * EYE_HEIGHT;
             this.drawTexture(matrices, (int) (centerX - (EYE_WIDTH / 2d)) + 1, y + 3, boxWidth, eyeTextureVOffset, EYE_WIDTH, EYE_HEIGHT);
@@ -236,17 +241,14 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 if (hasRenderBox) {
                     // draw entity
                     int entityX = (int) centerX;
-                    int entityY = y + boxHeight - 15;
+                    int entityY = y + boxHeight - 18;
                     EntityDimensions entityDimensions = type.getDimensions();
                     float scale = entityDimensions.height > BASE_RENDER_BOX_DIMENSIONS.height ? 1 / (entityDimensions.height / BASE_RENDER_BOX_DIMENSIONS.height) : 1;
                     this.drawEntity(entityX, entityY, scale, scale, 30, this.activeEntity);
                 }
 
                 // draw entity name
-                Text text = Optional.of(this.activeEntity.getDisplayName()).filter(t -> this.textRenderer.getWidth(t) < 90)
-                                    .orElseGet(() -> Text.translatable(type.getTranslationKey()));
-                int textWidth = this.textRenderer.getWidth(text);
-                this.drawText(matrices, text, (int) (x + (boxWidth / 2f) - (textWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
+                this.drawTrimmedCentredText(matrices, this.activeEntity.getDisplayName(), 90, (int) (leftX + (boxWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
             }
 
             matrices.pop();
@@ -255,7 +257,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             matrices.push();
 
-            double centerRightX = this.scaledWidth - x;
+            int rightX = 13;
+            double centerRightX = this.scaledWidth - rightX;
             matrices.translate(centerRightX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerRightX, -halfHeight, 0.0D);
@@ -267,7 +270,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     Text behaviorText = EntityBehavior.getText(this.activeEntity);
                     if (behaviorText != null) {
                         int behaviorY = halfHeight - (textHeight * 3) - 1;
-                        this.drawTextClusterFromRight(matrices, x + 1, behaviorY,
+                        this.drawTextClusterFromRight(matrices, rightX, behaviorY,
                             Text.translatable(BEHAVIOR_KEY, BEHAVIOR_ICON),
                             Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText, BEHAVIOR_ICON).formatted(Formatting.GRAY)
                         );
@@ -278,7 +281,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     if (level >= 3) {
                         // health
                         float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;
-                        this.drawTextClusterFromRight(matrices, x + 1, halfHeight, ((Float.isNaN(hurt) ? 0 : hurt) * (1 - BLACK_OPACITY)) + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
+                        this.drawTextClusterFromRight(matrices, rightX, halfHeight, ((Float.isNaN(hurt) ? 0 : hurt) * (1 - BLACK_OPACITY)) + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
                             Text.translatable(HEALTH_KEY, HEALTH_ICON),
                             this.createHealthHolderText(HEALTH_HOLDER_KEY, HEALTH_ICON, livingEntity.getHealth())
                         );
@@ -286,7 +289,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                         if (livingEntity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE) != null) {
                             // strength
                             int strengthY = halfHeight + (textHeight * 3) + 1;
-                            this.drawTextClusterFromRight(matrices, x + 1, strengthY,
+                            this.drawTextClusterFromRight(matrices, rightX, strengthY,
                                 Text.translatable(STRENGTH_KEY, STRENGTH_ICON),
                                 this.createHealthHolderText(STRENGTH_HOLDER_KEY, STRENGTH_ICON,
                                     (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE)
@@ -313,8 +316,27 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         return false;
     }
 
-    public void drawText(MatrixStack matrices, Text text, int x, int y) {
-        this.textRenderer.draw(matrices, text, x, y, 0x000000);
+    public void drawTrimmedCentredText(MatrixStack matrices, Text text, int maxWidth, int x, int y) {
+        List<OrderedText> wrapped = this.textRenderer.wrapLines(text, maxWidth);
+        if (wrapped.size() > 1) { // the text has been wrapped
+            // calculate dots
+            int dotsWidth = this.textRenderer.getWidth(DOTS_TEXT);
+
+            // wrap text again, accounting for dots
+            List<OrderedText> newWrapped = this.textRenderer.wrapLines(text, maxWidth - dotsWidth);
+            OrderedText orderedText = newWrapped.get(0);
+            int textWidth = this.textRenderer.getWidth(orderedText);
+
+            // draw text and dots
+            int width = textWidth + dotsWidth;
+            this.textRenderer.draw(matrices, orderedText, (int) (x - (width / 2f)), y, 0x000000);
+            this.textRenderer.draw(matrices, DOTS_TEXT, (int) (x - (width / 2f) + textWidth), y, 0x000000);
+        } else {
+            // the text wasn't wrapped, draw normally
+            OrderedText orderedText = wrapped.get(0);
+            int width = this.textRenderer.getWidth(orderedText);
+            this.textRenderer.draw(matrices, orderedText, (int) (x - (width / 2f)), y, 0x000000);
+        }
     }
 
     /**
@@ -503,7 +525,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     }
 
     public boolean isVisibleToRaycast(Entity entity) {
-        return !entity.isSpectator() && entity.canHit() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY);
+        return !entity.isSpectator() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY);
     }
 
     /**

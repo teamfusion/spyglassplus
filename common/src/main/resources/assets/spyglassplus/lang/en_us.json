@@ -4,6 +4,8 @@
 
   "itemGroup.spyglassplus.item_group": "Spyglass+",
 
+  "text.spyglassplus.discovery_hud.dots": "...",
+
   "text.spyglassplus.discovery_hud.behavior": "%s Behavior",
   "text.spyglassplus.discovery_hud.behavior.icon": "\uD83E\uDDE0",
   "text.spyglassplus.discovery_hud.behavior.holder": "%s",
