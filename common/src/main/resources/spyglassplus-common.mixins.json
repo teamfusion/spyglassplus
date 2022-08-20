@@ -4,12 +4,14 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
-    "EntityInvoker",
     "ItemGroupMixin",
     "ItemMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
-    "SpyglassItemMixin"
+    "SpyglassItemMixin",
+    "access.EntityInvoker",
+    "access.EntityTrackerAccessor",
+    "access.ThreadedAnvilChunkStorageAccessor"
   ],
   "client": [
     "client.BipedEntityModelMixin",
@@ -23,7 +25,6 @@
     "client.ItemEntityRendererMixin",
     "client.ItemModelsMixin",
     "client.ItemRendererMixin",
-    "client.KeyBindingInvoker",
     "client.LightmapTextureManagerMixin",
     "client.LivingEntityMixin",
     "client.LivingEntityRendererMixin",
@@ -32,7 +33,8 @@
     "client.ModelPredicateProviderRegistryMixin",
     "client.MouseMixin",
     "client.PlayerHeldItemFeatureRendererMixin",
-    "client.WorldRendererMixin"
+    "client.WorldRendererMixin",
+    "client.access.KeyBindingInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

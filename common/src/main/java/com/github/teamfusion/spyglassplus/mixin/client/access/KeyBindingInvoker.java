@@ -1,4 +1,4 @@
-package com.github.teamfusion.spyglassplus.mixin.client;
+package com.github.teamfusion.spyglassplus.mixin.client.access;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

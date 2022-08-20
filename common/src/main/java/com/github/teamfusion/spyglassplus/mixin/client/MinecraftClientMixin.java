@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
+import com.github.teamfusion.spyglassplus.mixin.client.access.KeyBindingInvoker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

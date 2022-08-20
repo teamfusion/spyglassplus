@@ -13,12 +13,12 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 /**
  * Responsible for rendering the HUD overlay for {@link SpyglassPlusItems#BINOCULARS}.
@@ -90,13 +90,13 @@ public class BinocularsOverlayRenderer {
     /**
      * Modifies inventory-based binocular renders to the correct model in mixins.
      */
-    public static void modifyRenderItemArgs(Args args) {
-        ItemStack stack = args.get(0);
-        ModelTransformation.Mode mode = args.get(1);
+    public static BakedModel modifyRenderItem(ItemStack stack, ModelTransformation.Mode mode) {
         boolean isInventory = mode == ModelTransformation.Mode.GUI || mode == ModelTransformation.Mode.GROUND || mode == ModelTransformation.Mode.FIXED;
         if (isInventory && stack.getItem() instanceof BinocularsItem) {
             BakedModelManager models = MinecraftClient.getInstance().getBakedModelManager();
-            args.set(7, models.getModel(INVENTORY_MODEL_ID));
+            return models.getModel(INVENTORY_MODEL_ID);
         }
+
+        return null;
     }
 }

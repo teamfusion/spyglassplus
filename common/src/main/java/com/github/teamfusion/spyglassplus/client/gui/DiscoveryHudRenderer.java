@@ -1,12 +1,13 @@
 package com.github.teamfusion.spyglassplus.client.gui;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
+import com.github.teamfusion.spyglassplus.client.entity.LivingEntityClientAccess;
 import com.github.teamfusion.spyglassplus.client.event.DiscoveryHudRenderEvent;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.DiscoveryHudEntitySetup;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.SpyglassStandEntity;
-import com.github.teamfusion.spyglassplus.mixin.EntityInvoker;
+import com.github.teamfusion.spyglassplus.mixin.access.EntityInvoker;
 import com.github.teamfusion.spyglassplus.mixin.client.InGameHudMixin;
 import com.github.teamfusion.spyglassplus.tag.SpyglassPlusEntityTypeTags;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -25,6 +26,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.StatusEffectSpriteManager;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -33,6 +36,8 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -60,6 +65,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static net.minecraft.client.gui.screen.ingame.HandledScreen.*;
 import static net.minecraft.util.math.MathHelper.*;
 
 // TODO fix scaling
@@ -179,7 +185,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         Entity targeted = this.raycast(camera, tickDelta, 64.0D);
         if (this.activeEntity != null) {
-            EntityType<?> type = this.activeEntity.getType();
+            EntityType<?> entityType = this.activeEntity.getType();
 
             if (!this.client.isPaused()) {
                 float lastFrameDuration = this.client.getLastFrameDuration();
@@ -206,11 +212,12 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             int halfHeight = window.getScaledHeight() / 2;
             int textHeight = this.textRenderer.fontHeight;
 
+            boolean renderStats = !entityType.isIn(SpyglassPlusEntityTypeTags.IGNORE_STATS_DISCOVERY);
             boolean hasRenderBox = this.hasRenderBox(this.activeEntity);
             int boxWidth = hasRenderBox ? BOX_WIDTH : TITLE_BOX_WIDTH;
             int boxHeight = hasRenderBox ? BOX_HEIGHT : TITLE_BOX_HEIGHT;
 
-            int y = halfHeight - (boxHeight / 2);
+            int boxTopY = halfHeight - (boxHeight / 2);
 
             /* Setup */
 
@@ -222,33 +229,49 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             matrices.push();
 
             int leftX = 10;
-            double centerX = leftX + (boxWidth / 2d);
-            matrices.translate(centerX, halfHeight, 0.0D);
+            double centerLeftX = leftX + (boxWidth / 2d);
+            matrices.translate(centerLeftX, halfHeight, 0.0D);
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
-            matrices.translate(-centerX, -halfHeight, 0.0D);
+            matrices.translate(-centerLeftX, -halfHeight, 0.0D);
 
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.openProgress);
 
             // box
             RenderSystem.setShaderTexture(0, ICONS_TEXTURE);
-            this.drawTexture(matrices, leftX, y, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
+            this.drawTexture(matrices, leftX, boxTopY, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
 
             int eyeTextureVOffset = floor(clamp(this.eyePhase, 0.0F, 1.0F) * (EYE_PHASES - 1)) * EYE_HEIGHT;
-            this.drawTexture(matrices, (int) (centerX - (EYE_WIDTH / 2d)) + 1, y + 3, boxWidth, eyeTextureVOffset, EYE_WIDTH, EYE_HEIGHT);
+            this.drawTexture(matrices, (int) (centerLeftX - (EYE_WIDTH / 2d)) + 1, boxTopY + 3, boxWidth, eyeTextureVOffset, EYE_WIDTH, EYE_HEIGHT);
 
             if (this.openProgress > 0.5F) {
                 if (hasRenderBox) {
                     // draw entity
-                    int entityX = (int) centerX;
-                    int entityY = y + boxHeight - 18;
-                    EntityDimensions entityDimensions = type.getDimensions();
+                    int entityX = (int) centerLeftX;
+                    int entityY = boxTopY + boxHeight - 18;
+                    EntityDimensions entityDimensions = entityType.getDimensions();
                     float scale = entityDimensions.height > BASE_RENDER_BOX_DIMENSIONS.height ? 1 / (entityDimensions.height / BASE_RENDER_BOX_DIMENSIONS.height) : 1;
                     this.drawEntity(entityX, entityY, scale, scale, 30, this.activeEntity);
                 }
 
                 // draw entity name
-                this.drawTrimmedCentredText(matrices, this.activeEntity.getDisplayName(), 90, (int) (leftX + (boxWidth / 2f)) + 1, (int) (y + 14 + (textHeight / 2f)) + 1);
+                this.drawTrimmedCentredText(matrices, this.activeEntity.getDisplayName(), 90, (int) (leftX + (boxWidth / 2f)) + 1, (int) (boxTopY + 14 + (textHeight / 2f)) + 1);
+            }
+
+            if (renderStats) {
+                if (level >= 3) {
+                    if (this.activeEntity instanceof LivingEntity livingEntity) {
+                        // effects
+                        List<StatusEffectInstance> effects = ((LivingEntityClientAccess) livingEntity).getEffects();
+
+                        List<StatusEffectInstance> beneficial = effects.stream().filter(effect -> effect.getEffectType().isBeneficial()).toList();
+                        List<StatusEffectInstance> notBeneficial = effects.stream().filter(effect -> !effect.getEffectType().isBeneficial()).toList();
+
+                        int y = boxTopY + BOX_HEIGHT + 1;
+                        this.renderStatusEffects(matrices, beneficial, leftX, y, 0);
+                        this.renderStatusEffects(matrices, notBeneficial, leftX, y, beneficial.isEmpty() ? 0 : 25);
+                    }
+                }
             }
 
             matrices.pop();
@@ -264,7 +287,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             matrices.translate(-centerRightX, -halfHeight, 0.0D);
 
             // stats
-            if (!type.isIn(SpyglassPlusEntityTypeTags.IGNORE_STATS_DISCOVERY)) {
+            if (renderStats) {
                 if (level >= 2) {
                     // behavior
                     Text behaviorText = EntityBehavior.getText(this.activeEntity);
@@ -277,8 +300,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     }
                 }
 
-                if (this.activeEntity instanceof LivingEntity livingEntity) {
-                    if (level >= 3) {
+                if (level >= 3) {
+                    if (this.activeEntity instanceof LivingEntity livingEntity) {
                         // health
                         float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;
                         this.drawTextClusterFromRight(matrices, rightX, halfHeight, ((Float.isNaN(hurt) ? 0 : hurt) * (1 - BLACK_OPACITY)) + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
@@ -314,6 +337,73 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         if (targeted != null) this.activeEntity = targeted;
 
         return false;
+    }
+
+    public void renderStatusEffects(MatrixStack matrices, List<StatusEffectInstance> effects, int rawX, int rawY, int yOffset) {
+        if (!effects.isEmpty()) {
+            int count = effects.size();
+            float xOffset = Math.max(6, count > 4 ? (BOX_WIDTH - 3f) / count : 25);
+
+            RenderSystem.enableBlend();
+
+            StatusEffectSpriteManager sprites = this.client.getStatusEffectSpriteManager();
+            for (int i = 0, l = effects.size(); i < l; i++) {
+                StatusEffectInstance effect = effects.get(i);
+                StatusEffect type = effect.getEffectType();
+
+                int duration = effect.getDuration();
+                float alpha = 1.0f;
+                if (duration <= 200) {
+                    int m = 10 - duration / 20;
+                    alpha = clamp(duration / 10f / 5 * 0.5f, 0.0f, 0.5f)
+                        + (cos(duration * (float) Math.PI / 5.0f) * clamp(m / 10f * 0.25f, 0.0f, 0.25f));
+                }
+
+                float x = rawX + (xOffset * i);
+                int y = rawY + yOffset;
+
+                RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
+                this.drawTexture(matrices, x, y, 141, 166, 24, 24);
+
+                Sprite sprite = sprites.getSprite(type);
+                RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
+                int size = 18;
+                this.drawSprite(matrices, x + 3, y + 3, this.getZOffset(), size, size, sprite);
+
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+
+            RenderSystem.disableBlend();
+        }
+    }
+
+    public void drawTexture(MatrixStack matrices, float x, float y, int u, int v, int width, int height) {
+        this.drawTexture(matrices, x, y, this.getZOffset(), (float)u, (float)v, width, height, 256, 256);
+    }
+
+    public void drawTexture(MatrixStack matrices, float x, float y, float z, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+        this.drawTexture(matrices, x, x + width, y, y + height, z, width, height, u, v, textureWidth, textureHeight);
+    }
+
+    public void drawTexture(MatrixStack matrices, float x0, float x1, float y0, float y1, float z, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight) {
+        this.drawTexturedQuad(matrices, x0, x1, y0, y1, z, (u + 0.0F) / (float)textureWidth, (u + (float)regionWidth) / (float)textureWidth, (v + 0.0F) / (float)textureHeight, (v + (float)regionHeight) / (float)textureHeight);
+    }
+
+    public void drawSprite(MatrixStack matrices, float x, float y, float z, int width, int height, Sprite sprite) {
+        this.drawTexturedQuad(matrices, x, x + width, y, y + height, z, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+    }
+
+    public void drawTexturedQuad(MatrixStack matrices, float x0, float x1, float y0, float y1, float z, float u0, float u1, float v0, float v1) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        buffer.vertex(matrix, x0, y1, z).texture(u0, v1).next();
+        buffer.vertex(matrix, x1, y1, z).texture(u1, v1).next();
+        buffer.vertex(matrix, x1, y0, z).texture(u1, v0).next();
+        buffer.vertex(matrix, x0, y0, z).texture(u0, v0).next();
+        BufferRenderer.drawWithShader(buffer.end());
     }
 
     public void drawTrimmedCentredText(MatrixStack matrices, Text text, int maxWidth, int x, int y) {

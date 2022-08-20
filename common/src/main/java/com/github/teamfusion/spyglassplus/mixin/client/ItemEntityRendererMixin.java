@@ -10,6 +10,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
+import java.util.Optional;
+
 /**
  * Replaces the inventory model for {@link SpyglassPlusItems#BINOCULARS}.
  */
@@ -24,6 +26,6 @@ public abstract class ItemEntityRendererMixin {
         )
     )
     private void onRender(Args args) {
-        BinocularsOverlayRenderer.modifyRenderItemArgs(args);
+        Optional.ofNullable(BinocularsOverlayRenderer.modifyRenderItem(args.get(0), args.get(1))).ifPresent(model -> args.set(7, model));
     }
 }

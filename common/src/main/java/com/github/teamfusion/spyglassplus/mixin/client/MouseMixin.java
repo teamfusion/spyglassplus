@@ -59,7 +59,7 @@ public class MouseMixin {
             int before = ISpyglass.getLocalScrutinyLevel(stack);
             int delta = (int) this.eventDeltaWheel;
             if (item.adjustScrutiny(stack, level, delta) != before) {
-                NetworkManager.sendToServer(ISpyglass.UPDATE_LOCAL_SCRUTINY_PACKET, Util.make(new PacketByteBuf(Unpooled.buffer()), buf -> buf.writeInt(delta)));
+                NetworkManager.sendToServer(ISpyglass.LOCAL_SCRUTINY_PACKET_ID, Util.make(new PacketByteBuf(Unpooled.buffer()), buf -> buf.writeInt(delta)));
                 player.playSound(item.getAdjustSound(), 1.0F, 1.0F);
                 this.eventDeltaWheel = 0;
             }
@@ -90,7 +90,7 @@ public class MouseMixin {
             if (level > 0) {
                 int before = ISpyglass.getLocalScrutinyLevel(stack);
                 if (item.adjustScrutiny(stack, level, 0) != before) {
-                    NetworkManager.sendToServer(ISpyglass.UPDATE_LOCAL_SCRUTINY_PACKET, Util.make(new PacketByteBuf(Unpooled.buffer()), buf -> buf.writeInt(0)));
+                    NetworkManager.sendToServer(ISpyglass.LOCAL_SCRUTINY_PACKET_ID, Util.make(new PacketByteBuf(Unpooled.buffer()), buf -> buf.writeInt(0)));
                     this.client.player.playSound(item.getResetAdjustSound(), 1.0F, 1.0F);
                 }
 

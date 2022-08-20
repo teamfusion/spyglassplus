@@ -1,4 +1,4 @@
-package com.github.teamfusion.spyglassplus.mixin;
+package com.github.teamfusion.spyglassplus.mixin.access;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
