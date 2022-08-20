@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[41,)"
 issueTrackerURL = "https://github.com/teamfusion/spyglassplus/issues"
-license = "Mit (Code); All Rights Reserved (Assets)"
+license = "MIT (Code); All Rights Reserved (Assets)"
 
 [[mods]]
 modId = "spyglassplus"
