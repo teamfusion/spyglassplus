@@ -19,6 +19,7 @@
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
     "client.EndCrystalEntityMixin",
+    "client.EntityMixin",
     "client.EntityRendererMixin",
     "client.GameRendererMixin",
     "client.InGameHudMixin",

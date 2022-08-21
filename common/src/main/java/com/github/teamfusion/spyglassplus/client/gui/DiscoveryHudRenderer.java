@@ -77,6 +77,8 @@ import static net.minecraft.util.math.MathHelper.*;
 @SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
 public class DiscoveryHudRenderer extends DrawableHelper {
+    private static DiscoveryHudRenderer INSTANCE;
+
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
 
     /**
@@ -131,6 +133,11 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     protected Entity activeEntity;
 
     /**
+     * The entity at the player's crosshair. May not be equal to {@link #activeEntity}.
+     */
+    protected Entity targetedEntity;
+
+    /**
      * How open the discovery HUD is, similar to spyglassScale in {@link InGameHud}.
      */
     protected float openProgress;
@@ -147,12 +154,19 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     protected boolean eyeClosing;
 
     public DiscoveryHudRenderer() {
+        INSTANCE = this;
+    }
+
+    public static DiscoveryHudRenderer getInstance() {
+        return INSTANCE;
     }
 
     /**
      * @see InGameHudMixin
      */
     public static void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera) {
+        discoveryHud.targetedEntity = discoveryHud.raycast(camera, tickDelta, 64.0D);
+
         if (DiscoveryHudRenderEvent.PRE.invoker().render(discoveryHud, matrices, tickDelta, camera).isFalse()) return;
 
         if (discoveryHud.render(matrices, tickDelta, camera)) {
@@ -183,7 +197,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.DISCOVERY.get(), stack);
         if (!(level > 0)) return false;
 
-        Entity targeted = this.raycast(camera, tickDelta, 64.0D);
         if (this.activeEntity != null) {
             EntityType<?> entityType = this.activeEntity.getType();
 
@@ -204,7 +217,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 }
 
                 // opening
-                this.openProgress = lerp(0.5F * lastFrameDuration, this.openProgress, targeted == null ? 0.0F : 1.0F);
+                this.openProgress = lerp(0.5F * lastFrameDuration, this.openProgress, this.targetedEntity == null ? 0.0F : 1.0F);
             }
 
             Window window = this.client.getWindow();
@@ -329,14 +342,16 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             RenderSystem.disableBlend();
 
-            if (targeted != null) this.activeEntity = targeted;
-
+            this.syncTargetedEntityToActive();
             return true;
         }
 
-        if (targeted != null) this.activeEntity = targeted;
-
+        this.syncTargetedEntityToActive();
         return false;
+    }
+
+    protected void syncTargetedEntityToActive() {
+        if (this.targetedEntity != null) this.activeEntity = this.targetedEntity;
     }
 
     public void renderStatusEffects(MatrixStack matrices, List<StatusEffectInstance> effects, int rawX, int rawY, int yOffset) {
@@ -667,6 +682,10 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
     public Entity getActiveEntity() {
         return this.activeEntity;
+    }
+
+    public Entity getTargetedEntity() {
+        return this.targetedEntity;
     }
 
     public float getOpenProgress() {
