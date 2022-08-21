@@ -8,6 +8,7 @@ import com.github.teamfusion.spyglassplus.entity.DiscoveryHudEntitySetup;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.SpyglassStandEntity;
 import com.github.teamfusion.spyglassplus.mixin.access.EntityInvoker;
+import com.github.teamfusion.spyglassplus.mixin.client.EntityMixin;
 import com.github.teamfusion.spyglassplus.mixin.client.InGameHudMixin;
 import com.github.teamfusion.spyglassplus.tag.SpyglassPlusEntityTypeTags;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -72,7 +73,10 @@ import static net.minecraft.util.math.MathHelper.*;
 
 /**
  * Responsible for rendering the HUD elements created by {@link SpyglassPlusEnchantments#DISCOVERY}.
- * @see InGameHudMixin
+ * Responsible also for calculating {@link #targetedEntity}, used for {@link SpyglassPlusEnchantments#INDICATE}.
+ *
+ * @see InGameHudMixin implementation of render
+ * @see EntityMixin implementation of targetedEntity
  */
 @SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
@@ -165,10 +169,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * @see InGameHudMixin
      */
     public static void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera) {
-        discoveryHud.targetedEntity = discoveryHud.raycast(camera, tickDelta, 64.0D);
-
-        if (DiscoveryHudRenderEvent.PRE.invoker().render(discoveryHud, matrices, tickDelta, camera).isFalse()) return;
-
         if (discoveryHud.render(matrices, tickDelta, camera)) {
             DiscoveryHudRenderEvent.POST.invoker().render(discoveryHud, matrices, tickDelta, camera);
         } else {
@@ -190,8 +190,13 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public boolean render(MatrixStack matrices, float tickDelta, Entity camera) {
         if (!this.client.options.getPerspective().isFirstPerson() || !(camera instanceof ScopingEntity scopingEntity) || !scopingEntity.isScoping()) {
             this.activeEntity = null;
+            this.targetedEntity = null;
             return false;
         }
+
+        this.targetedEntity = this.raycast(camera, tickDelta, 64.0D);
+
+        if (DiscoveryHudRenderEvent.PRE.invoker().render(this, matrices, tickDelta, camera).isFalse()) return false;
 
         ItemStack stack = scopingEntity.getScopingStack();
         int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.DISCOVERY.get(), stack);
