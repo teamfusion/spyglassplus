@@ -279,11 +279,19 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             if (renderStats) {
                 if (level >= 3) {
                     if (this.activeEntity instanceof LivingEntity livingEntity) {
-                        // effects
-                        List<StatusEffectInstance> effects = ((LivingEntityClientAccess) livingEntity).getEffects();
+                        // `effects`
+                        List<StatusEffectInstance> effects = ((LivingEntityClientAccess) livingEntity).getEffects()
+                                                                                                      .stream()
+                                                                                                      .filter(StatusEffectInstance::shouldShowIcon)
+                                                                                                      .toList();
 
-                        List<StatusEffectInstance> beneficial = effects.stream().filter(effect -> effect.getEffectType().isBeneficial()).toList();
-                        List<StatusEffectInstance> notBeneficial = effects.stream().filter(effect -> !effect.getEffectType().isBeneficial()).toList();
+                        List<StatusEffectInstance> beneficial = effects.stream()
+                                                                       .filter(effect -> effect.getEffectType().isBeneficial())
+                                                                       .toList();
+
+                        List<StatusEffectInstance> notBeneficial = effects.stream()
+                                                                          .filter(effect -> !effect.getEffectType().isBeneficial())
+                                                                          .toList();
 
                         int y = boxTopY + BOX_HEIGHT + 1;
                         this.renderStatusEffects(matrices, beneficial, leftX, y, 0);
