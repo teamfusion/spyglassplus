@@ -2,13 +2,13 @@ package com.github.teamfusion.spyglassplus.client;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.client.model.entity.SpyglassPlusEntityModelLayers;
+import com.github.teamfusion.spyglassplus.client.network.SpyglassPlusClientNetworking;
 import com.github.teamfusion.spyglassplus.client.render.entity.SpyglassStandEntityRenderer;
 import com.github.teamfusion.spyglassplus.entity.SpyglassPlusEntityType;
 import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import com.github.teamfusion.spyglassplus.mixin.client.ModelPredicateProviderRegistryMixin;
 import com.google.common.reflect.Reflection;
 import dev.architectury.event.events.client.ClientTooltipEvent;
-import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,7 +26,6 @@ public interface SpyglassPlusClient extends SpyglassPlus {
         EntityRendererRegistry.register(SpyglassPlusEntityType.SPYGLASS_STAND, SpyglassStandEntityRenderer::new);
 
         ClientTooltipEvent.ITEM.register(ISpyglass::appendLocalScrutinyLevelTooltip);
-
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, ISpyglass.EFFECTS_UPDATE_PACKET_ID, ISpyglass::updateDiscoveryEntityEffectsFromServer);
+        SpyglassPlusClientNetworking.registerReceivers();
     }
 }

@@ -1,45 +1,28 @@
 package com.github.teamfusion.spyglassplus.item;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
-import com.github.teamfusion.spyglassplus.client.entity.LivingEntityClientAccess;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
-import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import com.github.teamfusion.spyglassplus.sound.SpyglassPlusSoundEvents;
-import dev.architectury.networking.NetworkManager.PacketContext;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public interface ISpyglass {
     String
         LOCAL_SCRUTINY_LEVEL_KEY = "LocalScrutinyLevel",
         EFFECTS_KEY = "Effects";
-
-    Identifier
-        LOCAL_SCRUTINY_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_local_scrutiny"),
-        EFFECTS_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_active_effects");
 
     default boolean isSpyglassEnchantable(ItemStack stack) {
         return true;
@@ -104,42 +87,5 @@ public interface ISpyglass {
                 }
             }
         }
-    }
-
-    /**
-     * Receives a local scrutiny update from the client and updates the server.
-     */
-    static void updateLocalScrutinyFromClient(PacketByteBuf buf, PacketContext context) {
-        PlayerEntity player = context.getPlayer();
-        ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
-        if (scopingPlayer.isScoping()) {
-            ItemStack stack = scopingPlayer.getScopingStack();
-            if (stack.getItem() instanceof ISpyglass item) {
-                int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.SCRUTINY.get(), stack);
-                if (level > 0) {
-                    int delta = buf.readInt();
-                    item.adjustScrutiny(stack, level, delta);
-                }
-            }
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    static void updateDiscoveryEntityEffectsFromServer(PacketByteBuf buf, PacketContext context) {
-        int id = buf.readInt();
-        NbtCompound nbt = buf.readNbt();
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.execute(() -> {
-            if (client.world.getEntityById(id) instanceof LivingEntity livingEntity) {
-                NbtList nbtEffects = nbt.getList(EFFECTS_KEY, NbtElement.COMPOUND_TYPE);
-                List<StatusEffectInstance> list = new ArrayList<>();
-                nbtEffects.stream()
-                          .filter(NbtCompound.class::isInstance)
-                          .map(NbtCompound.class::cast)
-                          .map(StatusEffectInstance::fromNbt)
-                          .forEach(list::add);
-                ((LivingEntityClientAccess) livingEntity).setEffects(Collections.unmodifiableList(list));
-            }
-        });
     }
 }

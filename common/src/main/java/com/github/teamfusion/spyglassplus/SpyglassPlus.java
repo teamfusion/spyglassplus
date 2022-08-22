@@ -4,12 +4,10 @@ import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.enchantment.target.SpyglassPlusEnchantmentTargets;
 import com.github.teamfusion.spyglassplus.entity.SpyglassPlusEntityType;
-import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import com.github.teamfusion.spyglassplus.item.SpyglassPlusItems;
+import com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking;
 import com.github.teamfusion.spyglassplus.sound.SpyglassPlusSoundEvents;
 import com.google.common.reflect.Reflection;
-import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.NetworkManager.Side;
 import dev.architectury.utils.EnvExecutor;
 import net.fabricmc.api.EnvType;
 import org.slf4j.Logger;
@@ -33,7 +31,8 @@ public interface SpyglassPlus {
 
         SpyglassPlusEntityType.postRegister();
 
-        NetworkManager.registerReceiver(Side.C2S, ISpyglass.LOCAL_SCRUTINY_PACKET_ID, ISpyglass::updateLocalScrutinyFromClient);
+        SpyglassPlusNetworking.registerReceivers();
+
         EnvExecutor.runInEnv(EnvType.CLIENT, () -> SpyglassPlusClient::commonClientInitialize);
     }
 }
