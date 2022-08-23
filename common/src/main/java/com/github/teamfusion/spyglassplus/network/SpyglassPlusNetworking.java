@@ -15,7 +15,8 @@ import net.minecraft.util.Identifier;
 public interface SpyglassPlusNetworking {
     Identifier
         LOCAL_SCRUTINY_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_local_scrutiny"),
-        EFFECTS_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_active_effects");
+        EFFECTS_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_active_effects"),
+        INDICATE_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "indicate_update_packet_id");
 
     static void registerReceivers() {
         NetworkManager.registerReceiver(Side.C2S, LOCAL_SCRUTINY_PACKET_ID, SpyglassPlusNetworking::onLocalScrutinyUpdate);

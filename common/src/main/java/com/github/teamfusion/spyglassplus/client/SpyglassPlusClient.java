@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.client;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
+import com.github.teamfusion.spyglassplus.client.entity.IndicateTargetManager;
 import com.github.teamfusion.spyglassplus.client.model.entity.SpyglassPlusEntityModelLayers;
 import com.github.teamfusion.spyglassplus.client.network.SpyglassPlusClientNetworking;
 import com.github.teamfusion.spyglassplus.client.render.entity.SpyglassStandEntityRenderer;
@@ -16,6 +17,8 @@ import net.fabricmc.api.Environment;
 @SuppressWarnings("UnstableApiUsage")
 @Environment(EnvType.CLIENT)
 public interface SpyglassPlusClient extends SpyglassPlus {
+    IndicateTargetManager INDICATE_TARGET_MANAGER = new IndicateTargetManager();
+
     /**
      * @see ModelPredicateProviderRegistryMixin
      */

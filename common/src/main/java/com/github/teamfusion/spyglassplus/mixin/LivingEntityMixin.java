@@ -2,7 +2,6 @@ package com.github.teamfusion.spyglassplus.mixin;
 
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
-import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import com.github.teamfusion.spyglassplus.util.CommonPlayerLookup;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
@@ -27,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 
 import static com.github.teamfusion.spyglassplus.item.ISpyglass.*;
+import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.*;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -66,7 +66,7 @@ public abstract class LivingEntityMixin extends Entity {
                                   .stream()
                                   .filter(player -> EnchantmentHelper.getLevel(SpyglassPlusEnchantments.DISCOVERY.get(), player.getActiveItem()) > 0)
                                   .toList(),
-                ISpyglass.EFFECTS_UPDATE_PACKET_ID, buf
+                EFFECTS_UPDATE_PACKET_ID, buf
             );
         }
     }

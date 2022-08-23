@@ -7,10 +7,10 @@ import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.DiscoveryHudEntitySetup;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.SpyglassStandEntity;
-import com.github.teamfusion.spyglassplus.mixin.access.EntityInvoker;
 import com.github.teamfusion.spyglassplus.mixin.client.EntityMixin;
 import com.github.teamfusion.spyglassplus.mixin.client.InGameHudMixin;
 import com.github.teamfusion.spyglassplus.tag.SpyglassPlusEntityTypeTags;
+import com.github.teamfusion.spyglassplus.world.SpyglassRaycasting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -39,7 +39,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.TagKey;
@@ -48,16 +47,11 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.RaycastContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -194,7 +188,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             return false;
         }
 
-        this.targetedEntity = this.raycast(camera, tickDelta, 64.0D);
+        this.targetedEntity = SpyglassRaycasting.raycast(camera, this.getRotation(camera, tickDelta), tickDelta);
 
         if (DiscoveryHudRenderEvent.PRE.invoker().render(this, matrices, tickDelta, camera).isFalse()) return false;
 
@@ -610,83 +604,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         return camera instanceof SpyglassStandEntity stand
             ? new Vec2f(stand.getSpyglassYaw(tickDelta), stand.getSpyglassPitch(tickDelta))
             : new Vec2f(camera.getYaw(tickDelta), camera.getPitch(tickDelta));
-    }
-
-    /**
-     * Retrieves the entity that the camera is looking at.
-     */
-    public Entity raycast(Entity camera, float tickDelta, double distance) {
-        // calculate a position vector from the camera's rotation
-        Vec2f rotation = this.getRotation(camera, tickDelta);
-        Vec3d vector = ((EntityInvoker) camera).invokeGetRotationVector(rotation.y, rotation.x);
-
-        // calculate minimum and maximum points of raycast
-        Vec3d min = camera.getCameraPosVec(tickDelta);
-        Vec3d max = min.add(vector.x * distance, vector.y * distance, vector.z * distance);
-
-        // grab default hit result
-        HitResult hit = camera.world.raycast(new RaycastContext(min, max, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, camera));
-        if (hit != null) distance = hit.getPos().squaredDistanceTo(min);
-
-        // calculate entity hit result
-        Box net = camera.getBoundingBox().stretch(vector.multiply(distance)).expand(1.0F);
-        EntityHitResult entityHit = this.raycast(camera, min, max, net, this::isVisibleToRaycast, distance);
-
-        if (entityHit != null) {
-            Entity entity = entityHit.getEntity();
-            Vec3d pos = entityHit.getPos();
-            double entityDistance = min.squaredDistanceTo(pos);
-            if (entityDistance < distance || hit == null) return entity;
-        }
-
-        return null;
-    }
-
-    public boolean isVisibleToRaycast(Entity entity) {
-        return !entity.isSpectator() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY);
-    }
-
-    /**
-     * Modified and mapped version of {@link ProjectileUtil#raycast(Entity, Vec3d, Vec3d, Box, Predicate, double)}.
-     * <p>Modifies the result of {@link Entity#getTargetingMargin()}.</p>
-     */
-    public EntityHitResult raycast(Entity entity, Vec3d min, Vec3d max, Box box, Predicate<Entity> predicate, double distance) {
-        double runningDistance = distance;
-        Entity resultEntity = null;
-        Vec3d resultPos = null;
-
-        for (Entity candidate : entity.world.getOtherEntities(entity, box, predicate)) {
-            float margin = candidate.getTargetingMargin();
-            Box candidateBoundingBox = candidate.getBoundingBox().expand(
-                margin == 0.0F && !candidate.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_DISCOVERY)
-                    ? 0.175F : margin
-            );
-
-            Optional<Vec3d> optional = candidateBoundingBox.raycast(min, max);
-            if (candidateBoundingBox.contains(min)) {
-                if (!(runningDistance >= 0.0)) continue;
-                resultEntity = candidate;
-                resultPos = optional.orElse(min);
-                runningDistance = 0.0;
-                continue;
-            }
-
-            double squaredDistance;
-            Vec3d runningPos;
-            if (optional.isEmpty() || !((squaredDistance = min.squaredDistanceTo(runningPos = optional.get())) < runningDistance) && runningDistance != 0.0) continue;
-            if (candidate.getRootVehicle() == entity.getRootVehicle()) {
-                if (runningDistance != 0.0) continue;
-                resultEntity = candidate;
-                resultPos = runningPos;
-                continue;
-            }
-
-            resultEntity = candidate;
-            resultPos = runningPos;
-            runningDistance = squaredDistance;
-        }
-
-        return resultEntity == null ? null : new EntityHitResult(resultEntity, resultPos);
     }
 
     public static String translate(String suffix) {

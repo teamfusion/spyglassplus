@@ -1,6 +1,9 @@
 package com.github.teamfusion.spyglassplus.client.network;
 
+import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
+import com.github.teamfusion.spyglassplus.client.entity.IndicateTargetManager;
 import com.github.teamfusion.spyglassplus.client.entity.LivingEntityClientAccess;
+import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.NetworkManager.Side;
@@ -24,8 +27,25 @@ import static com.github.teamfusion.spyglassplus.item.ISpyglass.*;
 public interface SpyglassPlusClientNetworking extends SpyglassPlusNetworking {
     static void registerReceivers() {
         NetworkManager.registerReceiver(Side.S2C, EFFECTS_UPDATE_PACKET_ID, SpyglassPlusClientNetworking::onDiscoveryEffectsUpdate);
+        NetworkManager.registerReceiver(Side.S2C, INDICATE_UPDATE_PACKET_ID, SpyglassPlusClientNetworking::onIndicateUpdate);
     }
 
+    /**
+     * Receives an entity's updates for {@link SpyglassPlusEnchantments#INDICATE}.
+     */
+    static void onIndicateUpdate(PacketByteBuf buf, NetworkManager.PacketContext context) {
+        int oldId = buf.readInt();
+        int newId = buf.readInt();
+        if (newId != oldId) {
+            IndicateTargetManager targetManager = SpyglassPlusClient.INDICATE_TARGET_MANAGER;
+            targetManager.increment(newId);
+            targetManager.decrement(oldId);
+        }
+    }
+
+    /**
+     * Receives an entity's effects for {@link SpyglassPlusEnchantments#DISCOVERY}.
+     */
     static void onDiscoveryEffectsUpdate(PacketByteBuf buf, NetworkManager.PacketContext context) {
         int id = buf.readInt();
         NbtCompound nbt = buf.readNbt();

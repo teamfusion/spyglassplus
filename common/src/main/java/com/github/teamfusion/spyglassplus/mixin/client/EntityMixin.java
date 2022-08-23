@@ -1,5 +1,6 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
+import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
 import com.github.teamfusion.spyglassplus.client.gui.DiscoveryHudRenderer;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
@@ -31,7 +32,7 @@ public class EntityMixin {
             ItemStack stack = scopingEntity.getScopingStack();
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.INDICATE.get(), stack) > 0) {
                 Entity targeted = DiscoveryHudRenderer.getInstance().getTargetedEntity();
-                if (targeted == null || that != targeted) {
+                if ((that == null || that != targeted) && !SpyglassPlusClient.INDICATE_TARGET_MANAGER.isIndicated(that)) {
                     Color color = new Color(cir.getReturnValueI());
                     cir.setReturnValue(color.darker().darker().getRGB());
                 }
