@@ -22,6 +22,8 @@ public class ClientPlayerInteractionManagerMixin {
      */
     @Inject(method = "hasExperienceBar", at = @At("HEAD"), cancellable = true)
     private void onhasExperienceBar(CallbackInfoReturnable<Boolean> cir) {
-        if (this.client.player instanceof ScopingPlayer scoping && scoping.hasSpyglassStand()) cir.setReturnValue(false);
+        if (this.client.player instanceof ScopingPlayer scoping && scoping.hasSpyglassStand()) {
+            cir.setReturnValue(false);
+        }
     }
 }

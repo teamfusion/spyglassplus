@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.teamfusion.spyglassplus.item.ISpyglass.*;
+import static com.github.teamfusion.spyglassplus.item.ISpyglass.EFFECTS_KEY;
 
 @Environment(EnvType.CLIENT)
 public interface SpyglassPlusClientNetworking extends SpyglassPlusNetworking {

@@ -12,8 +12,9 @@ import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 
-import static com.github.teamfusion.spyglassplus.util.MathUtil.*;
-import static net.minecraft.client.render.entity.model.EntityModelPartNames.*;
+import static com.github.teamfusion.spyglassplus.util.MathUtil.DEGREES_TO_RADIANS;
+import static net.minecraft.client.render.entity.model.EntityModelPartNames.LEFT_LEG;
+import static net.minecraft.client.render.entity.model.EntityModelPartNames.RIGHT_LEG;
 
 @SuppressWarnings({ "unused", "FieldCanBeLocal" })
 @Environment(EnvType.CLIENT)

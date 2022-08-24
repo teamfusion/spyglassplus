@@ -43,7 +43,9 @@ public class SpyglassStandItem extends Item {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext usage) {
-        if (usage.getSide() == Direction.DOWN) return ActionResult.FAIL;
+        if (usage.getSide() == Direction.DOWN) {
+            return ActionResult.FAIL;
+        }
 
         EntityType<SpyglassStandEntity> type = SpyglassPlusEntityType.SPYGLASS_STAND.get();
         ItemPlacementContext placement = new ItemPlacementContext(usage);
@@ -52,12 +54,16 @@ public class SpyglassStandItem extends Item {
         World world = usage.getWorld();
         Vec3d vec = Vec3d.ofBottomCenter(pos);
         Box box = type.getDimensions().getBoxAt(vec.getX(), vec.getY(), vec.getZ());
-        if (!world.isSpaceEmpty(null, box) || !world.getOtherEntities(null, box).isEmpty()) return ActionResult.FAIL;
+        if (!world.isSpaceEmpty(null, box) || !world.getOtherEntities(null, box).isEmpty()) {
+            return ActionResult.FAIL;
+        }
 
         ItemStack stack = usage.getStack();
         if (world instanceof ServerWorld serverWorld) {
             SpyglassStandEntity entity = type.create(serverWorld, stack.getNbt(), null, usage.getPlayer(), pos, SpawnReason.SPAWN_EGG, true, true);
-            if (entity == null) return ActionResult.FAIL;
+            if (entity == null) {
+                return ActionResult.FAIL;
+            }
 
             float yaw = (float) MathHelper.floor((MathHelper.wrapDegrees(usage.getPlayerYaw()) + 22.5f) / 45.0f) * 45.0f;
             entity.setSpyglassYaw(yaw);
@@ -77,7 +83,7 @@ public class SpyglassStandItem extends Item {
             Direction direction = pointer.getBlockState().get(DispenserBlock.FACING);
             BlockPos pos = pointer.getPos().offset(direction);
             ServerWorld world = pointer.getWorld();
-            SpyglassStandEntity entity = new SpyglassStandEntity(world, (double)pos.getX() + 0.5, pos.getY(), (double)pos.getZ() + 0.5);
+            SpyglassStandEntity entity = new SpyglassStandEntity(world, (double) pos.getX() + 0.5, pos.getY(), (double) pos.getZ() + 0.5);
             EntityType.loadFromEntityNbt(world, null, entity, stack.getNbt());
             entity.setYaw(direction.asRotation());
             world.spawnEntity(entity);

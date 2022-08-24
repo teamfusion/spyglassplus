@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.*;
+import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.LOCAL_SCRUTINY_PACKET_ID;
 
 @Environment(EnvType.CLIENT)
 @Mixin(Mouse.class)
@@ -49,12 +49,18 @@ public class MouseMixin {
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
 
         Entity camera = this.client.getCameraEntity();
-        if (camera != player && camera instanceof ScopingEntity scoping && scoping.isScoping()) ci.cancel();
+        if (camera != player && camera instanceof ScopingEntity scoping && scoping.isScoping()) {
+            ci.cancel();
+        }
 
-        if (!this.client.options.getPerspective().isFirstPerson() || this.eventDeltaWheel == 0) return;
+        if (!this.client.options.getPerspective().isFirstPerson() || this.eventDeltaWheel == 0) {
+            return;
+        }
 
         ItemStack stack = scopingPlayer.getScopingStack();
-        if (!(stack.getItem() instanceof ISpyglass item)) return;
+        if (!(stack.getItem() instanceof ISpyglass item)) {
+            return;
+        }
 
         int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.SCRUTINY.get(), stack);
         if (level > 0) {
@@ -83,10 +89,14 @@ public class MouseMixin {
     )
     private void resetOnMiddleMouseClick(long window, int button, int action, int mods, CallbackInfo ci) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW.GLFW_PRESS) {
-            if (!this.client.options.getPerspective().isFirstPerson()) return;
+            if (!this.client.options.getPerspective().isFirstPerson()) {
+                return;
+            }
 
             ItemStack stack = this.client.getCameraEntity() instanceof ScopingEntity scoping ? scoping.getScopingStack() : ItemStack.EMPTY;
-            if (!(stack.getItem() instanceof ISpyglass item)) return;
+            if (!(stack.getItem() instanceof ISpyglass item)) {
+                return;
+            }
 
             int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.SCRUTINY.get(), stack);
             if (level > 0) {

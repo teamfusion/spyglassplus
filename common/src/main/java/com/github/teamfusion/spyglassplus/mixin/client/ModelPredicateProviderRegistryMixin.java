@@ -32,9 +32,7 @@ public abstract class ModelPredicateProviderRegistryMixin {
      */
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void onStaticInit(CallbackInfo ci) {
-        register(SpyglassPlusItems.SPYGLASS_STAND.get(), new Identifier(SpyglassPlus.MOD_ID, "small"),
-            (stack, world, entity, seed) -> SpyglassStandItem.isSmall(stack) ? 1 : 0
-        );
+        register(SpyglassPlusItems.SPYGLASS_STAND.get(), new Identifier(SpyglassPlus.MOD_ID, "small"), (stack, world, entity, seed) -> SpyglassStandItem.isSmall(stack) ? 1 : 0);
     }
 
     @Unique

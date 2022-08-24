@@ -23,6 +23,7 @@ public interface BinocularsHudOverlayRenderEvent {
     interface Pre {
         /**
          * Invoked before the binoculars overlay is rendered.
+         *
          * @return An {@link EventResult} determining the outcome of the event,
          *         the execution may be cancelled by the result.
          */

@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.github.teamfusion.spyglassplus.util.MathUtil.*;
+import static com.github.teamfusion.spyglassplus.util.MathUtil.DEGREES_TO_RADIANS;
 
 @Environment(EnvType.CLIENT)
 @Mixin(LivingEntityRenderer.class)

@@ -83,6 +83,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements ScopingP
      */
     @Inject(method = "isUsingSpyglass", at = @At("RETURN"), cancellable = true)
     private void onIsUsingSpyglass(CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValueZ() && !this.getScopingStack().isEmpty()) cir.setReturnValue(true);
+        if (!cir.getReturnValueZ() && !this.getScopingStack().isEmpty()) {
+            cir.setReturnValue(true);
+        }
     }
 }

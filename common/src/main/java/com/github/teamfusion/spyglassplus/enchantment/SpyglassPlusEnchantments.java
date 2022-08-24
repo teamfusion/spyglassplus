@@ -6,7 +6,8 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.util.registry.Registry;
 
-import static net.minecraft.enchantment.Enchantment.Rarity.*;
+import static net.minecraft.enchantment.Enchantment.Rarity.COMMON;
+import static net.minecraft.enchantment.Enchantment.Rarity.UNCOMMON;
 
 public interface SpyglassPlusEnchantments {
     DeferredRegister<Enchantment> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, Registry.ENCHANTMENT_KEY);

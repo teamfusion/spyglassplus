@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Collection;
 import java.util.Collections;
 
-import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.*;
+import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.INDICATE_UPDATE_PACKET_ID;
 
 @Mixin(Entity.class)
 public class EntityMixin {
@@ -34,15 +34,21 @@ public class EntityMixin {
      */
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickIndicate(CallbackInfo ci) {
-        if (this.world.isClient) return;
+        if (this.world.isClient) {
+            return;
+        }
 
         Entity that = (Entity) (Object) this;
         if (that instanceof ScopingEntity scoping) {
             if (scoping.isScoping()) {
                 ItemStack stack = scoping.getScopingStack();
-                if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.INDICATE.get(), stack) > 0) this.raycastAndSendIndicateUpdate(CommonPlayerLookup.tracking(that));
+                if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.INDICATE.get(), stack) > 0) {
+                    this.raycastAndSendIndicateUpdate(CommonPlayerLookup.tracking(that));
+                }
             } else {
-                if (this.lastIndicateEntityId != -1) this.sendIndicateUpdate(CommonPlayerLookup.tracking(that), -1);
+                if (this.lastIndicateEntityId != -1) {
+                    this.sendIndicateUpdate(CommonPlayerLookup.tracking(that), -1);
+                }
             }
         }
     }
@@ -68,7 +74,9 @@ public class EntityMixin {
         Entity that = (Entity) (Object) this;
         Entity entity = SpyglassRaycasting.raycast(that);
         int id = entity == null ? -1 : entity.getId();
-        if (this.lastIndicateEntityId != id) this.sendIndicateUpdate(tracking, id);
+        if (this.lastIndicateEntityId != id) {
+            this.sendIndicateUpdate(tracking, id);
+        }
         return id;
     }
 

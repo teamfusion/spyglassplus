@@ -25,8 +25,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 
-import static com.github.teamfusion.spyglassplus.item.ISpyglass.*;
-import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.*;
+import static com.github.teamfusion.spyglassplus.item.ISpyglass.EFFECTS_KEY;
+import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.EFFECTS_UPDATE_PACKET_ID;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -42,7 +42,9 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "isImmobile", at = @At("HEAD"), cancellable = true)
     private void onIsImmobile(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity that = (LivingEntity) (Object) this;
-        if (that instanceof ScopingPlayer scopingPlayer && scopingPlayer.hasSpyglassStand()) cir.setReturnValue(true);
+        if (that instanceof ScopingPlayer scopingPlayer && scopingPlayer.hasSpyglassStand()) {
+            cir.setReturnValue(true);
+        }
     }
 
     /**

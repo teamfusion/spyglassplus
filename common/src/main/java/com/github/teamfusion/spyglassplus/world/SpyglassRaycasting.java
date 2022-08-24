@@ -36,7 +36,9 @@ public interface SpyglassRaycasting {
 
         // grab default hit result
         HitResult hit = camera.world.raycast(new RaycastContext(min, max, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, camera));
-        if (hit != null) distance = hit.getPos().squaredDistanceTo(min);
+        if (hit != null) {
+            distance = hit.getPos().squaredDistanceTo(min);
+        }
 
         // calculate entity hit result
         Box net = camera.getBoundingBox().stretch(vector.multiply(distance)).expand(1.0F);
@@ -46,7 +48,9 @@ public interface SpyglassRaycasting {
             Entity entity = entityHit.getEntity();
             Vec3d pos = entityHit.getPos();
             double entityDistance = min.squaredDistanceTo(pos);
-            if (entityDistance < distance || hit == null) return entity;
+            if (entityDistance < distance || hit == null) {
+                return entity;
+            }
         }
 
         return null;
@@ -91,7 +95,9 @@ public interface SpyglassRaycasting {
 
             double squaredDistance;
             Vec3d runningPos;
-            if (optional.isEmpty() || !((squaredDistance = min.squaredDistanceTo(runningPos = optional.get())) < runningDistance) && runningDistance != 0.0) continue;
+            if (optional.isEmpty() || !((squaredDistance = min.squaredDistanceTo(runningPos = optional.get())) < runningDistance) && runningDistance != 0.0) {
+                continue;
+            }
             if (candidate.getRootVehicle() == entity.getRootVehicle()) {
                 if (runningDistance != 0.0) continue;
                 resultEntity = candidate;

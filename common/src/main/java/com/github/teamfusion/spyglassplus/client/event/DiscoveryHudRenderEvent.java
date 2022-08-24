@@ -25,6 +25,7 @@ public interface DiscoveryHudRenderEvent {
     interface Pre {
         /**
          * Invoked before the discovery HUD is rendered.
+         *
          * @return An {@link EventResult} determining the outcome of the event,
          *         the execution may be cancelled by the result.
          */

@@ -22,6 +22,7 @@ import net.minecraft.util.Identifier;
 
 /**
  * Responsible for rendering the HUD overlay for {@link SpyglassPlusItems#BINOCULARS}.
+ *
  * @see InGameHudMixin
  */
 @Environment(EnvType.CLIENT)
@@ -34,6 +35,19 @@ public class BinocularsOverlayRenderer {
     public BinocularsOverlayRenderer() {
     }
 
+    /**
+     * Modifies inventory-based binocular renders to the correct model in mixins.
+     */
+    public static BakedModel modifyRenderItem(ItemStack stack, ModelTransformation.Mode mode) {
+        boolean isInventory = mode == ModelTransformation.Mode.GUI || mode == ModelTransformation.Mode.GROUND || mode == ModelTransformation.Mode.FIXED;
+        if (isInventory && stack.getItem() instanceof BinocularsItem) {
+            BakedModelManager models = MinecraftClient.getInstance().getBakedModelManager();
+            return models.getModel(INVENTORY_MODEL_ID);
+        }
+
+        return null;
+    }
+
     public void render(float scale, int scaledWidth, int scaledHeight) {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
@@ -44,12 +58,12 @@ public class BinocularsOverlayRenderer {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         float ws;
-        float hs = ws = (float)Math.min(scaledWidth, scaledHeight);
-        float h = Math.min((float)scaledWidth / ws, (float)scaledHeight / hs) * scale;
+        float hs = ws = (float) Math.min(scaledWidth, scaledHeight);
+        float h = Math.min((float) scaledWidth / ws, (float) scaledHeight / hs) * scale;
         float hori = ws * h * 1.82F;
         float vert = hs * h * 0.95F;
-        float left = ((float)scaledWidth - hori) / 2.0f;
-        float top = ((float)scaledHeight - vert) / 2.0f;
+        float left = ((float) scaledWidth - hori) / 2.0f;
+        float top = ((float) scaledHeight - vert) / 2.0f;
         float right = left + hori;
         float bottom = top + vert;
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
@@ -85,18 +99,5 @@ public class BinocularsOverlayRenderer {
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-
-    /**
-     * Modifies inventory-based binocular renders to the correct model in mixins.
-     */
-    public static BakedModel modifyRenderItem(ItemStack stack, ModelTransformation.Mode mode) {
-        boolean isInventory = mode == ModelTransformation.Mode.GUI || mode == ModelTransformation.Mode.GROUND || mode == ModelTransformation.Mode.FIXED;
-        if (isInventory && stack.getItem() instanceof BinocularsItem) {
-            BakedModelManager models = MinecraftClient.getInstance().getBakedModelManager();
-            return models.getModel(INVENTORY_MODEL_ID);
-        }
-
-        return null;
     }
 }

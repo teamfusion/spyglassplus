@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static java.lang.Math.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 @Environment(EnvType.CLIENT)
 @Mixin(LightmapTextureManager.class)
@@ -29,7 +30,9 @@ public class LightmapTextureManagerMixin {
     @Inject(method = "getBrightness", at = @At("RETURN"), cancellable = true)
     private static void modifyBrightnessForIlluminate(DimensionType type, int lightLevel, CallbackInfoReturnable<Float> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (!client.options.getPerspective().isFirstPerson()) return;
+        if (!client.options.getPerspective().isFirstPerson()) {
+            return;
+        }
 
         if (client.getCameraEntity() instanceof ScopingEntity scoping) {
             ItemStack stack = scoping.getScopingStack();
@@ -37,7 +40,9 @@ public class LightmapTextureManagerMixin {
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.ILLUMINATE.get(), stack) > 0) {
                 long diff = time - lastOpenedSpyglassAt;
                 cir.setReturnValue(min(1.0F, max(cir.getReturnValueF(), diff / 1000f)));
-            } else lastOpenedSpyglassAt = time;
+            } else {
+                lastOpenedSpyglassAt = time;
+            }
         }
     }
 }

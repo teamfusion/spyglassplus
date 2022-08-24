@@ -8,6 +8,6 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public interface LivingEntityClientAccess {
-    void setEffects(List<StatusEffectInstance> effects);
     List<StatusEffectInstance> getEffects();
+    void setEffects(List<StatusEffectInstance> effects);
 }

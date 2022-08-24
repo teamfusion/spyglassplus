@@ -30,6 +30,8 @@ public abstract class CameraMixin {
         )
     )
     private void onUpdateRotation(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
-        if (focusedEntity instanceof SpyglassStandEntity spyglassStand) this.setRotation(spyglassStand.getSpyglassYaw(tickDelta), spyglassStand.getSpyglassPitch(tickDelta));
+        if (focusedEntity instanceof SpyglassStandEntity spyglassStand) {
+            this.setRotation(spyglassStand.getSpyglassYaw(tickDelta), spyglassStand.getSpyglassPitch(tickDelta));
+        }
     }
 }

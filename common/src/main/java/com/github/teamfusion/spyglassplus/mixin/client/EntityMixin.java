@@ -27,7 +27,9 @@ public abstract class EntityMixin {
      */
     @Inject(method = "getTeamColorValue", at = @At("RETURN"), cancellable = true)
     private void onGetTeamColorValue(CallbackInfoReturnable<Integer> cir) {
-        if (this.isGlowing()) return;
+        if (this.isGlowing()) {
+            return;
+        }
 
         Entity that = (Entity) (Object) this;
         MinecraftClient client = MinecraftClient.getInstance();

@@ -54,7 +54,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static net.minecraft.util.math.MathHelper.*;
+import static net.minecraft.util.math.MathHelper.clamp;
+import static net.minecraft.util.math.MathHelper.lerp;
 
 /**
  * @see SpyglassPlusEntityType#SPYGLASS_STAND
@@ -156,7 +157,9 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             maybePlayer.ifPresent(this::tickUser);
 
             if (!this.world.isClient && this.hasUser()) {
-                if (maybePlayer.isEmpty()) this.setUser(null);
+                if (maybePlayer.isEmpty()) {
+                    this.setUser(null);
+                }
             }
         }
     }
@@ -231,7 +234,9 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     @Environment(EnvType.CLIENT)
     public void useSpyglassClient(PlayerEntity player) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == player) client.setCameraEntity(this);
+        if (client.player == player) {
+            client.setCameraEntity(this);
+        }
     }
 
     /**
@@ -252,11 +257,15 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     @Environment(EnvType.CLIENT)
     public void stopUsingSpyglassClient(PlayerEntity player) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == player) client.setCameraEntity(player);
+        if (client.player == player) {
+            client.setCameraEntity(player);
+        }
     }
 
     public boolean isWithinUseRange(Entity entity) {
-        if (entity.distanceTo(this) > 3.0D) return false;
+        if (entity.distanceTo(this) > 3.0D) {
+            return false;
+        }
 
         Vec3d pos = entity.getPos();
         Vec3d rotationVec = this.getRotationVec(1.0F);
@@ -282,14 +291,18 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (this.world.isClient || this.isRemoved()) return false;
+        if (this.world.isClient || this.isRemoved()) {
+            return false;
+        }
 
         if (DamageSource.OUT_OF_WORLD.equals(source)) {
             this.kill();
             return false;
         }
 
-        if (this.isInvulnerableTo(source) || this.isInvisible() || this.isMarker()) return false;
+        if (this.isInvulnerableTo(source) || this.isInvisible() || this.isMarker()) {
+            return false;
+        }
 
         if (source.isExplosive()) {
             this.onBreak(source);
@@ -393,7 +406,9 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     @Override
     public void travel(Vec3d input) {
-        if (this.canClip()) super.travel(input);
+        if (this.canClip()) {
+            super.travel(input);
+        }
     }
 
     protected boolean canClip() {
@@ -420,8 +435,14 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     @Override
     public void onTrackedDataSet(TrackedData<?> data) {
-        if (SMALL.equals(data)) this.calculateDimensions();
-        if (MARKER.equals(data)) this.intersectionChecked = !this.isMarker();
+        if (SMALL.equals(data)) {
+            this.calculateDimensions();
+        }
+
+        if (MARKER.equals(data)) {
+            this.intersectionChecked = !this.isMarker();
+        }
+
         super.onTrackedDataSet(data);
     }
 
@@ -582,7 +603,11 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     @Override
     protected void tickCramming() {
         List<Entity> list = this.world.getOtherEntities(this, this.getBoundingBox(), RIDEABLE_MINECART_PREDICATE);
-        for (Entity entity : list) if (this.squaredDistanceTo(entity) <= 0.2) entity.pushAwayFrom(this);
+        for (Entity entity : list) {
+            if (this.squaredDistanceTo(entity) <= 0.2) {
+                entity.pushAwayFrom(this);
+            }
+        }
     }
 
     @Override
@@ -643,7 +668,9 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     @Environment(EnvType.CLIENT)
     public float getSpyglassYaw(float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (this.doesNotMatch(client.player)) return this.getSpyglassYaw();
+        if (this.doesNotMatch(client.player)) {
+            return this.getSpyglassYaw();
+        }
 
         if (tickDelta == 1.0f) return this.spyglassYaw;
         return lerp(tickDelta, this.prevSpyglassYaw, this.spyglassYaw);
@@ -660,7 +687,9 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     @Environment(EnvType.CLIENT)
     public float getSpyglassPitch(float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (this.doesNotMatch(client.player)) return this.getSpyglassPitch();
+        if (this.doesNotMatch(client.player)) {
+            return this.getSpyglassPitch();
+        }
 
         if (tickDelta == 1.0f) return this.spyglassPitch;
         return lerp(tickDelta, this.prevSpyglassPitch, this.spyglassPitch);

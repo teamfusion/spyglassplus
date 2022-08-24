@@ -42,19 +42,15 @@ public abstract class InGameHudMixin implements InGameHudAccess {
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
     private void renderBinocularsOverlay(float scale, CallbackInfo ci) {
         if (this.client.getCameraEntity() instanceof ScopingEntity scoping && scoping.getScopingStack().getItem() instanceof BinocularsItem) {
-            if (BinocularsHudOverlayRenderEvent.PRE.invoker().render(this.binocularsOverlayRenderer, scale, this.scaledWidth, this.scaledHeight).isFalse()) return;
+            if (BinocularsHudOverlayRenderEvent.PRE.invoker().render(this.binocularsOverlayRenderer, scale, this.scaledWidth, this.scaledHeight).isFalse()) {
+                return;
+            }
 
             this.binocularsOverlayRenderer.render(scale, this.scaledWidth, this.scaledHeight);
             BinocularsHudOverlayRenderEvent.POST.invoker().render(this.binocularsOverlayRenderer, scale, this.scaledWidth, this.scaledHeight);
             ci.cancel();
         }
     }
-
-    /* Cancels rendering off the crosshair when using binoculars.
-    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    private void onRenderCrosshair(MatrixStack matrices, CallbackInfo ci) {
-        if (this.client.getCameraEntity() instanceof ScopingEntity scoping && scoping.getScopingStack().getItem() instanceof BinocularsItem) ci.cancel();
-    }*/
 
     /**
      * Renders HUD for {@link SpyglassPlusEnchantments#DISCOVERY}.

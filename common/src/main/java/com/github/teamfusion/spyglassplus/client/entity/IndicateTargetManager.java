@@ -34,17 +34,23 @@ public class IndicateTargetManager {
 
     /**
      * Increments watchers.
+     *
      * @see SpyglassPlusClientNetworking#onIndicateUpdate(PacketByteBuf, NetworkManager.PacketContext)
      */
     public void increment(int id) {
-        if (id != -1) this.watchers.compute(id, (key, value) -> (value == null ? 0 : value) + 1);
+        if (id != -1) {
+            this.watchers.compute(id, (key, value) -> (value == null ? 0 : value) + 1);
+        }
     }
 
     /**
      * Decrements watchers.
+     *
      * @see SpyglassPlusClientNetworking#onIndicateUpdate(PacketByteBuf, NetworkManager.PacketContext)
      */
     public void decrement(int id) {
-        if (id != -1) this.watchers.compute(id, (key, value) -> Math.max(0, (value == null ? 0 : value) - 1));
+        if (id != -1) {
+            this.watchers.compute(id, (key, value) -> Math.max(0, (value == null ? 0 : value) - 1));
+        }
     }
 }

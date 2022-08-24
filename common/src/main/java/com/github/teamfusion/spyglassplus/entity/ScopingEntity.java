@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 
 /**
  * An interface implemented into entities that can scope.
+ *
  * @see ScopingPlayer ScopingPlayer, its player extension
  * @see PlayerEntityMixin
  * @see SpyglassStandEntity

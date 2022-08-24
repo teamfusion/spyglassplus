@@ -66,7 +66,9 @@ public abstract class WorldRendererMixin {
         Matrix4f positionMatrix2, boolean hasCapturedFrustum, Frustum frustum, float viewDistance,
         boolean thickFog, boolean renderOutline, VertexConsumerProvider.Immediate immediate
     ) {
-        if (!this.shouldForceRenderPlayer()) return;
+        if (!this.shouldForceRenderPlayer()) {
+            return;
+        }
 
         // reimplemented entity renderer from WorldRenderer#render
         Entity entity = this.client.player;
@@ -90,7 +92,9 @@ public abstract class WorldRendererMixin {
             int g = teamColor >> 8  & 0xFF;
             int b = teamColor       & 0xFF;
             outlineVertices.setColor(r, g, b, 0xFF);
-        } else vertex = immediate;
+        } else {
+            vertex = immediate;
+        }
 
         this.renderEntity(entity, x, y, z, tickDelta, matrices, vertex);
     }
@@ -114,7 +118,9 @@ public abstract class WorldRendererMixin {
         Matrix4f positionMatrix2, boolean hasCapturedFrustum, Frustum frustum, float viewDistance,
         boolean thickFog, boolean renderOutline
     ) {
-        if (!this.shouldForceRenderPlayer()) return;
+        if (!this.shouldForceRenderPlayer()) {
+            return;
+        }
 
         if (!renderOutline && this.renderOutline) {
             this.entityOutlineShader.render(tickDelta);
@@ -126,7 +132,9 @@ public abstract class WorldRendererMixin {
 
     @Unique
     private boolean shouldForceRenderPlayer() {
-        if (Platform.isForge()) return false;
+        if (Platform.isForge()) {
+            return false;
+        }
 
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(this.client.player);
         return scopingPlayer.hasSpyglassStand() && !this.client.options.getPerspective().isFirstPerson();

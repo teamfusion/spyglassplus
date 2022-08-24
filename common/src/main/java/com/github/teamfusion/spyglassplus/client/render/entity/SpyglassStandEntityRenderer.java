@@ -14,8 +14,10 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3f;
+
+import static java.lang.Math.PI;
+import static net.minecraft.util.math.MathHelper.sin;
 
 @Environment(EnvType.CLIENT)
 public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends EntityRenderer<T> {
@@ -46,8 +48,10 @@ public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends 
         matrices.scale(-1.0f, -1.0f, 1.0f);
         matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-180f));
 
-        float shake = (float)(entity.world.getTime() - entity.getLastHitTime()) + tickDelta;
-        if (shake < 5.0f) matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.sin(shake / 1.5f * (float)Math.PI) * 3.0f));
+        float shake = (float) (entity.world.getTime() - entity.getLastHitTime()) + tickDelta;
+        if (shake < 5.0f) {
+            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(sin((shake / 1.5f) * (float) PI) * 3.0f));
+        }
 
         matrices.translate(0.0, -1.501f, 0.0);
 
@@ -58,15 +62,21 @@ public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends 
         // render spyglass, with glint conditionally
         SpyglassStandEntityModel<T> spyglassModel = this.getModel(entity, true);
         this.render(spyglassModel, layer, alpha, entity, tickDelta, matrices, vertices, light);
-        if (entity.getSpyglassStack().hasEnchantments()) this.render(spyglassModel, RenderLayer.getEntityGlint(), alpha, entity, tickDelta, matrices, vertices, light);
+        if (entity.getSpyglassStack().hasEnchantments()) {
+            this.render(spyglassModel, RenderLayer.getEntityGlint(), alpha, entity, tickDelta, matrices, vertices, light);
+        }
 
         matrices.pop();
 
-        if (this.hasLabel(entity)) this.renderLabelIfPresent(entity, entity.getDisplayName(), matrices, vertices, light);
+        if (this.hasLabel(entity)) {
+            this.renderLabelIfPresent(entity, entity.getDisplayName(), matrices, vertices, light);
+        }
     }
 
     public void render(SpyglassStandEntityModel<T> model, RenderLayer layer, float alpha, T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertices, int light) {
-        if (layer == null) return;
+        if (layer == null) {
+            return;
+        }
 
         model.riding = entity.hasVehicle();
         model.child = entity.isSmall();
@@ -85,8 +95,7 @@ public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends 
     }
 
     public SpyglassStandEntityModel<T> getModel(T entity, boolean spyglass) {
-        if (entity.isSmall()) return spyglass ? this.spyglassModelSmall : this.modelSmall;
-        return spyglass ? this.spyglassModel : this.model;
+        return entity.isSmall() ? (spyglass ? this.spyglassModelSmall : this.modelSmall) : (spyglass ? this.spyglassModel : this.model);
     }
 
     public RenderLayer getRenderLayer(T entity, Identifier texture, boolean showBody, boolean translucent, boolean showOutline) {

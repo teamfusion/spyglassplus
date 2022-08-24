@@ -60,8 +60,15 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static net.minecraft.client.gui.screen.ingame.HandledScreen.*;
-import static net.minecraft.util.math.MathHelper.*;
+import static java.lang.Math.PI;
+import static java.lang.Math.atan;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
+import static net.minecraft.client.gui.screen.ingame.HandledScreen.BACKGROUND_TEXTURE;
+import static net.minecraft.util.math.MathHelper.clamp;
+import static net.minecraft.util.math.MathHelper.cos;
+import static net.minecraft.util.math.MathHelper.floor;
+import static net.minecraft.util.math.MathHelper.lerp;
 
 // TODO fix scaling
 
@@ -190,11 +197,15 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         this.targetedEntity = SpyglassRaycasting.raycast(camera, this.getRotation(camera, tickDelta), tickDelta);
 
-        if (DiscoveryHudRenderEvent.PRE.invoker().render(this, matrices, tickDelta, camera).isFalse()) return false;
+        if (DiscoveryHudRenderEvent.PRE.invoker().render(this, matrices, tickDelta, camera).isFalse()) {
+            return false;
+        }
 
         ItemStack stack = scopingEntity.getScopingStack();
         int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.DISCOVERY.get(), stack);
-        if (!(level > 0)) return false;
+        if (!(level > 0)) {
+            return false;
+        }
 
         if (this.activeEntity != null) {
             EntityType<?> entityType = this.activeEntity.getType();
@@ -203,9 +214,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 float lastFrameDuration = this.client.getLastFrameDuration();
 
                 // eye
-                float delta = this.eyePhase < 0
-                    ? this.random.nextFloat() * EYE_BLINK_FREQUENCY
-                    : 1.0F / (EYE_BLINK_SPEED * 20);
+                float delta = this.eyePhase < 0 ? this.random.nextFloat() * EYE_BLINK_FREQUENCY : 1.0F / (EYE_BLINK_SPEED * 20);
 
                 this.eyePhase = this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration));
 
@@ -279,13 +288,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                                                                                                       .filter(StatusEffectInstance::shouldShowIcon)
                                                                                                       .toList();
 
-                        List<StatusEffectInstance> beneficial = effects.stream()
-                                                                       .filter(effect -> effect.getEffectType().isBeneficial())
-                                                                       .toList();
-
-                        List<StatusEffectInstance> notBeneficial = effects.stream()
-                                                                          .filter(effect -> !effect.getEffectType().isBeneficial())
-                                                                          .toList();
+                        List<StatusEffectInstance> beneficial = effects.stream().filter(effect -> effect.getEffectType().isBeneficial()).toList();
+                        List<StatusEffectInstance> notBeneficial = effects.stream().filter(effect -> !effect.getEffectType().isBeneficial()).toList();
 
                         int y = boxTopY + BOX_HEIGHT + 1;
                         this.renderStatusEffects(matrices, beneficial, leftX, y, 0);
@@ -358,13 +362,15 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     }
 
     protected void syncTargetedEntityToActive() {
-        if (this.targetedEntity != null) this.activeEntity = this.targetedEntity;
+        if (this.targetedEntity != null) {
+            this.activeEntity = this.targetedEntity;
+        }
     }
 
     public void renderStatusEffects(MatrixStack matrices, List<StatusEffectInstance> effects, int rawX, int rawY, int yOffset) {
         if (!effects.isEmpty()) {
             int count = effects.size();
-            float xOffset = Math.max(6, count > 4 ? (BOX_WIDTH - 3f) / count : 25);
+            float xOffset = max(6, count > 4 ? (BOX_WIDTH - 3f) / count : 25);
 
             RenderSystem.enableBlend();
 
@@ -377,8 +383,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 float alpha = 1.0f;
                 if (duration <= 200) {
                     int m = 10 - duration / 20;
-                    alpha = clamp(duration / 10f / 5 * 0.5f, 0.0f, 0.5f)
-                        + (cos(duration * (float) Math.PI / 5.0f) * clamp(m / 10f * 0.25f, 0.0f, 0.25f));
+                    alpha = clamp(duration / 10f / 5 * 0.5f, 0.0f, 0.5f) + (cos((duration * (float) PI) / 5.0f) * clamp((m / 10f) * 0.25f, 0.0f, 0.25f));
                 }
 
                 float x = rawX + (xOffset * i);
@@ -401,7 +406,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     }
 
     public void drawTexture(MatrixStack matrices, float x, float y, int u, int v, int width, int height) {
-        this.drawTexture(matrices, x, y, this.getZOffset(), (float)u, (float)v, width, height, 256, 256);
+        this.drawTexture(matrices, x, y, this.getZOffset(), (float) u, (float) v, width, height, 256, 256);
     }
 
     public void drawTexture(MatrixStack matrices, float x, float y, float z, float u, float v, int width, int height, int textureWidth, int textureHeight) {
@@ -409,7 +414,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     }
 
     public void drawTexture(MatrixStack matrices, float x0, float x1, float y0, float y1, float z, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight) {
-        this.drawTexturedQuad(matrices, x0, x1, y0, y1, z, (u + 0.0F) / (float)textureWidth, (u + (float)regionWidth) / (float)textureWidth, (v + 0.0F) / (float)textureHeight, (v + (float)regionHeight) / (float)textureHeight);
+        this.drawTexturedQuad(matrices, x0, x1, y0, y1, z, (u + 0.0F) / (float) textureWidth, (u + (float) regionWidth) / (float) textureWidth, (v + 0.0F) / (float) textureHeight, (v + (float) regionHeight) / (float) textureHeight);
     }
 
     public void drawSprite(MatrixStack matrices, float x, float y, float z, int width, int height, Sprite sprite) {
@@ -505,10 +510,10 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(matrix, (float)x1, (float)y2, 0.0F).color(r, g, b, alpha).next();
-        bufferBuilder.vertex(matrix, (float)x2, (float)y2, 0.0F).color(r, g, b, alpha).next();
-        bufferBuilder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(r, g, b, alpha).next();
-        bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(r, g, b, alpha).next();
+        bufferBuilder.vertex(matrix, (float) x1, (float) y2, 0.0F).color(r, g, b, alpha).next();
+        bufferBuilder.vertex(matrix, (float) x2, (float) y2, 0.0F).color(r, g, b, alpha).next();
+        bufferBuilder.vertex(matrix, (float) x2, (float) y1, 0.0F).color(r, g, b, alpha).next();
+        bufferBuilder.vertex(matrix, (float) x1, (float) y1, 0.0F).color(r, g, b, alpha).next();
         BufferRenderer.drawWithShader(bufferBuilder.end());
 
         RenderSystem.enableTexture();
@@ -526,7 +531,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * Transforms a given health value into its representation as hearts, to 2 decimal places.
      */
     public String formatHearts(double health) {
-        return String.format("%.1f", 0.5D * Math.round(health));
+        return String.format("%.1f", 0.5D * round(health));
     }
 
     /**
@@ -538,8 +543,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
     @SuppressWarnings("deprecation")
     public void drawEntity(int x, int y, float xScale, float yScale, int scale, Entity entity) {
-        float yawOffset = (float) Math.atan(-300 / 40.0f);
-        float pitchOffset = (float) Math.atan(0 / 40.0f);
+        float yawOffset = (float) atan(-300 / 40.0f);
+        float pitchOffset = (float) atan(0 / 40.0f);
 
         MatrixStack matrices = RenderSystem.getModelViewStack();
         matrices.push();
@@ -572,7 +577,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         entity.setCustomName(null);
 
         NbtCompound setupNbt = new NbtCompound();
-        if (entity instanceof DiscoveryHudEntitySetup setup) setup.setupBeforeDiscoveryHud(setupNbt, renderYaw, renderPitch, yawOffset, pitchOffset);
+        if (entity instanceof DiscoveryHudEntitySetup setup) {
+            setup.setupBeforeDiscoveryHud(setupNbt, renderYaw, renderPitch, yawOffset, pitchOffset);
+        }
 
         DiffuseLighting.method_34742();
         EntityRenderDispatcher dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
@@ -590,7 +597,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         entity.setPitch(pitch);
         entity.setCustomName(customName);
 
-        if (entity instanceof DiscoveryHudEntitySetup setup) setup.cleanupAfterDiscoveryHud(setupNbt);
+        if (entity instanceof DiscoveryHudEntitySetup setup) {
+            setup.cleanupAfterDiscoveryHud(setupNbt);
+        }
 
         matrices.pop();
         RenderSystem.applyModelViewMatrix();
@@ -647,6 +656,17 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             this.translationKey = BEHAVIOR_KEY + ".type." + this.name().toLowerCase(Locale.ROOT);
         }
 
+        /**
+         * @implNote I would implement some fancy caching stuff, but this runs on tags that can be modified at runtime
+         */
+        public static EntityBehavior get(Entity entity) {
+            return Arrays.stream(values()).filter(behavior -> behavior.matches(entity.getType())).findFirst().orElse(null);
+        }
+
+        public static Text getText(Entity entity) {
+            return Optional.ofNullable(EntityBehavior.get(entity)).map(EntityBehavior::getTranslationKey).map(Text::translatable).orElse(null);
+        }
+
         public String getTranslationKey() {
             return this.translationKey;
         }
@@ -654,22 +674,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         public boolean matches(EntityType<?> entity) {
             return this.predicate.test(entity);
         }
-
-        /**
-         * @implNote I would implement some fancy caching stuff, but this runs on tags that can be modified at runtime
-         */
-        public static EntityBehavior get(Entity entity) {
-            return Arrays.stream(values())
-                         .filter(behavior -> behavior.matches(entity.getType()))
-                         .findFirst()
-                         .orElse(null);
-        }
-
-        public static Text getText(Entity entity) {
-            return Optional.ofNullable(EntityBehavior.get(entity))
-                           .map(EntityBehavior::getTranslationKey)
-                           .map(Text::translatable)
-                           .orElse(null);
-        }
     }
+
+
 }

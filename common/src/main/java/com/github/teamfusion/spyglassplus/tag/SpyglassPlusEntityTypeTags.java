@@ -34,12 +34,16 @@ public interface SpyglassPlusEntityTypeTags {
      * Contains entities pertaining to this behavior.
      */
     TagKey<EntityType<?>>
-        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE = create("discovery_enchantment_entity_behavior/passive"),
-        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_NEUTRAL = create("discovery_enchantment_entity_behavior/neutral"),
-        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_HOSTILE = create("discovery_enchantment_entity_behavior/hostile"),
-        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_BOSS = create("discovery_enchantment_entity_behavior/boss");
+        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE = createDiscoveryBehavior("passive"),
+        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_NEUTRAL = createDiscoveryBehavior("neutral"),
+        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_HOSTILE = createDiscoveryBehavior("hostile"),
+        DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_BOSS    = createDiscoveryBehavior("boss");
 
     static TagKey<EntityType<?>> create(String id) {
         return TagKey.of(Registry.ENTITY_TYPE_KEY, new Identifier(SpyglassPlus.MOD_ID, id));
+    }
+
+    static TagKey<EntityType<?>> createDiscoveryBehavior(String id) {
+        return create("discovery_enchantment_entity_behavior/" + id);
     }
 }

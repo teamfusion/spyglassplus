@@ -23,7 +23,9 @@ public class ItemGroupMixin {
     @Inject(method = "appendStacks", at = @At("HEAD"), cancellable = true)
     private void onAppendStacks(DefaultedList<ItemStack> stacks, CallbackInfo ci) {
         ItemGroup that = (ItemGroup) (Object) this;
-        if (that != SpyglassPlusItemGroups.ALL) return;
+        if (that != SpyglassPlusItemGroups.ALL) {
+            return;
+        }
 
         Registry.ITEM.stream()
                      .filter(ISpyglass.class::isInstance)

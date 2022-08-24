@@ -25,7 +25,9 @@ public class EntityRendererMixin<T extends Entity> {
         ClientPlayerEntity player = client.player;
         if (entity == player) {
             ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
-            if (scopingPlayer.hasSpyglassStand()) cir.setReturnValue(!client.options.getPerspective().isFirstPerson());
+            if (scopingPlayer.hasSpyglassStand()) {
+                cir.setReturnValue(!client.options.getPerspective().isFirstPerson());
+            }
         }
     }
 }

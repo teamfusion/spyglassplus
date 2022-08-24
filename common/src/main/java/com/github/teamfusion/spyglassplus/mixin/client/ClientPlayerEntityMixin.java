@@ -53,7 +53,9 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         cancellable = true
     )
     private void onTickNewAi(CallbackInfo ci) {
-        if (this.client.getCameraEntity() instanceof SpyglassStandEntity entity && entity.isUser(this)) ci.cancel();
+        if (this.client.getCameraEntity() instanceof SpyglassStandEntity entity && entity.isUser(this)) {
+            ci.cancel();
+        }
     }
 
     /**
@@ -61,6 +63,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
      */
     @Inject(method = "isCamera", at = @At("HEAD"), cancellable = true)
     private void onIsCamera(CallbackInfoReturnable<Boolean> cir) {
-        if (this.client.getCameraEntity() instanceof SpyglassStandEntity entity && entity.isUser(this)) cir.setReturnValue(true);
+        if (this.client.getCameraEntity() instanceof SpyglassStandEntity entity && entity.isUser(this)) {
+            cir.setReturnValue(true);
+        }
     }
 }
