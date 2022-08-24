@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
+    "EntityMixin",
     "ItemGroupMixin",
     "ItemMixin",
     "LivingEntityMixin",
@@ -19,6 +20,7 @@
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
     "client.EndCrystalEntityMixin",
+    "client.EntityMixin",
     "client.EntityRendererMixin",
     "client.GameRendererMixin",
     "client.InGameHudMixin",

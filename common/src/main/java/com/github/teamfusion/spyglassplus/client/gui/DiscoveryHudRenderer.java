@@ -7,9 +7,10 @@ import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.DiscoveryHudEntitySetup;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.SpyglassStandEntity;
-import com.github.teamfusion.spyglassplus.mixin.access.EntityInvoker;
+import com.github.teamfusion.spyglassplus.mixin.client.EntityMixin;
 import com.github.teamfusion.spyglassplus.mixin.client.InGameHudMixin;
 import com.github.teamfusion.spyglassplus.tag.SpyglassPlusEntityTypeTags;
+import com.github.teamfusion.spyglassplus.world.SpyglassRaycasting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -38,7 +39,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.TagKey;
@@ -47,16 +47,11 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.RaycastContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -72,11 +67,16 @@ import static net.minecraft.util.math.MathHelper.*;
 
 /**
  * Responsible for rendering the HUD elements created by {@link SpyglassPlusEnchantments#DISCOVERY}.
- * @see InGameHudMixin
+ * Responsible also for calculating {@link #targetedEntity}, used for {@link SpyglassPlusEnchantments#INDICATE}.
+ *
+ * @see InGameHudMixin implementation of render
+ * @see EntityMixin implementation of targetedEntity
  */
 @SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
 public class DiscoveryHudRenderer extends DrawableHelper {
+    private static DiscoveryHudRenderer INSTANCE;
+
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
 
     /**
@@ -131,6 +131,11 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     protected Entity activeEntity;
 
     /**
+     * The entity at the player's crosshair. May not be equal to {@link #activeEntity}.
+     */
+    protected Entity targetedEntity;
+
+    /**
      * How open the discovery HUD is, similar to spyglassScale in {@link InGameHud}.
      */
     protected float openProgress;
@@ -147,14 +152,17 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     protected boolean eyeClosing;
 
     public DiscoveryHudRenderer() {
+        INSTANCE = this;
+    }
+
+    public static DiscoveryHudRenderer getInstance() {
+        return INSTANCE;
     }
 
     /**
      * @see InGameHudMixin
      */
     public static void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera) {
-        if (DiscoveryHudRenderEvent.PRE.invoker().render(discoveryHud, matrices, tickDelta, camera).isFalse()) return;
-
         if (discoveryHud.render(matrices, tickDelta, camera)) {
             DiscoveryHudRenderEvent.POST.invoker().render(discoveryHud, matrices, tickDelta, camera);
         } else {
@@ -176,14 +184,18 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public boolean render(MatrixStack matrices, float tickDelta, Entity camera) {
         if (!this.client.options.getPerspective().isFirstPerson() || !(camera instanceof ScopingEntity scopingEntity) || !scopingEntity.isScoping()) {
             this.activeEntity = null;
+            this.targetedEntity = null;
             return false;
         }
+
+        this.targetedEntity = SpyglassRaycasting.raycast(camera, this.getRotation(camera, tickDelta), tickDelta);
+
+        if (DiscoveryHudRenderEvent.PRE.invoker().render(this, matrices, tickDelta, camera).isFalse()) return false;
 
         ItemStack stack = scopingEntity.getScopingStack();
         int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.DISCOVERY.get(), stack);
         if (!(level > 0)) return false;
 
-        Entity targeted = this.raycast(camera, tickDelta, 64.0D);
         if (this.activeEntity != null) {
             EntityType<?> entityType = this.activeEntity.getType();
 
@@ -204,7 +216,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 }
 
                 // opening
-                this.openProgress = lerp(0.5F * lastFrameDuration, this.openProgress, targeted == null ? 0.0F : 1.0F);
+                this.openProgress = lerp(0.5F * lastFrameDuration, this.openProgress, this.targetedEntity == null ? 0.0F : 1.0F);
             }
 
             Window window = this.client.getWindow();
@@ -261,11 +273,19 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             if (renderStats) {
                 if (level >= 3) {
                     if (this.activeEntity instanceof LivingEntity livingEntity) {
-                        // effects
-                        List<StatusEffectInstance> effects = ((LivingEntityClientAccess) livingEntity).getEffects();
+                        // `effects`
+                        List<StatusEffectInstance> effects = ((LivingEntityClientAccess) livingEntity).getEffects()
+                                                                                                      .stream()
+                                                                                                      .filter(StatusEffectInstance::shouldShowIcon)
+                                                                                                      .toList();
 
-                        List<StatusEffectInstance> beneficial = effects.stream().filter(effect -> effect.getEffectType().isBeneficial()).toList();
-                        List<StatusEffectInstance> notBeneficial = effects.stream().filter(effect -> !effect.getEffectType().isBeneficial()).toList();
+                        List<StatusEffectInstance> beneficial = effects.stream()
+                                                                       .filter(effect -> effect.getEffectType().isBeneficial())
+                                                                       .toList();
+
+                        List<StatusEffectInstance> notBeneficial = effects.stream()
+                                                                          .filter(effect -> !effect.getEffectType().isBeneficial())
+                                                                          .toList();
 
                         int y = boxTopY + BOX_HEIGHT + 1;
                         this.renderStatusEffects(matrices, beneficial, leftX, y, 0);
@@ -329,14 +349,16 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             RenderSystem.disableBlend();
 
-            if (targeted != null) this.activeEntity = targeted;
-
+            this.syncTargetedEntityToActive();
             return true;
         }
 
-        if (targeted != null) this.activeEntity = targeted;
-
+        this.syncTargetedEntityToActive();
         return false;
+    }
+
+    protected void syncTargetedEntityToActive() {
+        if (this.targetedEntity != null) this.activeEntity = this.targetedEntity;
     }
 
     public void renderStatusEffects(MatrixStack matrices, List<StatusEffectInstance> effects, int rawX, int rawY, int yOffset) {
@@ -584,89 +606,16 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             : new Vec2f(camera.getYaw(tickDelta), camera.getPitch(tickDelta));
     }
 
-    /**
-     * Retrieves the entity that the camera is looking at.
-     */
-    public Entity raycast(Entity camera, float tickDelta, double distance) {
-        // calculate a position vector from the camera's rotation
-        Vec2f rotation = this.getRotation(camera, tickDelta);
-        Vec3d vector = ((EntityInvoker) camera).invokeGetRotationVector(rotation.y, rotation.x);
-
-        // calculate minimum and maximum points of raycast
-        Vec3d min = camera.getCameraPosVec(tickDelta);
-        Vec3d max = min.add(vector.x * distance, vector.y * distance, vector.z * distance);
-
-        // grab default hit result
-        HitResult hit = camera.world.raycast(new RaycastContext(min, max, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, camera));
-        if (hit != null) distance = hit.getPos().squaredDistanceTo(min);
-
-        // calculate entity hit result
-        Box net = camera.getBoundingBox().stretch(vector.multiply(distance)).expand(1.0F);
-        EntityHitResult entityHit = this.raycast(camera, min, max, net, this::isVisibleToRaycast, distance);
-
-        if (entityHit != null) {
-            Entity entity = entityHit.getEntity();
-            Vec3d pos = entityHit.getPos();
-            double entityDistance = min.squaredDistanceTo(pos);
-            if (entityDistance < distance || hit == null) return entity;
-        }
-
-        return null;
-    }
-
-    public boolean isVisibleToRaycast(Entity entity) {
-        return !entity.isSpectator() && !entity.isInvisibleTo(this.client.player) && !entity.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_DISCOVERY);
-    }
-
-    /**
-     * Modified and mapped version of {@link ProjectileUtil#raycast(Entity, Vec3d, Vec3d, Box, Predicate, double)}.
-     * <p>Modifies the result of {@link Entity#getTargetingMargin()}.</p>
-     */
-    public EntityHitResult raycast(Entity entity, Vec3d min, Vec3d max, Box box, Predicate<Entity> predicate, double distance) {
-        double runningDistance = distance;
-        Entity resultEntity = null;
-        Vec3d resultPos = null;
-
-        for (Entity candidate : entity.world.getOtherEntities(entity, box, predicate)) {
-            float margin = candidate.getTargetingMargin();
-            Box candidateBoundingBox = candidate.getBoundingBox().expand(
-                margin == 0.0F && !candidate.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_DISCOVERY)
-                    ? 0.175F : margin
-            );
-
-            Optional<Vec3d> optional = candidateBoundingBox.raycast(min, max);
-            if (candidateBoundingBox.contains(min)) {
-                if (!(runningDistance >= 0.0)) continue;
-                resultEntity = candidate;
-                resultPos = optional.orElse(min);
-                runningDistance = 0.0;
-                continue;
-            }
-
-            double squaredDistance;
-            Vec3d runningPos;
-            if (optional.isEmpty() || !((squaredDistance = min.squaredDistanceTo(runningPos = optional.get())) < runningDistance) && runningDistance != 0.0) continue;
-            if (candidate.getRootVehicle() == entity.getRootVehicle()) {
-                if (runningDistance != 0.0) continue;
-                resultEntity = candidate;
-                resultPos = runningPos;
-                continue;
-            }
-
-            resultEntity = candidate;
-            resultPos = runningPos;
-            runningDistance = squaredDistance;
-        }
-
-        return resultEntity == null ? null : new EntityHitResult(resultEntity, resultPos);
-    }
-
     public static String translate(String suffix) {
         return "text.%s.discovery_hud.%s".formatted(SpyglassPlus.MOD_ID, suffix);
     }
 
     public Entity getActiveEntity() {
         return this.activeEntity;
+    }
+
+    public Entity getTargetedEntity() {
+        return this.targetedEntity;
     }
 
     public float getOpenProgress() {
