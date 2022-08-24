@@ -660,11 +660,17 @@ public class DiscoveryHudRenderer extends DrawableHelper {
          * @implNote I would implement some fancy caching stuff, but this runs on tags that can be modified at runtime
          */
         public static EntityBehavior get(Entity entity) {
-            return Arrays.stream(values()).filter(behavior -> behavior.matches(entity.getType())).findFirst().orElse(null);
+            return Arrays.stream(values())
+                         .filter(behavior -> behavior.matches(entity.getType()))
+                         .findFirst()
+                         .orElse(null);
         }
 
         public static Text getText(Entity entity) {
-            return Optional.ofNullable(EntityBehavior.get(entity)).map(EntityBehavior::getTranslationKey).map(Text::translatable).orElse(null);
+            return Optional.ofNullable(EntityBehavior.get(entity))
+                           .map(EntityBehavior::getTranslationKey)
+                           .map(Text::translatable)
+                           .orElse(null);
         }
 
         public String getTranslationKey() {
@@ -675,6 +681,4 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             return this.predicate.test(entity);
         }
     }
-
-
 }
