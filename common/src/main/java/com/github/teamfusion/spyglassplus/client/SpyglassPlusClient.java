@@ -28,7 +28,11 @@ public interface SpyglassPlusClient extends SpyglassPlus {
     static void commonClientInitialize() {
         LOGGER.info("Initializing {}-CLIENT", MOD_NAME);
 
-        Reflection.initialize(SpyglassPlusEntityModelLayers.class);
+        Reflection.initialize(
+            SpyglassPlusEntityModelLayers.class,
+            SpyglassPlusConfig.class
+        );
+
         EntityRendererRegistry.register(SpyglassPlusEntityType.SPYGLASS_STAND, SpyglassStandEntityRenderer::new);
 
         ClientTooltipEvent.ITEM.register(ISpyglass::appendLocalScrutinyLevelTooltip);
