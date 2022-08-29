@@ -33,6 +33,10 @@ dependencies {
   forge "net.minecraftforge:forge:${rootProject.ver_minecraft}-${rootProject.ver_forge}"
   modApi "dev.architectury:architectury-forge:${rootProject.ver_architectury}"
 
+  modApi("me.shedaniel.cloth:cloth-config-forge:${rootProject.ver_cloth_config}") {
+    exclude(group: "net.fabricmc.fabric-api")
+  }
+
   common(project(path: ":common", configuration: "namedElements")) { transitive false }
   shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 }

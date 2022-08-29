@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus;
 
 import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
+import com.github.teamfusion.spyglassplus.client.config.SpyglassPlusConfig;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.enchantment.target.SpyglassPlusEnchantmentTargets;
 import com.github.teamfusion.spyglassplus.entity.SpyglassPlusEntityType;
@@ -22,7 +23,10 @@ public interface SpyglassPlus {
     static void commonInitialize() {
         LOGGER.info("Initializing {}", MOD_NAME);
 
-        Reflection.initialize(SpyglassPlusEnchantmentTargets.class);
+        Reflection.initialize(
+            SpyglassPlusEnchantmentTargets.class,
+            SpyglassPlusConfig.class
+        );
 
         SpyglassPlusItems.REGISTER.register();
         SpyglassPlusEntityType.REGISTER.register();

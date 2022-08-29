@@ -1,6 +1,8 @@
 package com.github.teamfusion.spyglassplus.client.gui;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
+import com.github.teamfusion.spyglassplus.client.config.SpyglassPlusConfig;
+import com.github.teamfusion.spyglassplus.client.config.SpyglassPlusConfig.DisplayConfig.DiscoveryHudConfig;
 import com.github.teamfusion.spyglassplus.client.entity.LivingEntityClientAccess;
 import com.github.teamfusion.spyglassplus.client.event.DiscoveryHudRenderEvent;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
@@ -84,6 +86,7 @@ import static net.minecraft.util.math.MathHelper.lerp;
 public class DiscoveryHudRenderer extends DrawableHelper {
     private static DiscoveryHudRenderer INSTANCE;
 
+    public static final DiscoveryHudConfig CONFIG = SpyglassPlusConfig.get().display.discoveryHud;
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
 
     /**
@@ -214,18 +217,25 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 float lastFrameDuration = this.client.getLastFrameDuration();
 
                 // eye
-                float delta = this.eyePhase < 0 ? this.random.nextFloat() * EYE_BLINK_FREQUENCY : 1.0F / (EYE_BLINK_SPEED * 20);
+                if (CONFIG.eyeOpens) {
+                    float delta = this.eyePhase < 0 ? this.random.nextFloat() * EYE_BLINK_FREQUENCY : 1.0F / (EYE_BLINK_SPEED * 20);
 
-                this.eyePhase = this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration));
+                    this.eyePhase = this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration));
 
-                if (this.eyePhase >= 1.2F) {
+                    if (this.eyePhase >= 1.2F) {
+                        this.eyeClosing = true;
+                    } else if (this.eyePhase <= -0.2F) {
+                        this.eyeClosing = false;
+                    }
+                } else {
+                    this.eyePhase = 1.0F;
                     this.eyeClosing = true;
-                } else if (this.eyePhase <= -0.2F) {
-                    this.eyeClosing = false;
                 }
 
                 // opening
-                this.openProgress = lerp(0.5F * lastFrameDuration, this.openProgress, this.targetedEntity == null ? 0.0F : 1.0F);
+                this.openProgress = CONFIG.openWithZoom
+                    ? lerp(0.5F * lastFrameDuration, this.openProgress, this.targetedEntity == null ? 0.0F : 1.0F)
+                    : this.targetedEntity == null ? 0.0F : 1.0F;
             }
 
             Window window = this.client.getWindow();

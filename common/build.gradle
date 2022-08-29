@@ -9,6 +9,10 @@ loom {
 dependencies {
   modImplementation "net.fabricmc:fabric-loader:${rootProject.ver_fabric_loader}"
   modApi "dev.architectury:architectury:${rootProject.ver_architectury}"
+
+  modApi("me.shedaniel.cloth:cloth-config:${rootProject.ver_cloth_config}") {
+    exclude(group: "net.fabricmc.fabric-api")
+  }
 }
 
 publishing {
