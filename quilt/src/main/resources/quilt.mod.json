@@ -45,6 +45,10 @@
       {
         "id": "architectury",
         "version": ">=6.2"
+      },
+      {
+        "id": "cloth-config",
+        "version": "*"
       }
     ]
   }
