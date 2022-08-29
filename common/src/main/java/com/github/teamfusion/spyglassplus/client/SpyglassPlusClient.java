@@ -11,7 +11,6 @@ import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import com.github.teamfusion.spyglassplus.mixin.client.ModelPredicateProviderRegistryMixin;
 import com.google.common.reflect.Reflection;
 import dev.architectury.event.events.client.ClientTooltipEvent;
-import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.fabricmc.api.EnvType;
@@ -28,17 +27,24 @@ public interface SpyglassPlusClient extends SpyglassPlus {
     static void commonClientInitialize() {
         LOGGER.info("Initializing {}-CLIENT", MOD_NAME);
 
-        Reflection.initialize(
-            SpyglassPlusEntityModelLayers.class,
-            SpyglassPlusConfig.class
-        );
+        Reflection.initialize(SpyglassPlusEntityModelLayers.class);
 
         EntityRendererRegistry.register(SpyglassPlusEntityType.SPYGLASS_STAND, SpyglassStandEntityRenderer::new);
 
         ClientTooltipEvent.ITEM.register(ISpyglass::appendLocalScrutinyLevelTooltip);
         SpyglassPlusClientNetworking.registerReceivers();
 
-        Mod mod = Platform.getMod(MOD_ID);
-        mod.registerConfigurationScreen(SpyglassPlusConfig::createScreen);
+        // cloth config as optional on forge
+        if (!Platform.isForge() || Platform.isModLoaded("cloth_config")) {
+            initializeClothConfig();
+        }
+    }
+
+    /**
+     * Explicitly initializes {@link SpyglassPlusConfig} and registers its config screen across platforms.
+     */
+    static void initializeClothConfig() {
+        Reflection.initialize(SpyglassPlusConfig.class);
+        Platform.getMod(MOD_ID).registerConfigurationScreen(SpyglassPlusConfig::createScreen);
     }
 }
