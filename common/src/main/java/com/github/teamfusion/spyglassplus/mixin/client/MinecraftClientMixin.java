@@ -96,9 +96,11 @@ public abstract class MinecraftClientMixin {
         }
 
         if (this.getCameraEntity() instanceof ScopingEntity scopingEntity && scopingEntity.isScoping()) {
-            ItemStack stack = scopingEntity.getScopingStack();
-            if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.INDICATE.get(), stack) > 0) {
-                cir.setReturnValue(true);
+            if (this.options.getPerspective().isFirstPerson()) {
+                ItemStack stack = scopingEntity.getScopingStack();
+                if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.INDICATE.get(), stack) > 0) {
+                    cir.setReturnValue(true);
+                }
             }
         }
     }
