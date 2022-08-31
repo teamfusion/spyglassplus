@@ -35,7 +35,6 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
         );
 
         this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE).add(
-            ALLAY,
             AXOLOTL,
             BAT,
             CAT,
@@ -44,7 +43,6 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
             COW,
             DONKEY,
             FOX,
-            FROG,
             GLOW_SQUID,
             HORSE,
             MOOSHROOM,
@@ -60,7 +58,6 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
             SNOW_GOLEM,
             SQUID,
             STRIDER,
-            TADPOLE,
             TROPICAL_FISH,
             TURTLE,
             VILLAGER,
@@ -107,7 +104,6 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
             STRAY,
             VEX,
             VINDICATOR,
-            WARDEN,
             WITCH,
             WITHER_SKELETON,
             ZOGLIN,
@@ -119,5 +115,10 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
             ENDER_DRAGON,
             WITHER
         );
+    }
+
+    @Override
+    public String getName() {
+        return "Spyglass+ Entity Type Tags";
     }
 }

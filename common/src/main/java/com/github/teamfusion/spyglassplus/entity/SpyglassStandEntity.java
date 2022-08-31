@@ -345,7 +345,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             this.kill();
         } else {
             this.world.sendEntityStatus(this, EntityStatuses.HIT_ARMOR_STAND);
-            this.emitGameEvent(GameEvent.ENTITY_DAMAGE, source.getAttacker());
+            this.emitGameEvent(GameEvent.ENTITY_DAMAGED, source.getAttacker());
             this.lastHitTime = time;
         }
 
@@ -536,7 +536,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             this.kill();
         } else {
             this.setHealth(health);
-            this.emitGameEvent(GameEvent.ENTITY_DAMAGE, source.getAttacker());
+            this.emitGameEvent(GameEvent.ENTITY_DAMAGED, source.getAttacker());
         }
     }
 
@@ -553,7 +553,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     @Override
     public void kill() {
         this.remove(RemovalReason.KILLED);
-        this.emitGameEvent(GameEvent.ENTITY_DIE);
+        this.emitGameEvent(GameEvent.ENTITY_KILLED);
     }
 
     @Override
@@ -596,8 +596,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     }
 
     @Override
-    public boolean canHit() {
-        return super.canHit() && !this.isMarker();
+    public boolean collides() {
+        return super.collides() && !this.isMarker();
     }
 
     @Override

@@ -9,7 +9,7 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +28,7 @@ public class LightmapTextureManagerMixin {
      * Modifies brightness for the {@link SpyglassPlusEnchantments#ILLUMINATE illuminate enchantment}.
      */
     @Inject(method = "getBrightness", at = @At("RETURN"), cancellable = true)
-    private static void modifyBrightnessForIlluminate(DimensionType type, int lightLevel, CallbackInfoReturnable<Float> cir) {
+    private void modifyBrightnessForIlluminate(World world, int lightLevel, CallbackInfoReturnable<Float> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (!client.options.getPerspective().isFirstPerson()) {
             return;

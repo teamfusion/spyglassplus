@@ -39,10 +39,10 @@
 
   "depends": {
     "java": ">=17",
-    "minecraft": ">=1.19",
+    "minecraft": ">=1.18",
     "fabricloader": ">=0.14",
-    "fabric-api": ">=0.58",
-    "architectury": ">=6.2",
+    "fabric": ">=0.58",
+    "architectury": ">=4.9",
     "frame-enchantments-v0": "*"
   }
 }

@@ -30,4 +30,9 @@ public final class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
         Arrays.stream(items).map(RegistrySupplier::get).forEach(builder::add);
         return builder;
     }
+
+    @Override
+    public String getName() {
+        return "Spyglass+ Item Tags";
+    }
 }

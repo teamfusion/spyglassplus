@@ -9,7 +9,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.text.Text;
+import net.minecraft.text.LiteralText;
 
 @Environment(EnvType.CLIENT)
 public class SpyglassPlusClientTest implements ClientModInitializer, SpyglassPlusClient {
@@ -24,7 +24,7 @@ public class SpyglassPlusClientTest implements ClientModInitializer, SpyglassPlu
 
         DiscoveryHudRenderEvent.POST.register((discoveryHud, matrices, tickDelta, camera) -> {
             MinecraftClient client = MinecraftClient.getInstance();
-            client.player.sendMessage(Text.literal(String.format(
+            client.player.sendMessage(new LiteralText(String.format(
                 "Closing: %s | %.2f", discoveryHud.isEyeClosing() ? "Y" : "N", discoveryHud.getEyePhase()
             )), true);
         });

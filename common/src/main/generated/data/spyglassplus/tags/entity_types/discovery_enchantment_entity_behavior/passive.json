@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "minecraft:allay",
     "minecraft:axolotl",
     "minecraft:bat",
     "minecraft:cat",
@@ -10,7 +9,6 @@
     "minecraft:cow",
     "minecraft:donkey",
     "minecraft:fox",
-    "minecraft:frog",
     "minecraft:glow_squid",
     "minecraft:horse",
     "minecraft:mooshroom",
@@ -26,7 +24,6 @@
     "minecraft:snow_golem",
     "minecraft:squid",
     "minecraft:strider",
-    "minecraft:tadpole",
     "minecraft:tropical_fish",
     "minecraft:turtle",
     "minecraft:villager",

@@ -14,6 +14,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 
@@ -83,7 +84,7 @@ public interface ISpyglass {
                 int adjustment = level - getLocalScrutinyLevel(stack);
                 if (adjustment != 0) {
                     String key = "%s.%s.local_scrutiny_level_tooltip".formatted(item.getTranslationKey(), SpyglassPlus.MOD_ID);
-                    list.add(1 + stack.getEnchantments().size(), Text.translatable(key, adjustment).formatted(Formatting.DARK_GRAY));
+                    list.add(1 + stack.getEnchantments().size(), new TranslatableText(key, adjustment).formatted(Formatting.DARK_GRAY));
                 }
             }
         }

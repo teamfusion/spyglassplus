@@ -45,18 +45,19 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
-import net.minecraft.util.math.random.Random;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -108,10 +109,10 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     public static final Style DISCOVERY_FONT_STYLE = Style.EMPTY.withFont(DISCOVERY_FONT).withFormatting(Formatting.RED);
 
     public static final Text
-        DOTS_TEXT = Text.translatable(DOTS_KEY),
-        BEHAVIOR_ICON = Text.translatable(BEHAVIOR_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
-        HEALTH_ICON = Text.translatable(HEALTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
-        STRENGTH_ICON = Text.translatable(STRENGTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE);
+        DOTS_TEXT = new TranslatableText(DOTS_KEY),
+        BEHAVIOR_ICON = new TranslatableText(BEHAVIOR_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
+        HEALTH_ICON = new TranslatableText(HEALTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE),
+        STRENGTH_ICON = new TranslatableText(STRENGTH_ICON_KEY).setStyle(DISCOVERY_FONT_STYLE);
 
     public static final int
         BOX_WIDTH = 109, BOX_HEIGHT = 124,
@@ -128,7 +129,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final TextRenderer textRenderer = this.client.textRenderer;
-    private final Random random = Random.create();
+    private final Random random = new Random();
 
     private int scaledWidth;
 
@@ -318,8 +319,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     if (behaviorText != null) {
                         int behaviorY = halfHeight - (textHeight * 3) - 1;
                         this.drawTextClusterFromRight(matrices, rightX, behaviorY,
-                            Text.translatable(BEHAVIOR_KEY, BEHAVIOR_ICON),
-                            Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText, BEHAVIOR_ICON).formatted(Formatting.GRAY)
+                            new TranslatableText(BEHAVIOR_KEY, BEHAVIOR_ICON),
+                            new TranslatableText(BEHAVIOR_HOLDER_KEY, behaviorText, BEHAVIOR_ICON).formatted(Formatting.GRAY)
                         );
                     }
                 }
@@ -329,7 +330,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                         // health
                         float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;
                         this.drawTextClusterFromRight(matrices, rightX, halfHeight, ((Float.isNaN(hurt) ? 0 : hurt) * (1 - BLACK_OPACITY)) + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
-                            Text.translatable(HEALTH_KEY, HEALTH_ICON),
+                            new TranslatableText(HEALTH_KEY, HEALTH_ICON),
                             this.createHealthHolderText(HEALTH_HOLDER_KEY, HEALTH_ICON, livingEntity.getHealth())
                         );
 
@@ -337,7 +338,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                             // strength
                             int strengthY = halfHeight + (textHeight * 3) + 1;
                             this.drawTextClusterFromRight(matrices, rightX, strengthY,
-                                Text.translatable(STRENGTH_KEY, STRENGTH_ICON),
+                                new TranslatableText(STRENGTH_KEY, STRENGTH_ICON),
                                 this.createHealthHolderText(STRENGTH_HOLDER_KEY, STRENGTH_ICON,
                                     (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE)
                                 )
@@ -430,7 +431,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         buffer.vertex(matrix, x1, y1, z).texture(u1, v1).next();
         buffer.vertex(matrix, x1, y0, z).texture(u1, v0).next();
         buffer.vertex(matrix, x0, y0, z).texture(u0, v0).next();
-        BufferRenderer.drawWithShader(buffer.end());
+        buffer.end();
+        BufferRenderer.draw(buffer);
     }
 
     public void drawTrimmedCentredText(MatrixStack matrices, Text text, int maxWidth, int x, int y) {
@@ -514,7 +516,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         bufferBuilder.vertex(matrix, (float) x2, (float) y2, 0.0F).color(r, g, b, alpha).next();
         bufferBuilder.vertex(matrix, (float) x2, (float) y1, 0.0F).color(r, g, b, alpha).next();
         bufferBuilder.vertex(matrix, (float) x1, (float) y1, 0.0F).color(r, g, b, alpha).next();
-        BufferRenderer.drawWithShader(bufferBuilder.end());
+        bufferBuilder.end();
+        BufferRenderer.draw(bufferBuilder);
 
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
@@ -524,7 +527,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * Constructs text that is displayed below a statistic.
      */
     public Text createHealthHolderText(String key, Text icon, float health) {
-        return Text.translatable(key, this.formatHearts(health), icon).formatted(Formatting.GRAY);
+        return new TranslatableText(key, this.formatHearts(health), icon).formatted(Formatting.GRAY);
     }
 
     /**
@@ -669,7 +672,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         public static Text getText(Entity entity) {
             return Optional.ofNullable(EntityBehavior.get(entity))
                            .map(EntityBehavior::getTranslationKey)
-                           .map(Text::translatable)
+                           .map(TranslatableText::new)
                            .orElse(null);
         }
 
