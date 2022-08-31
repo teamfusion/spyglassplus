@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.github.teamfusion.spyglassplus.mixin.exclusive",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "client.ItemEntityRendererMixin",
+    "client.ItemRendererMixin",
+    "client.ModelLoaderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,4 +1,4 @@
-package com.github.teamfusion.spyglassplus.mixin.client;
+package com.github.teamfusion.spyglassplus.mixin.exclusive.client;
 
 import com.github.teamfusion.spyglassplus.client.gui.BinocularsOverlayRenderer;
 import com.github.teamfusion.spyglassplus.item.SpyglassPlusItems;
@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@SuppressWarnings("InjectIntoConstructor")
 @Environment(EnvType.CLIENT)
 @Mixin(ModelLoader.class)
 public abstract class ModelLoaderMixin {

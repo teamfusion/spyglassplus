@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
   "mixin": [
-    "spyglassplus.mixins.json",
-    "spyglassplus-common.mixins.json"
+    "spyglassplus-common.mixins.json",
+    "spyglassplus-exclusive.mixins.json",
+    "spyglassplus.mixins.json"
   ],
   "quilt_loader": {
     "group": "${group}",

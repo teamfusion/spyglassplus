@@ -15,6 +15,7 @@ loom {
     extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
     mixinConfig "${project.mod_id}-common.mixins.json"
+    mixinConfig "${project.mod_id}-exclusive.mixins.json"
     mixinConfig "${project.mod_id}.mixins.json"
   }
 }
