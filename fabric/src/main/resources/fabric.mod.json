@@ -32,8 +32,9 @@
     "mm:early_risers": [ "com.github.teamfusion.spyglassplus.fabric.SpyglassPlusASM" ]
   },
   "mixins": [
-    "spyglassplus.mixins.json",
-    "spyglassplus-common.mixins.json"
+    "spyglassplus-common.mixins.json",
+    "spyglassplus-exclusive.mixins.json",
+    "spyglassplus.mixins.json"
   ],
 
   "depends": {
