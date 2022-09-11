@@ -34,10 +34,7 @@ public interface SpyglassPlusClient extends SpyglassPlus {
         ClientTooltipEvent.ITEM.register(ISpyglass::appendLocalScrutinyLevelTooltip);
         SpyglassPlusClientNetworking.registerReceivers();
 
-        // cloth config as optional on forge
-        if (!Platform.isForge() || Platform.isModLoaded("cloth_config")) {
-            initializeClothConfig();
-        }
+        initializeClothConfig();
     }
 
     /**
