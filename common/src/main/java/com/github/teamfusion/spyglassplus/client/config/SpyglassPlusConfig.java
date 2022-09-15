@@ -35,6 +35,10 @@ public class SpyglassPlusConfig implements ConfigData {
             @Comment("Whether or not the eye will display as open at any time. Accessibility option for possible triggers.")
             @Tooltip(count = 3)
             public boolean eyeOpens = true;
+
+            @Comment("Whether or not the Discovery HUD has an extra 'step' before fully closing.")
+            @Tooltip(count = 2)
+            public boolean trailOff = true;
         }
     }
 

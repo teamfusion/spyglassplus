@@ -58,5 +58,8 @@
   "text.autoconfig.spyglassplus.option.display.discoveryHud.eyeOpens": "Eye Opens",
   "text.autoconfig.spyglassplus.option.display.discoveryHud.eyeOpens.@Tooltip[0]": "Whether or not the eye will display as open",
   "text.autoconfig.spyglassplus.option.display.discoveryHud.eyeOpens.@Tooltip[1]": "at any time. Accessibility option for",
-  "text.autoconfig.spyglassplus.option.display.discoveryHud.eyeOpens.@Tooltip[2]": "possible triggers."
+  "text.autoconfig.spyglassplus.option.display.discoveryHud.eyeOpens.@Tooltip[2]": "possible triggers.",
+  "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff": "Trail-Off",
+  "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[0]": "Whether or not the Discovery HUD has an",
+  "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[1]": "extra 'step' before fully closing."
 }
