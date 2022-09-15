@@ -86,8 +86,6 @@ import static net.minecraft.util.math.MathHelper.lerp;
 @Environment(EnvType.CLIENT)
 public class DiscoveryHudRenderer extends DrawableHelper {
     private static DiscoveryHudRenderer INSTANCE;
-
-    public static final DiscoveryHudConfig CONFIG = SpyglassPlusConfig.get().display.discoveryHud;
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
 
     /**
@@ -218,13 +216,14 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         }
 
         if (this.activeEntity != null) {
+            DiscoveryHudConfig config = SpyglassPlusConfig.get().display.discoveryHud;
             EntityType<?> entityType = this.activeEntity.getType();
 
             if (!this.client.isPaused()) {
                 float lastFrameDuration = this.client.getLastFrameDuration();
 
                 // eye
-                if (CONFIG.eyeOpens) {
+                if (config.eyeOpens) {
                     float delta = this.eyePhase < 0 ? this.random.nextFloat() * EYE_BLINK_FREQUENCY : 1.0F / (EYE_BLINK_SPEED * 20);
                     this.eyePhase = this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration));
                     if (this.eyePhase >= 1.2F) {
@@ -240,8 +239,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 // opening
                 boolean hudShouldOpen = this.hudShouldOpen();
                 this.trailOff = hudShouldOpen ? 0.0F : this.trailOff + (0.1F * lastFrameDuration);
-                float desiredOpenProgress = hudShouldOpen ? 1.0F : (this.trailOff < 1 && CONFIG.trailOff ? 0.8F : 0.0F);
-                this.openProgress = CONFIG.openWithZoom
+                float desiredOpenProgress = hudShouldOpen ? 1.0F : (this.trailOff < 1 && config.trailOff ? 0.8F : 0.0F);
+                this.openProgress = config.openWithZoom
                     ? lerp(0.5F * lastFrameDuration, this.openProgress, desiredOpenProgress)
                     : desiredOpenProgress;
             }
