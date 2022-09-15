@@ -1,14 +1,13 @@
 package com.github.teamfusion.spyglassplus.client.config;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
+import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.Config.Gui.Background;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.CollapsibleObject;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.Tooltip;
-import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,8 +17,6 @@ import net.minecraft.client.gui.screen.Screen;
 @Background(Background.TRANSPARENT)
 @Config(name = SpyglassPlus.MOD_ID)
 public class SpyglassPlusConfig implements ConfigData {
-    public static final ConfigHolder<SpyglassPlusConfig> INSTANCE = AutoConfig.register(SpyglassPlusConfig.class, JanksonConfigSerializer::new);
-
     @CollapsibleObject(startExpanded = true)
     public DisplayConfig display = new DisplayConfig();
 
@@ -39,7 +36,7 @@ public class SpyglassPlusConfig implements ConfigData {
     }
 
     public static SpyglassPlusConfig get() {
-        return INSTANCE.getConfig();
+        return SpyglassPlusClient.CONFIG_HOLDER.getConfig();
     }
 
     public static Screen createScreen(Screen parent) {
