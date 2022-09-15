@@ -151,6 +151,11 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     protected float openProgress;
 
     /**
+     * The progress of a minor trail-off when stopping targeting an entity.
+     */
+    protected float trailOff;
+
+    /**
      * The progress of the HUD eye blinking.
      * <p>Min: -0.2, Max: 1.2</p>
      */
@@ -185,6 +190,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      */
     public void reset() {
         this.openProgress = 0.0F;
+        this.trailOff = 0.0F;
         this.eyePhase = -0.2F;
     }
 
@@ -219,9 +225,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 // eye
                 if (CONFIG.eyeOpens) {
                     float delta = this.eyePhase < 0 ? this.random.nextFloat() * EYE_BLINK_FREQUENCY : 1.0F / (EYE_BLINK_SPEED * 20);
-
                     this.eyePhase = this.eyePhase + (delta * (this.eyeClosing ? -lastFrameDuration : lastFrameDuration));
-
                     if (this.eyePhase >= 1.2F) {
                         this.eyeClosing = true;
                     } else if (this.eyePhase <= -0.2F) {
@@ -233,9 +237,11 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 }
 
                 // opening
+                boolean hudShouldOpen = this.hudShouldOpen();
+                this.trailOff = hudShouldOpen ? 0.0F : this.trailOff + (0.1F * lastFrameDuration);
                 this.openProgress = CONFIG.openWithZoom
-                    ? lerp(0.5F * lastFrameDuration, this.openProgress, this.targetedEntity == null ? 0.0F : 1.0F)
-                    : this.targetedEntity == null ? 0.0F : 1.0F;
+                    ? lerp(0.5F * lastFrameDuration, this.openProgress, hudShouldOpen ? 1.0F : 0.0F)
+                    : hudShouldOpen ? 1.0F : 0.0F;
             }
 
             Window window = this.client.getWindow();
@@ -363,16 +369,20 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             RenderSystem.disableBlend();
 
-            this.syncTargetedEntityToActive();
+            this.trySyncTargetedEntityToActive();
             return true;
         }
 
-        this.syncTargetedEntityToActive();
+        this.trySyncTargetedEntityToActive();
         return false;
     }
 
-    protected void syncTargetedEntityToActive() {
-        if (this.targetedEntity != null) {
+    public boolean hudShouldOpen() {
+        return this.targetedEntity != null;
+    }
+
+    protected void trySyncTargetedEntityToActive() {
+        if (this.hudShouldOpen()) {
             this.activeEntity = this.targetedEntity;
         }
     }
