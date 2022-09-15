@@ -238,10 +238,11 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
                 // opening
                 boolean hudShouldOpen = this.hudShouldOpen();
+                float desiredOpenProgress = hudShouldOpen ? 1.0F : (this.trailOff < 1 ? 0.8F : 0.0F);
                 this.trailOff = hudShouldOpen ? 0.0F : this.trailOff + (0.1F * lastFrameDuration);
                 this.openProgress = CONFIG.openWithZoom
-                    ? lerp(0.5F * lastFrameDuration, this.openProgress, hudShouldOpen ? 1.0F : 0.0F)
-                    : hudShouldOpen ? 1.0F : 0.0F;
+                    ? lerp(0.5F * lastFrameDuration, this.openProgress, desiredOpenProgress)
+                    : desiredOpenProgress;
             }
 
             Window window = this.client.getWindow();
