@@ -37,6 +37,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
@@ -559,7 +560,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
      * Whether an entity renders inside of its box.
      */
     public boolean hasRenderBox(Entity entity) {
-        return !entity.getType().isIn(SpyglassPlusEntityTypeTags.DO_NOT_RENDER_BOX_DISCOVERY);
+        return !entity.getType().isIn(SpyglassPlusEntityTypeTags.DO_NOT_RENDER_BOX_DISCOVERY)
+            && (!(entity instanceof ItemEntity itemEntity) || !itemEntity.getStack().isEmpty());
     }
 
     @SuppressWarnings("deprecation")
