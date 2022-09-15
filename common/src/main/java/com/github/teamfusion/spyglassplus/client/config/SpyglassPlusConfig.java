@@ -13,6 +13,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
 
+/**
+ * Config for {@link SpyglassPlus}.
+ */
 @Environment(EnvType.CLIENT)
 @Background(Background.TRANSPARENT)
 @Config(name = SpyglassPlus.MOD_ID)
@@ -35,6 +38,9 @@ public class SpyglassPlusConfig implements ConfigData {
         }
     }
 
+    /**
+     * @return the instance of this config class stored in {@link SpyglassPlusClient#CONFIG_HOLDER}
+     */
     public static SpyglassPlusConfig get() {
         return SpyglassPlusClient.CONFIG_HOLDER.getConfig();
     }
