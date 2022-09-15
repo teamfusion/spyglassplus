@@ -38,13 +38,13 @@ public interface SpyglassPlusClient extends SpyglassPlus {
         ClientTooltipEvent.ITEM.register(ISpyglass::appendLocalScrutinyLevelTooltip);
         SpyglassPlusClientNetworking.registerReceivers();
 
-        initializeClothConfig();
+        initializeConfig();
     }
 
     /**
      * Explicitly initializes {@link SpyglassPlusConfig} and registers its config screen across platforms.
      */
-    static void initializeClothConfig() {
+    static void initializeConfig() {
         Reflection.initialize(SpyglassPlusConfig.class);
         Platform.getMod(MOD_ID).registerConfigurationScreen(SpyglassPlusConfig::createScreen);
     }
