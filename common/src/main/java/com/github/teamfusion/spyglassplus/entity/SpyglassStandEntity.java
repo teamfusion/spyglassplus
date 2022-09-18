@@ -3,6 +3,7 @@ package com.github.teamfusion.spyglassplus.entity;
 import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import com.github.teamfusion.spyglassplus.item.SpyglassPlusItems;
 import com.github.teamfusion.spyglassplus.sound.SpyglassPlusSoundEvents;
+import com.github.teamfusion.spyglassplus.tag.SpyglassPlusItemTags;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
@@ -113,7 +114,8 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
         ItemStack spyglassStack = this.getSpyglassStack();
         if (spyglassStack.isEmpty()) {
             ItemStack stack = player.getStackInHand(hand);
-            if (stack.getItem() instanceof ISpyglass spyglass) { // add spyglass stack
+            ISpyglass spyglass = isValidStackForSpyglassStand(stack);
+            if (spyglass != null) { // add spyglass stack
                 this.setSpyglassStack(stack.copy());
                 stack.decrement(1);
                 this.playSound(spyglass.getUseSound(), 1.0F, 1.0F);
@@ -125,15 +127,17 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
                 return ActionResult.SUCCESS;
             }
         } else {
-            if (spyglassStack.getItem() instanceof ISpyglass spyglass) {
-                if (player.isSneaking()) { // remove spyglass stack
-                    this.dropStack(spyglassStack);
-                    this.setSpyglassStack(ItemStack.EMPTY);
+            if (player.isSneaking()) { // remove spyglass stack
+                this.dropStack(spyglassStack);
+                this.setSpyglassStack(ItemStack.EMPTY);
 
+                if (spyglassStack.getItem() instanceof ISpyglass spyglass) {
                     this.playSound(spyglass.getStopUsingSound(), 1.0F, 1.0F);
+                }
 
-                    return ActionResult.SUCCESS;
-                } else {
+                return ActionResult.SUCCESS;
+            } else {
+                if (spyglassStack.getItem() instanceof ISpyglass spyglass) {
                     if (!this.hasUser() && this.isWithinUseRange(player)) { // use spyglass stand
                         this.useSpyglass(player, spyglass);
                         return ActionResult.CONSUME;
@@ -143,6 +147,10 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
         }
 
         return super.interact(player, hand);
+    }
+
+    public static ISpyglass isValidStackForSpyglassStand(ItemStack stack) {
+        return stack.getItem() instanceof ISpyglass spyglass && stack.isIn(SpyglassPlusItemTags.SPYGLASS_STAND_ITEMS) ? spyglass : null;
     }
 
     @Override

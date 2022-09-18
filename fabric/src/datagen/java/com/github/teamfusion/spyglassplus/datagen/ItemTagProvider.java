@@ -22,6 +22,10 @@ public final class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
         this.add(SpyglassPlusItemTags.SCOPING_ITEMS, BINOCULARS).add(
             SPYGLASS
         );
+
+        this.add(SpyglassPlusItemTags.SPYGLASS_STAND_ITEMS).add(
+            SPYGLASS
+        );
     }
 
     @SafeVarargs
