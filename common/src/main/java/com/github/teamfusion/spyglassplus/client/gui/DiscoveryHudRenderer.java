@@ -345,7 +345,8 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     if (this.activeEntity instanceof LivingEntity livingEntity) {
                         // health
                         float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;
-                        this.drawTextClusterFromRight(matrices, rightX, halfHeight, ((Float.isNaN(hurt) ? 0 : hurt) * (1 - BLACK_OPACITY)) + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
+                        float br = (livingEntity.isDead() ? 1F : (Float.isNaN(hurt) ? 0F : hurt)) * (1 - BLACK_OPACITY);
+                        this.drawTextClusterFromRight(matrices, rightX, halfHeight, br + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
                             Text.translatable(HEALTH_KEY, HEALTH_ICON),
                             this.createHealthHolderText(HEALTH_HOLDER_KEY, HEALTH_ICON, livingEntity.getHealth())
                         );
