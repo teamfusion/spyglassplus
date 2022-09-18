@@ -35,3 +35,10 @@ mandatory = true
 versionRange = "[6.2,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.spyglassplus]]
+modId = "cloth_config"
+mandatory = true
+versionRange = "[8.0,)"
+ordering = "AFTER"
+side = "BOTH"

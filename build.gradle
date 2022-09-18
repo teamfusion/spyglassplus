@@ -35,6 +35,15 @@ allprojects {
   version = ENV.GITHUB_ACTIONS ? "${ver}.build.${ENV.GITHUB_RUN_NUMBER}" : ver
 
   repositories {
+    maven {
+      name = 'Terraformers'
+      url  = 'https://maven.terraformersmc.com/releases/'
+    }
+
+    maven {
+      name = 'Shedaniel'
+      url  = 'https://maven.shedaniel.me/'
+    }
   }
 
   tasks.withType(JavaCompile) {
