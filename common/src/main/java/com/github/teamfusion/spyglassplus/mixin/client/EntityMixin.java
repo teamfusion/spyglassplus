@@ -5,7 +5,6 @@ import com.github.teamfusion.spyglassplus.client.entity.CommandTargetManager;
 import com.github.teamfusion.spyglassplus.client.gui.DiscoveryHudRenderer;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
-import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -41,13 +40,12 @@ public abstract class EntityMixin {
 
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
                 CommandTargetManager manager = SpyglassPlusClient.COMMAND_TARGET_MANAGER;
+                int color = 0xDF0A0A;
                 if (manager.getLastTargetedEntity() == that) {
-                    cir.setReturnValue(0xFFA500);
+                    cir.setReturnValue(color);
                     return;
                 } else if (manager.getEntity() == that) {
-                    int color = 0xFF0000;
-                    float progress = (float) manager.getCommandTicks() / ISpyglass.MAX_COMMAND_TICKS;
-                    cir.setReturnValue(this.multiplyColorByFactor(color, progress));
+                    cir.setReturnValue(this.multiplyColorByFactor(color, 0.5F));
                     return;
                 }
             }
@@ -56,8 +54,7 @@ public abstract class EntityMixin {
                 Entity targeted = DiscoveryHudRenderer.getInstance().getTargetedEntity();
                 if ((that == null || that != targeted) && !SpyglassPlusClient.INDICATE_TARGET_MANAGER.isIndicated(that)) {
                     int color = cir.getReturnValueI();
-                    float factor = 0.5f;
-                    cir.setReturnValue(this.multiplyColorByFactor(color, factor));
+                    cir.setReturnValue(this.multiplyColorByFactor(color, 0.5F));
                 }
             }
         }

@@ -61,5 +61,8 @@
   "text.autoconfig.spyglassplus.option.display.discoveryHud.eyeOpens.@Tooltip[2]": "possible triggers.",
   "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff": "Trail-Off",
   "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[0]": "Whether or not the Discovery HUD has an",
-  "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[1]": "extra 'step' before fully closing."
+  "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[1]": "extra 'step' before fully closing.",
+
+  "key.category.spyglassplus": "Spyglass Plus",
+  "key.spyglassplus.trigger_command_enchantment": "Trigger Command Enchantment"
 }

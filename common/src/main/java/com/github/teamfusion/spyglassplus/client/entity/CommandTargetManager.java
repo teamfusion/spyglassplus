@@ -16,7 +16,6 @@ public class CommandTargetManager {
 
     private Entity entity;
     private Entity lastTargetedEntity;
-    private int commandTicks;
 
     public CommandTargetManager() {
         this.client = MinecraftClient.getInstance();
@@ -38,13 +37,5 @@ public class CommandTargetManager {
     @Nullable
     public Entity getLastTargetedEntity() {
         return lastTargetedEntity;
-    }
-
-    public void setCommandTicks(int commandTicks) {
-        this.commandTicks = commandTicks;
-    }
-
-    public int getCommandTicks() {
-        return this.commandTicks;
     }
 }

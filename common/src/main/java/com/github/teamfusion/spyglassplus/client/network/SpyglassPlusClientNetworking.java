@@ -76,13 +76,8 @@ public interface SpyglassPlusClientNetworking extends SpyglassPlusNetworking {
      */
     static void onCommandUpdate(PacketByteBuf buf, PacketContext context) {
         int id = buf.readInt();
-        int commandTicks = buf.readInt();
         MinecraftClient client = MinecraftClient.getInstance();
-        client.execute(() -> {
-            CommandTargetManager manager = SpyglassPlusClient.COMMAND_TARGET_MANAGER;
-            manager.setEntity(id);
-            manager.setCommandTicks(commandTicks);
-        });
+        client.execute(() -> SpyglassPlusClient.COMMAND_TARGET_MANAGER.setEntity(id));
     }
 
     /**

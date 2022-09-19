@@ -19,12 +19,14 @@
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
+    "client.ControlsListWidgetKeyBindingEntryMixin",
     "client.EndCrystalEntityMixin",
     "client.EntityMixin",
     "client.EntityRendererMixin",
     "client.GameRendererMixin",
     "client.InGameHudMixin",
     "client.ItemModelsMixin",
+    "client.KeyBindingMixin",
     "client.LightmapTextureManagerMixin",
     "client.LivingEntityMixin",
     "client.LivingEntityRendererMixin",
@@ -33,6 +35,7 @@
     "client.MouseMixin",
     "client.PlayerHeldItemFeatureRendererMixin",
     "client.WorldRendererMixin",
+    "client.access.KeyBindingAccessor",
     "client.access.KeyBindingInvoker"
   ],
   "injectors": {
