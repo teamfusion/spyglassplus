@@ -294,7 +294,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     @Override
     public boolean isScoping() {
-        return true;
+        return this.hasUser();
     }
 
     @Override
