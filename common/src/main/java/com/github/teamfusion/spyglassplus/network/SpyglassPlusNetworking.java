@@ -4,6 +4,7 @@ import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import com.github.teamfusion.spyglassplus.item.ISpyglass;
+import com.github.teamfusion.spyglassplus.util.ModLoaded;
 import com.github.teamfusion.spyglassplus.world.SpyglassRaycasting;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.NetworkManager.PacketContext;
@@ -12,6 +13,8 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.AxolotlEntity;
+import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -95,8 +98,14 @@ public interface SpyglassPlusNetworking {
         }
 
         if (entity instanceof IronGolemEntity golem) {
-            //noinspection RedundantIfStatement
             if (golem.isPlayerCreated()) {
+                return true;
+            }
+        }
+
+        if (ModLoaded.DOMESTICATION_INNOVATION) {
+            //noinspection RedundantIfStatement
+            if (entity instanceof FoxEntity || entity instanceof AxolotlEntity) {
                 return true;
             }
         }
