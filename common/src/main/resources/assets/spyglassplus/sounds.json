@@ -190,11 +190,17 @@
 
   "enchantment.command.trigger": {
     "sounds": [
+      "minecraft:mob/guardian/guardian_death"
+    ],
+    "subtitle": "subtitles.enchantment.spyglassplus.command.trigger"
+  },
+  "enchantment.command.untarget": {
+    "sounds": [
       "minecraft:mob/guardian/guardian_hit1",
       "minecraft:mob/guardian/guardian_hit2",
       "minecraft:mob/guardian/guardian_hit3",
       "minecraft:mob/guardian/guardian_hit4"
     ],
-    "subtitle": "subtitles.enchantment.spyglassplus.command.trigger"
+    "subtitle": "subtitles.enchantment.spyglassplus.command.untarget"
   }
 }

@@ -91,8 +91,12 @@ public interface SpyglassPlusClientNetworking extends SpyglassPlusNetworking {
             Entity old = manager.getLastTargetedEntity();
             Entity entity = manager.setLastTargetedEntity(id);
             if (entity != old) {
-                client.player.playSound(SpyglassPlusSoundEvents.ENCHANT_COMMAND_TRIGGER.get(), 1.0F, 1.0F);
-                client.particleManager.addEmitter(entity, ParticleTypes.CRIT);
+                if (entity != null) {
+                    client.player.playSound(SpyglassPlusSoundEvents.ENCHANT_COMMAND_TRIGGER.get(), 1.0F, 1.0F);
+                    client.particleManager.addEmitter(entity, ParticleTypes.CRIT);
+                } else {
+                    client.player.playSound(SpyglassPlusSoundEvents.ENCHANT_COMMAND_UNTARGET.get(), 1.0F, 1.0F);
+                }
             }
         });
     }

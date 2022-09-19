@@ -23,7 +23,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -31,8 +31,7 @@ public interface SpyglassPlusNetworking {
     Identifier
         LOCAL_SCRUTINY_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_local_scrutiny"),
         COMMAND_TRIGGERED_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "command_triggered"),
-
-    EFFECTS_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_active_effects"),
+        EFFECTS_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_active_effects"),
         INDICATE_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "indicate_update"),
         COMMAND_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "command_update"),
         COMMAND_TARGETED_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "command_targeted");
@@ -70,15 +69,15 @@ public interface SpyglassPlusNetworking {
             ItemStack stack = scopingPlayer.getScopingStack();
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
                 Entity entity = SpyglassRaycasting.raycast(player, entityx -> entityx instanceof MobEntity mobEntity && !isCommandAllyTo(player, mobEntity));
-                if (entity instanceof MobEntity target) {
+                if (entity instanceof MobEntity || entity == null) {
                     Box box = new Box(player.getBlockPos()).expand(64.0D);
                     List<MobEntity> nearbyAllies = player.world.getNonSpectatingEntities(MobEntity.class, box).stream().filter(entityx -> isCommandAllyTo(player, entityx)).toList();
 
-                    if (!nearbyAllies.isEmpty() && !nearbyAllies.contains(target)) {
-                        nearbyAllies.forEach(entityx -> entityx.setTarget(target));
+                    if (!nearbyAllies.isEmpty() && !nearbyAllies.contains(entity)) {
+                        nearbyAllies.forEach(entityx -> entityx.setTarget(entity == null ? null : (MobEntity) entity));
 
                         if (player instanceof ServerPlayerEntity serverPlayer) {
-                            sendCommandTargeted(target, serverPlayer);
+                            sendCommandTargeted(entity, serverPlayer);
                         }
                     }
                 }
@@ -113,9 +112,9 @@ public interface SpyglassPlusNetworking {
         return false;
     }
 
-    static void sendCommandTargeted(@NotNull Entity targetedEntity, ServerPlayerEntity player) {
+    static void sendCommandTargeted(@Nullable Entity targetedEntity, ServerPlayerEntity player) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeInt(targetedEntity.getId());
+        buf.writeInt(targetedEntity == null ? -1 : targetedEntity.getId());
         NetworkManager.sendToPlayer(player, COMMAND_TARGETED_PACKET_ID, buf);
     }
 }

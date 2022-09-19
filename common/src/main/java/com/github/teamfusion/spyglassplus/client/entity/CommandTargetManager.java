@@ -26,7 +26,8 @@ public class CommandTargetManager {
     }
 
     public Entity setLastTargetedEntity(int id) {
-        return this.lastTargetedEntity = this.client.world.getEntityById(id);
+        this.lastTargetedEntity = id == -1 ? null : this.client.world.getEntityById(id);
+        return this.lastTargetedEntity;
     }
 
     @Nullable
