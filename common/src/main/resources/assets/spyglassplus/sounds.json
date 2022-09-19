@@ -186,5 +186,15 @@
       }
     ],
     "subtitle": "subtitles.entity.spyglassplus.spyglass_stand.enlarge"
+  },
+
+  "enchantment.command.trigger": {
+    "sounds": [
+      "minecraft:mob/guardian/guardian_hit1",
+      "minecraft:mob/guardian/guardian_hit2",
+      "minecraft:mob/guardian/guardian_hit3",
+      "minecraft:mob/guardian/guardian_hit4"
+    ],
+    "subtitle": "subtitles.enchantment.spyglassplus.command.trigger"
   }
 }

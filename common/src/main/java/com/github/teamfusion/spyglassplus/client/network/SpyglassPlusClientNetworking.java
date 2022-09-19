@@ -6,6 +6,7 @@ import com.github.teamfusion.spyglassplus.client.entity.IndicateTargetManager;
 import com.github.teamfusion.spyglassplus.client.entity.LivingEntityClientAccess;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking;
+import com.github.teamfusion.spyglassplus.sound.SpyglassPlusSoundEvents;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.NetworkManager.PacketContext;
 import dev.architectury.networking.NetworkManager.Side;
@@ -20,7 +21,6 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.SoundEvents;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,7 +91,7 @@ public interface SpyglassPlusClientNetworking extends SpyglassPlusNetworking {
             Entity old = manager.getLastTargetedEntity();
             Entity entity = manager.setLastTargetedEntity(id);
             if (entity != old) {
-                client.player.playSound(SoundEvents.ENTITY_GUARDIAN_HURT, 1.0F, 1.0F);
+                client.player.playSound(SpyglassPlusSoundEvents.ENCHANT_COMMAND_TRIGGER.get(), 1.0F, 1.0F);
                 client.particleManager.addEmitter(entity, ParticleTypes.CRIT);
             }
         });

@@ -38,9 +38,12 @@
 
   "subtitles.item.spyglassplus.spyglass.adjust": "Spyglass adjusts",
   "subtitles.item.spyglassplus.spyglass.reset_adjust": "Spyglass snaps",
+
   "subtitles.entity.spyglassplus.spyglass_stand.fall": "Something fell",
   "subtitles.entity.spyglassplus.spyglass_stand.shrink": "Spyglass Stand shrinks",
   "subtitles.entity.spyglassplus.spyglass_stand.enlarge": "Spyglass Stand enlarges",
+
+  "subtitles.enchantment.spyglassplus.command.trigger": "Command commands",
 
   "enchantment.spyglassplus.discovery": "Discovery",
   "enchantment.spyglassplus.indicate": "Indicate",
