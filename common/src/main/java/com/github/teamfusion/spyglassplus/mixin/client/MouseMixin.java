@@ -124,7 +124,7 @@ public class MouseMixin {
             target = "Lnet/minecraft/client/option/KeyBinding;setKeyPressed(Lnet/minecraft/client/util/InputUtil$Key;Z)V"
         )
     )
-    private void checkForCommandKeyBinding(long window, int button, int action, int mods, CallbackInfo ci) {
+    private void checkForTriggerCommandMouse(long window, int button, int action, int mods, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player instanceof ScopingPlayer scopingPlayer && scopingPlayer.isScoping()) {
             ItemStack stack = scopingPlayer.getScopingStack();

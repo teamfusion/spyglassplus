@@ -57,7 +57,7 @@ public interface SpyglassPlusClient extends SpyglassPlus {
         ClientTooltipEvent.ITEM.register(ISpyglass::appendLocalScrutinyLevelTooltip);
         SpyglassPlusClientNetworking.registerReceivers();
 
-        ClientTickEvent.CLIENT_LEVEL_POST.register(SpyglassPlusClient::clientWorldTick);
+        ClientTickEvent.CLIENT_LEVEL_POST.register(SpyglassPlusClient::checkForTriggerCommandKeyboard);
 
         initializeConfig();
     }
@@ -70,7 +70,7 @@ public interface SpyglassPlusClient extends SpyglassPlus {
         Platform.getMod(MOD_ID).registerConfigurationScreen(SpyglassPlusConfig::createScreen);
     }
 
-    static void clientWorldTick(ClientWorld world) {
+    static void checkForTriggerCommandKeyboard(ClientWorld world) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player instanceof ScopingPlayer scopingPlayer && scopingPlayer.isScoping()) {
             ItemStack stack = scopingPlayer.getScopingStack();
