@@ -16,7 +16,9 @@ public interface SpyglassPlusNetworking {
     Identifier
         LOCAL_SCRUTINY_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_local_scrutiny"),
         EFFECTS_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "update_active_effects"),
-        INDICATE_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "indicate_update_packet_id");
+        INDICATE_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "indicate_update"),
+        COMMAND_UPDATE_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "command_update"),
+        COMMAND_TARGETED_PACKET_ID = new Identifier(SpyglassPlus.MOD_ID, "command_targeted");
 
     static void registerReceivers() {
         NetworkManager.registerReceiver(Side.C2S, LOCAL_SCRUTINY_PACKET_ID, SpyglassPlusNetworking::onLocalScrutinyUpdate);

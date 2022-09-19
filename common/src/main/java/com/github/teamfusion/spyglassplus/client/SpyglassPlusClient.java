@@ -2,6 +2,7 @@ package com.github.teamfusion.spyglassplus.client;
 
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.client.config.SpyglassPlusConfig;
+import com.github.teamfusion.spyglassplus.client.entity.CommandTargetManager;
 import com.github.teamfusion.spyglassplus.client.entity.IndicateTargetManager;
 import com.github.teamfusion.spyglassplus.client.model.entity.SpyglassPlusEntityModelLayers;
 import com.github.teamfusion.spyglassplus.client.network.SpyglassPlusClientNetworking;
@@ -23,7 +24,9 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public interface SpyglassPlusClient extends SpyglassPlus {
     ConfigHolder<SpyglassPlusConfig> CONFIG_HOLDER = AutoConfig.register(SpyglassPlusConfig.class, JanksonConfigSerializer::new);
+
     IndicateTargetManager INDICATE_TARGET_MANAGER = new IndicateTargetManager();
+    CommandTargetManager COMMAND_TARGET_MANAGER = new CommandTargetManager();
 
     /**
      * @see ModelPredicateProviderRegistryMixin

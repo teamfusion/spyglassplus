@@ -24,6 +24,8 @@ public interface ISpyglass {
         LOCAL_SCRUTINY_LEVEL_KEY = "LocalScrutinyLevel",
         EFFECTS_KEY = "Effects";
 
+    int MAX_COMMAND_TICKS = 20 * 2;
+
     default boolean isSpyglassEnchantable(ItemStack stack) {
         return true;
     }

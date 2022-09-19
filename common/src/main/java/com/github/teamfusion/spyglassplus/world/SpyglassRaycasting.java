@@ -26,7 +26,7 @@ public interface SpyglassRaycasting {
     /**
      * Retrieves the entity that the camera is looking at.
      */
-    static Entity raycast(Entity camera, Vec2f rotation, float tickDelta, double distance) {
+    static Entity raycast(Entity camera, Vec2f rotation, float tickDelta, double distance, Predicate<Entity> predicate) {
         // calculate a position vector from the camera's rotation
         Vec3d vector = ((EntityInvoker) camera).invokeGetRotationVector(rotation.y, rotation.x);
 
@@ -42,7 +42,7 @@ public interface SpyglassRaycasting {
 
         // calculate entity hit result
         Box net = camera.getBoundingBox().stretch(vector.multiply(distance)).expand(1.0F);
-        EntityHitResult entityHit = raycast(camera, min, max, net, entity -> isVisibleToRaycast(entity, camera instanceof PlayerEntity player ? player : null), distance);
+        EntityHitResult entityHit = raycast(camera, min, max, net, entity -> isVisibleToRaycast(entity, camera instanceof PlayerEntity player ? player : null) && predicate.test(entity), distance);
 
         if (entityHit != null) {
             Entity entity = entityHit.getEntity();
@@ -57,7 +57,11 @@ public interface SpyglassRaycasting {
     }
 
     static Entity raycast(Entity camera, Vec2f rotation, float tickDelta) {
-        return raycast(camera, rotation, tickDelta, MAX_RAYCAST_DISTANCE);
+        return raycast(camera, rotation, tickDelta, MAX_RAYCAST_DISTANCE, entity -> true);
+    }
+
+    static Entity raycast(Entity camera, Predicate<Entity> predicate) {
+        return raycast(camera, getRotation(camera), 1.0F, MAX_RAYCAST_DISTANCE, predicate);
     }
 
     static Entity raycast(Entity camera) {
