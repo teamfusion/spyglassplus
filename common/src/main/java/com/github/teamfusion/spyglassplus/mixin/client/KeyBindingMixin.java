@@ -73,13 +73,17 @@ public abstract class KeyBindingMixin {
     private static void onOnKeyPressed(InputUtil.Key key, CallbackInfo ci) {
         KeyBinding keyBinding = SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT;
         KeyBindingAccessor access = (KeyBindingAccessor) keyBinding;
-        if (access.getBoundKey() == key) access.setTimesPressed(access.getTimesPressed() + 1);
+        if (access.getBoundKey() == key) {
+            access.setTimesPressed(access.getTimesPressed() + 1);
+        }
     }
 
     @Inject(method = "setKeyPressed", at = @At("HEAD"))
     private static void onSetKeyPressed(InputUtil.Key key, boolean pressed, CallbackInfo ci) {
         KeyBinding keyBinding = SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT;
         KeyBindingAccessor access = (KeyBindingAccessor) keyBinding;
-        if (access.getBoundKey() == key) keyBinding.setPressed(pressed);
+        if (access.getBoundKey() == key) {
+            keyBinding.setPressed(pressed);
+        }
     }
 }
