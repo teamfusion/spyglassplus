@@ -41,7 +41,7 @@
     "java": ">=17",
     "minecraft": ">=1.19",
     "fabricloader": ">=0.14",
-    "fabric-api": ">=0.58",
+    "fabric": ">=0.58",
     "architectury": ">=6.2",
     "frame-enchantments-v0": "*",
     "cloth-config": "*"
