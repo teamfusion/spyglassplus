@@ -38,9 +38,13 @@
 
   "subtitles.item.spyglassplus.spyglass.adjust": "Spyglass adjusts",
   "subtitles.item.spyglassplus.spyglass.reset_adjust": "Spyglass snaps",
+
   "subtitles.entity.spyglassplus.spyglass_stand.fall": "Something fell",
   "subtitles.entity.spyglassplus.spyglass_stand.shrink": "Spyglass Stand shrinks",
   "subtitles.entity.spyglassplus.spyglass_stand.enlarge": "Spyglass Stand enlarges",
+
+  "subtitles.enchantment.spyglassplus.command.trigger": "Command commands",
+  "subtitles.enchantment.spyglassplus.command.untarget": "Command calls off",
 
   "enchantment.spyglassplus.discovery": "Discovery",
   "enchantment.spyglassplus.indicate": "Indicate",
@@ -61,5 +65,8 @@
   "text.autoconfig.spyglassplus.option.display.discoveryHud.eyeOpens.@Tooltip[2]": "possible triggers.",
   "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff": "Trail-Off",
   "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[0]": "Whether or not the Discovery HUD has an",
-  "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[1]": "extra 'step' before fully closing."
+  "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[1]": "extra 'step' before fully closing.",
+
+  "key.category.spyglassplus": "Spyglass Plus",
+  "key.spyglassplus.trigger_command_enchantment": "Trigger Command Enchantment"
 }

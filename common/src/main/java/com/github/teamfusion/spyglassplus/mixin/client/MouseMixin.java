@@ -1,9 +1,11 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
+import com.github.teamfusion.spyglassplus.client.keybinding.SpyglassPlusKeyBindings;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import com.github.teamfusion.spyglassplus.item.ISpyglass;
+import com.github.teamfusion.spyglassplus.mixin.client.access.KeyBindingAccessor;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
@@ -24,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.COMMAND_TRIGGERED_PACKET_ID;
 import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.LOCAL_SCRUTINY_PACKET_ID;
 
 @Environment(EnvType.CLIENT)
@@ -107,6 +110,29 @@ public class MouseMixin {
                 }
 
                 ci.cancel();
+            }
+        }
+    }
+
+    /**
+     * Resets the local scrutiny level on middle mouse click.
+     */
+    @Inject(
+        method = "onMouseButton",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/option/KeyBinding;setKeyPressed(Lnet/minecraft/client/util/InputUtil$Key;Z)V"
+        )
+    )
+    private void checkForTriggerCommandMouse(long window, int button, int action, int mods, CallbackInfo ci) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player instanceof ScopingPlayer scopingPlayer && scopingPlayer.isScoping()) {
+            ItemStack stack = scopingPlayer.getScopingStack();
+            if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
+                int code = ((KeyBindingAccessor) SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT).getBoundKey().getCode();
+                if ((code >= 0 && code <= 7) && button == code) {
+                    NetworkManager.sendToServer(COMMAND_TRIGGERED_PACKET_ID, new PacketByteBuf(Unpooled.EMPTY_BUFFER));
+                }
             }
         }
     }

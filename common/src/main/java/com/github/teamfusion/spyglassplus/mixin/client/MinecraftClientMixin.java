@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
 import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
+import com.github.teamfusion.spyglassplus.client.entity.CommandTargetManager;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
@@ -98,8 +99,17 @@ public abstract class MinecraftClientMixin {
         if (this.getCameraEntity() instanceof ScopingEntity scopingEntity && scopingEntity.isScoping()) {
             if (this.options.getPerspective().isFirstPerson()) {
                 ItemStack stack = scopingEntity.getScopingStack();
+
                 if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.INDICATE.get(), stack) > 0) {
                     cir.setReturnValue(true);
+                    return;
+                }
+
+                if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
+                    CommandTargetManager manager = SpyglassPlusClient.COMMAND_TARGET_MANAGER;
+                    if (manager.getEntity() == entity || manager.getLastTargetedEntity() == entity) {
+                        cir.setReturnValue(true);
+                    }
                 }
             }
         }

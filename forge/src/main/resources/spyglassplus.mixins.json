@@ -5,7 +5,7 @@
   "minVersion": "0.8",
   "mixins": [],
   "client": [
-    "ForgeGuiMixin"
+    "client.ForgeGuiMixin"
   ],
   "injectors": {
     "defaultRequire": 1

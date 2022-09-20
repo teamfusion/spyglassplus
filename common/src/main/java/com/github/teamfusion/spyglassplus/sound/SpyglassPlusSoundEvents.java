@@ -22,6 +22,12 @@ public interface SpyglassPlusSoundEvents {
     RegistrySupplier<SoundEvent> ENTITY_SPYGLASS_STAND_FALL = spyglassStand("fall");
     RegistrySupplier<SoundEvent> ENTITY_SPYGLASS_STAND_SHRINK = spyglassStand("shrink");
     RegistrySupplier<SoundEvent> ENTITY_SPYGLASS_STAND_ENLARGE = spyglassStand("enlarge");
+    RegistrySupplier<SoundEvent> ENCHANT_COMMAND_TRIGGER = command("trigger");
+    RegistrySupplier<SoundEvent> ENCHANT_COMMAND_UNTARGET = command("untarget");
+
+    static RegistrySupplier<SoundEvent> command(String id) {
+        return register("enchantment.command.%s".formatted(id));
+    }
 
     private static RegistrySupplier<SoundEvent> binoculars(String id) {
         return item("binoculars", id);
