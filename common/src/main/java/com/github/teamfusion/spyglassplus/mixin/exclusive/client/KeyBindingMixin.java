@@ -1,4 +1,4 @@
-package com.github.teamfusion.spyglassplus.mixin.client;
+package com.github.teamfusion.spyglassplus.mixin.exclusive.client;
 
 import com.github.teamfusion.spyglassplus.client.keybinding.SpyglassPlusKeyBindings;
 import com.github.teamfusion.spyglassplus.mixin.client.access.KeyBindingAccessor;

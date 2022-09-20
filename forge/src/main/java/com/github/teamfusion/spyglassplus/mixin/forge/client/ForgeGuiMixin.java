@@ -1,4 +1,4 @@
-package com.github.teamfusion.spyglassplus.mixin.forge;
+package com.github.teamfusion.spyglassplus.mixin.forge.client;
 
 import com.github.teamfusion.spyglassplus.client.gui.DiscoveryHudRenderer;
 import com.github.teamfusion.spyglassplus.client.gui.InGameHudAccess;
