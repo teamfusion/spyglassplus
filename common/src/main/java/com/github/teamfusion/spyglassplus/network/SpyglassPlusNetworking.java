@@ -4,7 +4,8 @@ import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import com.github.teamfusion.spyglassplus.item.ISpyglass;
-import com.github.teamfusion.spyglassplus.util.ModLoaded;
+import com.github.teamfusion.spyglassplus.mixin.access.FoxEntityInvoker;
+import com.github.teamfusion.spyglassplus.tag.SpyglassPlusEntityTypeTags;
 import com.github.teamfusion.spyglassplus.world.SpyglassRaycasting;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.NetworkManager.PacketContext;
@@ -13,12 +14,12 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -26,6 +27,8 @@ import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface SpyglassPlusNetworking {
     Identifier
@@ -102,14 +105,28 @@ public interface SpyglassPlusNetworking {
             }
         }
 
-        if (ModLoaded.DOMESTICATION_INNOVATION) {
+        if (entity instanceof FoxEntity foxEntity) {
+            List<UUID> trusted = ((FoxEntityInvoker) foxEntity).invokeGetTrustedUuids();
+            if (trusted.contains(player.getUuid())) {
+                return true;
+            }
+        }
+
+        if (entity.getType().isIn(SpyglassPlusEntityTypeTags.CHECKS_NBT_COMMAND)) {
+            NbtCompound nbt = new NbtCompound();
+            entity.writeCustomDataToNbt(nbt);
+            UUID uuid = tryGetUuid(nbt, "Owner").orElseGet(() -> tryGetUuid(nbt, "OwnerUUID").orElse(null));
             //noinspection RedundantIfStatement
-            if (entity instanceof FoxEntity || entity instanceof AxolotlEntity) {
+            if (uuid != null && uuid.equals(player.getUuid())) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    static Optional<UUID> tryGetUuid(NbtCompound nbt, String key) {
+        return nbt.containsUuid(key) ? Optional.of(nbt.getUuid(key)) : Optional.empty();
     }
 
     static void sendCommandTargeted(@Nullable Entity targetedEntity, ServerPlayerEntity player) {

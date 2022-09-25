@@ -31,6 +31,11 @@ public interface SpyglassPlusEntityTypeTags {
     TagKey<EntityType<?>> DO_NOT_RENDER_BOX_DISCOVERY = create("do_not_render_box_discovery");
 
     /**
+     * Contains entities that check NBT for owner in {@link SpyglassPlusEnchantments#COMMAND}.
+     */
+    TagKey<EntityType<?>> CHECKS_NBT_COMMAND = create("check_nbt_command");
+
+    /**
      * Contains entities pertaining to this behavior.
      */
     TagKey<EntityType<?>>

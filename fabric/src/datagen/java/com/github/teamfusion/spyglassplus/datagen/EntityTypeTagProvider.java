@@ -34,6 +34,11 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
             ENDER_DRAGON
         );
 
+        this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.CHECKS_NBT_COMMAND).add(
+            FOX,
+            AXOLOTL
+        );
+
         this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE).add(
             ALLAY,
             AXOLOTL,
