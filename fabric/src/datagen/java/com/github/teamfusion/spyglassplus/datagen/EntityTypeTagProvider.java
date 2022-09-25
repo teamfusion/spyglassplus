@@ -36,7 +36,9 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
 
         this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.CHECKS_NBT_COMMAND).add(
             FOX,
-            AXOLOTL
+            AXOLOTL,
+            RABBIT,
+            FROG
         );
 
         this.getOrCreateTagBuilder(SpyglassPlusEntityTypeTags.DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_PASSIVE).add(
