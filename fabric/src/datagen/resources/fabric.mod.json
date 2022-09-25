@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "spyglassplus-datagen",
   "name": "Spyglass Plus Data Generation",
-  "version": "${version}",
+  "version": "1.0.0",
   "environment": "server",
   "entrypoints": {
     "fabric-datagen": [ "com.github.teamfusion.spyglassplus.datagen.SpyglassPlusDataGenerator" ]
