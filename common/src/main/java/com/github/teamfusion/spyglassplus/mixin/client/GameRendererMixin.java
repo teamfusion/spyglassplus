@@ -23,6 +23,8 @@ public class GameRendererMixin {
     @Shadow @Final private MinecraftClient client;
     @Shadow private float fovMultiplier;
 
+    private float spyglassFov;
+
     /**
      * Implements default fovMultiplier for the spyglass stand.
      */
@@ -55,7 +57,11 @@ public class GameRendererMixin {
             ItemStack stack = scoping.getScopingStack();
             int level = ISpyglass.getLocalScrutinyLevel(stack);
             if (level > 0) {
+                this.spyglassFov = 0.4F / level;
                 this.fovMultiplier *= 0.4F / level;
+            }else {
+                this.spyglassFov *= 0.1F;
+                this.fovMultiplier -= this.spyglassFov;
             }
         }
     }
