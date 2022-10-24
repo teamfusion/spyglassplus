@@ -51,10 +51,10 @@ public interface ISpyglass {
     /**
      * Modifies the local scrutiny level based on scroll delta.
      */
-    default int adjustScrutiny(ItemStack stack, int level, int delta) {
+    default int adjustScrutiny(ItemStack stack, int max, int delta) {
         NbtCompound nbt = stack.getOrCreateNbt();
-        int local = nbt.contains(LOCAL_SCRUTINY_LEVEL_KEY) ? nbt.getInt(LOCAL_SCRUTINY_LEVEL_KEY) : level;
-        int adjusted = delta == 0 ? level : MathHelper.clamp(local + delta, 0, level);
+        int local = nbt.contains(LOCAL_SCRUTINY_LEVEL_KEY) ? nbt.getInt(LOCAL_SCRUTINY_LEVEL_KEY) : max;
+        int adjusted = delta == 0 ? 0 : MathHelper.clamp(local + delta, -max, max);
         nbt.putInt(LOCAL_SCRUTINY_LEVEL_KEY, adjusted);
         return adjusted;
     }
@@ -66,10 +66,9 @@ public interface ISpyglass {
 
     static int getLocalScrutinyLevel(ItemStack stack) {
         Enchantment enchantment = SpyglassPlusEnchantments.SCRUTINY.get();
-        int level = hasLocalScrutinyLevel(stack)
-            ? stack.getNbt().getInt(LOCAL_SCRUTINY_LEVEL_KEY)
-            : EnchantmentHelper.getLevel(enchantment, stack);
-        return MathHelper.clamp(level, 0, enchantment.getMaxLevel());
+        int level = hasLocalScrutinyLevel(stack) ? stack.getNbt().getInt(LOCAL_SCRUTINY_LEVEL_KEY) : 0;
+        int max = enchantment.getMaxLevel();
+        return MathHelper.clamp(level, -max, max);
     }
 
     /* Events */
@@ -80,7 +79,7 @@ public interface ISpyglass {
         if (item instanceof ISpyglass) {
             int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.SCRUTINY.get(), stack);
             if (level > 0) {
-                int adjustment = level - getLocalScrutinyLevel(stack);
+                int adjustment = getLocalScrutinyLevel(stack);
                 if (adjustment != 0) {
                     String key = "%s.%s.local_scrutiny_level_tooltip".formatted(item.getTranslationKey(), SpyglassPlus.MOD_ID);
                     list.add(1 + stack.getEnchantments().size(), Text.translatable(key, adjustment).formatted(Formatting.DARK_GRAY));
