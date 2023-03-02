@@ -23,12 +23,15 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.world.EntityView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface SpyglassPlusNetworking {
     Identifier
@@ -66,25 +69,42 @@ public interface SpyglassPlusNetworking {
      * Received when a client triggers {@link SpyglassPlusEnchantments#COMMAND}.
      */
     static void onCommandTriggered(PacketByteBuf buf, PacketContext context) {
+        boolean target = buf.readBoolean();
+
         PlayerEntity player = context.getPlayer();
         ScopingPlayer scopingPlayer = ScopingPlayer.cast(player);
         if (scopingPlayer.isScoping()) {
             ItemStack stack = scopingPlayer.getScopingStack();
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
-                Entity entity = SpyglassRaycasting.raycast(player, entityx -> entityx instanceof MobEntity mobEntity && !isCommandAllyTo(player, mobEntity));
-                if (entity instanceof MobEntity || entity == null) {
-                    Box box = new Box(player.getBlockPos()).expand(64.0D);
-                    List<MobEntity> nearbyAllies = player.world.getNonSpectatingEntities(MobEntity.class, box).stream().filter(entityx -> isCommandAllyTo(player, entityx)).toList();
+                if (target) {
+                    Entity entity = SpyglassRaycasting.raycast(player, e -> e instanceof MobEntity mobEntity && !isCommandAllyTo(player, mobEntity));
+                    if (entity instanceof MobEntity mobEntity) {
+                        executeIfCommandAllies(player, mobEntity, player.getBlockPos(), player.getWorld(), entities -> {
+                            entities.forEach(e -> e.setTarget(mobEntity));
 
-                    if (!nearbyAllies.isEmpty() && !nearbyAllies.contains(entity)) {
-                        nearbyAllies.forEach(entityx -> entityx.setTarget(entity == null ? null : (MobEntity) entity));
-
-                        if (player instanceof ServerPlayerEntity serverPlayer) {
-                            sendCommandTargeted(entity, serverPlayer);
-                        }
+                            if (player instanceof ServerPlayerEntity serverPlayer) {
+                                sendCommandTargeted(mobEntity, serverPlayer);
+                            }
+                        });
                     }
+                } else {
+                    executeIfCommandAllies(player, null, player.getBlockPos(), player.getWorld(), entities -> {
+                        entities.forEach(e -> e.setTarget(null));
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                            sendCommandTargeted(null, serverPlayer);
+                        }
+                    });
                 }
             }
+        }
+    }
+
+    static void executeIfCommandAllies(PlayerEntity source, @Nullable MobEntity targeted, BlockPos pos, EntityView world, Consumer<List<MobEntity>> entities) {
+        Box box = new Box(pos).expand(64.0D);
+        List<MobEntity> nearbyAllies = world.getNonSpectatingEntities(MobEntity.class, box).stream().filter(e -> isCommandAllyTo(source, e)).toList();
+
+        if (!nearbyAllies.isEmpty() && !nearbyAllies.contains(targeted)) {
+            entities.accept(nearbyAllies);
         }
     }
 

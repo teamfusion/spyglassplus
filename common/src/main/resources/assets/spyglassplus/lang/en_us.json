@@ -68,5 +68,6 @@
   "text.autoconfig.spyglassplus.option.display.discoveryHud.trailOff.@Tooltip[1]": "extra 'step' before fully closing.",
 
   "key.category.spyglassplus": "Spyglass Plus",
-  "key.spyglassplus.trigger_command_enchantment": "Trigger Command Enchantment"
+  "key.spyglassplus.command_target": "Command (Target)",
+  "key.spyglassplus.command_untarget": "Command (Untarget)"
 }

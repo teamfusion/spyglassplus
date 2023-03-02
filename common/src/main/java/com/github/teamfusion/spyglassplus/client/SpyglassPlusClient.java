@@ -27,12 +27,14 @@ import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+
+import java.util.function.Predicate;
 
 import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.COMMAND_TRIGGERED_PACKET_ID;
 
@@ -75,12 +77,32 @@ public interface SpyglassPlusClient extends SpyglassPlus {
         if (client.player instanceof ScopingPlayer scopingPlayer && scopingPlayer.isScoping()) {
             ItemStack stack = scopingPlayer.getScopingStack();
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
-                Window window = client.getWindow();
-                int code = ((KeyBindingAccessor) SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT).getBoundKey().getCode();
-                if (!(code >= 0 && code <= 7) && InputUtil.isKeyPressed(window.getHandle(), code)) {
-                    NetworkManager.sendToServer(COMMAND_TRIGGERED_PACKET_ID, new PacketByteBuf(Unpooled.EMPTY_BUFFER));
-                }
+                long handle = client.getWindow().getHandle();
+                sendCommandTriggerToServer(code -> InputUtil.isKeyPressed(handle, code));
             }
         }
+    }
+
+    static void sendCommandTriggerToServer(Predicate<Integer> keyPressedPredicate) {
+        int targetCode = getKeyCode(SpyglassPlusKeyBindings.COMMAND_TARGET);
+        if (keyPressedPredicate.test(targetCode)) {
+            NetworkManager.sendToServer(COMMAND_TRIGGERED_PACKET_ID, createCommandTriggeredPacketBuf(true));
+        } else {
+            int untargetCode = getKeyCode(SpyglassPlusKeyBindings.COMMAND_UNTARGET);
+            if (keyPressedPredicate.test(untargetCode)) {
+                NetworkManager.sendToServer(COMMAND_TRIGGERED_PACKET_ID, createCommandTriggeredPacketBuf(false));
+            }
+        }
+    }
+
+    static int getKeyCode(KeyBinding keyBinding) {
+        int code = ((KeyBindingAccessor) keyBinding).getBoundKey().getCode();
+        return code >= 0 && code <= 7 ? -1 : code;
+    }
+
+    static PacketByteBuf createCommandTriggeredPacketBuf(boolean target) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeBoolean(target);
+        return buf;
     }
 }

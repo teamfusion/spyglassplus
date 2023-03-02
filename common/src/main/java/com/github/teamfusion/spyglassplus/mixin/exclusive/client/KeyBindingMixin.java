@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 
 /**
- * An incredible mixin that prevents {@link SpyglassPlusKeyBindings#TRIGGER_COMMAND_ENCHANTMENT} from
+ * An incredible mixin that prevents {@link SpyglassPlusKeyBindings#COMMAND_TARGET} from
  * being added to relevant maps that the game loops through to set key states, and runs its own
  * logic instead.
  */
@@ -41,7 +41,7 @@ public abstract class KeyBindingMixin {
     )
     private <V> V onInitAddToKeyBindings(V value) {
         KeyBinding that = (KeyBinding) (Object) this;
-        if (that == SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT) {
+        if (that == SpyglassPlusKeyBindings.COMMAND_TARGET) {
             return (V) KEY_TO_BINDINGS.get(this.boundKey);
         }
 
@@ -59,7 +59,7 @@ public abstract class KeyBindingMixin {
     )
     private static <V> V onUpdateKeysByCodeAddToKeyBindings(V value) {
         KeyBinding keyBinding = (KeyBinding) value;
-        if (keyBinding == SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT) {
+        if (keyBinding == SpyglassPlusKeyBindings.COMMAND_TARGET) {
             KeyBindingAccessor access = (KeyBindingAccessor) keyBinding;
             return (V) KEY_TO_BINDINGS.get(access.getBoundKey());
         }
@@ -71,7 +71,7 @@ public abstract class KeyBindingMixin {
 
     @Inject(method = "onKeyPressed", at = @At("HEAD"))
     private static void onOnKeyPressed(InputUtil.Key key, CallbackInfo ci) {
-        KeyBinding keyBinding = SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT;
+        KeyBinding keyBinding = SpyglassPlusKeyBindings.COMMAND_TARGET;
         KeyBindingAccessor access = (KeyBindingAccessor) keyBinding;
         if (access.getBoundKey() == key) {
             access.setTimesPressed(access.getTimesPressed() + 1);
@@ -80,7 +80,7 @@ public abstract class KeyBindingMixin {
 
     @Inject(method = "setKeyPressed", at = @At("HEAD"))
     private static void onSetKeyPressed(InputUtil.Key key, boolean pressed, CallbackInfo ci) {
-        KeyBinding keyBinding = SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT;
+        KeyBinding keyBinding = SpyglassPlusKeyBindings.COMMAND_TARGET;
         KeyBindingAccessor access = (KeyBindingAccessor) keyBinding;
         if (access.getBoundKey() == key) {
             keyBinding.setPressed(pressed);

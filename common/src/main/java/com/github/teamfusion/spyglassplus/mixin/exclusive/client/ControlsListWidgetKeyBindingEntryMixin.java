@@ -25,7 +25,7 @@ public class ControlsListWidgetKeyBindingEntryMixin {
     @Shadow @Final private ButtonWidget editButton;
 
     /**
-     * Removes the error formatting from {@link SpyglassPlusKeyBindings#TRIGGER_COMMAND_ENCHANTMENT} and its co-binding.
+     * Removes the error formatting from {@link SpyglassPlusKeyBindings#COMMAND_TARGET} and its co-binding.
      */
     @Inject(
         method = "render",
@@ -39,7 +39,7 @@ public class ControlsListWidgetKeyBindingEntryMixin {
     )
     private void onRender(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci, boolean selected, boolean incompatible) {
         if (incompatible) {
-            if (this.binding == SpyglassPlusKeyBindings.TRIGGER_COMMAND_ENCHANTMENT
+            if (this.binding == SpyglassPlusKeyBindings.COMMAND_TARGET
                 || this.binding == ExclusiveKeyBindingAccessor.getKEY_TO_BINDINGS().get(((KeyBindingAccessor) this.binding).getBoundKey())
             ) this.editButton.setMessage(this.editButton.getMessage().copy().formatted(Formatting.WHITE));
         }

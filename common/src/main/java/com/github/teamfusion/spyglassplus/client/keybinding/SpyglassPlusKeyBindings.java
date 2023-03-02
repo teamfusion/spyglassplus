@@ -11,7 +11,8 @@ import net.minecraft.client.util.InputUtil;
 public interface SpyglassPlusKeyBindings {
     String CATEGORY = "key.category." + SpyglassPlus.MOD_ID;
 
-    KeyBinding TRIGGER_COMMAND_ENCHANTMENT = register("trigger_command_enchantment", InputUtil.UNKNOWN_KEY.getCode());
+    KeyBinding COMMAND_TARGET = register("command_target", InputUtil.UNKNOWN_KEY.getCode());
+    KeyBinding COMMAND_UNTARGET = register("command_untarget", InputUtil.UNKNOWN_KEY.getCode());
 
     private static KeyBinding register(String id, int code) {
         KeyBinding binding = new KeyBinding("key.%s.%s".formatted(SpyglassPlus.MOD_ID, id), code, CATEGORY);
