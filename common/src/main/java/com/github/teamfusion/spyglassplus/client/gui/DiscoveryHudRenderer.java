@@ -5,6 +5,7 @@ import com.github.teamfusion.spyglassplus.client.config.SpyglassPlusConfig;
 import com.github.teamfusion.spyglassplus.client.config.SpyglassPlusConfig.DisplayConfig.DiscoveryHudConfig;
 import com.github.teamfusion.spyglassplus.client.entity.LivingEntityClientAccess;
 import com.github.teamfusion.spyglassplus.client.event.DiscoveryHudRenderEvent;
+import com.github.teamfusion.spyglassplus.enchantment.DiscoveryEnchantment;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.DiscoveryHudEntitySetup;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
@@ -33,7 +34,6 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.StatusEffectSpriteManager;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
@@ -210,7 +210,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         }
 
         ItemStack stack = scopingEntity.getScopingStack();
-        int level = EnchantmentHelper.getLevel(SpyglassPlusEnchantments.DISCOVERY.get(), stack);
+        int level = DiscoveryEnchantment.getLevel(stack);
         if (!(level > 0)) {
             return false;
         }
@@ -297,7 +297,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             }
 
             if (renderStats) {
-                if (level >= 3) {
+                if (level >= 2) {
                     if (this.activeEntity instanceof LivingEntity livingEntity) {
                         // `effects`
                         List<StatusEffectInstance> effects = ((LivingEntityClientAccess) livingEntity).getEffects()
@@ -339,9 +339,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                             Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText, BEHAVIOR_ICON).formatted(Formatting.GRAY)
                         );
                     }
-                }
 
-                if (level >= 3) {
                     if (this.activeEntity instanceof LivingEntity livingEntity) {
                         // health
                         float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;

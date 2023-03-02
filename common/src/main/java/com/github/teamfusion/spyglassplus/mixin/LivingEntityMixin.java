@@ -1,11 +1,10 @@
 package com.github.teamfusion.spyglassplus.mixin;
 
-import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
+import com.github.teamfusion.spyglassplus.enchantment.DiscoveryEnchantment;
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
 import com.github.teamfusion.spyglassplus.util.CommonPlayerLookup;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -66,7 +65,7 @@ public abstract class LivingEntityMixin extends Entity {
             NetworkManager.sendToPlayers(
                 CommonPlayerLookup.tracking(this)
                                   .stream()
-                                  .filter(player -> EnchantmentHelper.getLevel(SpyglassPlusEnchantments.DISCOVERY.get(), player.getActiveItem()) > 0)
+                                  .filter(player -> DiscoveryEnchantment.getLevel(player.getActiveItem()) > 0)
                                   .toList(),
                 EFFECTS_UPDATE_PACKET_ID, buf
             );
