@@ -29,9 +29,6 @@ jobs:
       - name: Build Forge
         run: ./gradlew :forge:build
 
-      - name: Build Quilt
-        run: ./gradlew :quilt:build
-
       # Upload
 
       - name: Upload artifacts
@@ -51,9 +48,3 @@ jobs:
         with:
           name: Artifacts (Forge)
           path: ./forge/build/libs/
-
-      - name: Upload artifacts (Quilt)
-        uses: actions/upload-artifact@v2
-        with:
-          name: Artifacts (Quilt)
-          path: ./quilt/build/libs/
