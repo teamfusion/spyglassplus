@@ -64,11 +64,14 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.lang.Math.PI;
-import static java.lang.Math.*;
-import static net.minecraft.client.gui.screen.ingame.HandledScreen.*;
+import static java.lang.Math.atan;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
+import static net.minecraft.client.gui.screen.ingame.HandledScreen.BACKGROUND_TEXTURE;
+import static net.minecraft.util.math.MathHelper.clamp;
 import static net.minecraft.util.math.MathHelper.cos;
 import static net.minecraft.util.math.MathHelper.floor;
-import static net.minecraft.util.math.MathHelper.*;
+import static net.minecraft.util.math.MathHelper.lerp;
 
 // TODO fix scaling
 

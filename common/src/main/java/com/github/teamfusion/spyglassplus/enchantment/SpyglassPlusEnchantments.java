@@ -8,7 +8,8 @@ import net.minecraft.registry.RegistryKeys;
 
 import java.util.function.Function;
 
-import static net.minecraft.enchantment.Enchantment.Rarity.*;
+import static net.minecraft.enchantment.Enchantment.Rarity.COMMON;
+import static net.minecraft.enchantment.Enchantment.Rarity.UNCOMMON;
 
 public interface SpyglassPlusEnchantments {
     DeferredRegister<Enchantment> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, RegistryKeys.ENCHANTMENT);
