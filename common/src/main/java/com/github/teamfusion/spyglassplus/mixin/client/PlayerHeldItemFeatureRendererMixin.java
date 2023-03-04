@@ -41,7 +41,7 @@ public abstract class PlayerHeldItemFeatureRendererMixin {
         method = "renderSpyglass",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/util/math/MatrixStack;translate(DDD)V",
+            target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V",
             shift = At.Shift.AFTER
         )
     )

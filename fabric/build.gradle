@@ -61,10 +61,8 @@ dependencies {
   }
 
   include modApi("com.github.Chocohead:Fabric-ASM:${project.ver_asm}")
-  include modImplementation("net.moddingplayground.frame:frame-enchantments-v0:${project.ver_frame_enchantments}")
-
-  modImplementation ("net.moddingplayground.frame:frame-toymaker-v0:${rootProject.ver_toymaker}") {
-    exclude group: 'com.terraformersmc', module: 'modmenu'
+  include modImplementation("net.moddingplayground.frame:frame-enchantments-v0:${project.ver_frame_enchantments}") {
+    exclude(group: "net.fabricmc.fabric-api")
   }
 
   modImplementation "com.terraformersmc:modmenu:${project.ver_mod_menu}"

@@ -3,12 +3,12 @@ package com.github.teamfusion.spyglassplus.sound;
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public interface SpyglassPlusSoundEvents {
-    DeferredRegister<SoundEvent> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, Registry.SOUND_EVENT_KEY);
+    DeferredRegister<SoundEvent> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, RegistryKeys.SOUND_EVENT);
 
     RegistrySupplier<SoundEvent> ITEM_BINOCULARS_USE = binoculars("use");
     RegistrySupplier<SoundEvent> ITEM_BINOCULARS_STOP_USING = binoculars("stop_using");
@@ -50,6 +50,6 @@ public interface SpyglassPlusSoundEvents {
     }
 
     static RegistrySupplier<SoundEvent> register(String id) {
-        return REGISTER.register(id, () -> new SoundEvent(new Identifier(SpyglassPlus.MOD_ID, id)));
+        return REGISTER.register(id, () -> SoundEvent.of(new Identifier(SpyglassPlus.MOD_ID, id)));
     }
 }

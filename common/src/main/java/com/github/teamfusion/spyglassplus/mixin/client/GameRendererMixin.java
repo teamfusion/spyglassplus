@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Environment(EnvType.CLIENT)
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
-    @Shadow @Final private MinecraftClient client;
+    @Shadow @Final MinecraftClient client;
     @Shadow private float fovMultiplier;
 
     /**

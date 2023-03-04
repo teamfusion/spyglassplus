@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "spyglassplus:binoculars",
-    "minecraft:spyglass"
+    "minecraft:spyglass",
+    "spyglassplus:binoculars"
   ]
 }

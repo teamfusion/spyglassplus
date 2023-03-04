@@ -8,11 +8,11 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EntityType.Builder;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public interface SpyglassPlusEntityType {
-    DeferredRegister<EntityType<?>> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, Registry.ENTITY_TYPE_KEY);
+    DeferredRegister<EntityType<?>> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, RegistryKeys.ENTITY_TYPE);
 
     RegistrySupplier<EntityType<SpyglassStandEntity>> SPYGLASS_STAND = register("spyglass_stand",
         Builder.<SpyglassStandEntity>create(SpyglassStandEntity::new, SpawnGroup.MISC)

@@ -1,37 +1,23 @@
 package com.github.teamfusion.spyglassplus.datagen;
 
+import com.github.teamfusion.spyglassplus.item.SpyglassPlusItems;
 import com.github.teamfusion.spyglassplus.tag.SpyglassPlusItemTags;
-import dev.architectury.registry.registries.RegistrySupplier;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
+import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryWrapper;
 
-import java.util.Arrays;
-
-import static com.github.teamfusion.spyglassplus.item.SpyglassPlusItems.*;
-import static net.minecraft.item.Items.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
-    public ItemTagProvider(FabricDataGenerator gen, BlockTagProvider blockTagProvider) {
-        super(gen, blockTagProvider);
+    public ItemTagProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
+        super(output, completableFuture);
+
     }
 
     @Override
-    protected void generateTags() {
-        this.add(SpyglassPlusItemTags.SCOPING_ITEMS, BINOCULARS).add(
-            SPYGLASS
-        );
-
-        this.add(SpyglassPlusItemTags.SPYGLASS_STAND_ITEMS).add(
-            SPYGLASS
-        );
-    }
-
-    @SafeVarargs
-    public final FabricTagBuilder<Item> add(TagKey<Item> tag, RegistrySupplier<Item>... items) {
-        FabricTagBuilder<Item> builder = this.getOrCreateTagBuilder(tag);
-        Arrays.stream(items).map(RegistrySupplier::get).forEach(builder::add);
-        return builder;
+    protected void configure(RegistryWrapper.WrapperLookup arg) {
+        this.getOrCreateTagBuilder(SpyglassPlusItemTags.SCOPING_ITEMS).add(Items.SPYGLASS).add(SpyglassPlusItems.BINOCULARS.getId());
+        this.getOrCreateTagBuilder(SpyglassPlusItemTags.SPYGLASS_STAND_ITEMS).add(Items.SPYGLASS);
     }
 }

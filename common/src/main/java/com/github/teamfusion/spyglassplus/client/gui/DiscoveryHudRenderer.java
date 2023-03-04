@@ -44,17 +44,17 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,14 +64,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.lang.Math.PI;
-import static java.lang.Math.atan;
-import static java.lang.Math.max;
-import static java.lang.Math.round;
-import static net.minecraft.client.gui.screen.ingame.HandledScreen.BACKGROUND_TEXTURE;
-import static net.minecraft.util.math.MathHelper.clamp;
+import static java.lang.Math.*;
+import static net.minecraft.client.gui.screen.ingame.HandledScreen.*;
 import static net.minecraft.util.math.MathHelper.cos;
 import static net.minecraft.util.math.MathHelper.floor;
-import static net.minecraft.util.math.MathHelper.lerp;
+import static net.minecraft.util.math.MathHelper.*;
 
 // TODO fix scaling
 
@@ -272,7 +269,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             matrices.scale(this.openProgress, this.openProgress, this.openProgress);
             matrices.translate(-centerLeftX, -halfHeight, 0.0D);
 
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.openProgress);
 
             // box
@@ -413,7 +410,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 this.drawTexture(matrices, x, y, 141, 166, 24, 24);
 
                 Sprite sprite = sprites.getSprite(type);
-                RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+                RenderSystem.setShaderTexture(0, sprite.getAtlasId());
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
                 int size = 18;
                 this.drawSprite(matrices, x + 3, y + 3, this.getZOffset(), size, size, sprite);
@@ -442,7 +439,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     }
 
     public void drawTexturedQuad(MatrixStack matrices, float x0, float x1, float y0, float y1, float z, float u0, float u1, float v0, float v1) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
@@ -450,7 +447,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         buffer.vertex(matrix, x1, y1, z).texture(u1, v1).next();
         buffer.vertex(matrix, x1, y0, z).texture(u1, v0).next();
         buffer.vertex(matrix, x0, y0, z).texture(u0, v0).next();
-        BufferRenderer.drawWithShader(buffer.end());
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
     public void drawTrimmedCentredText(MatrixStack matrices, Text text, int maxWidth, int x, int y) {
@@ -528,13 +525,13 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         RenderSystem.disableTexture();
         RenderSystem.defaultBlendFunc();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         bufferBuilder.vertex(matrix, (float) x1, (float) y2, 0.0F).color(r, g, b, alpha).next();
         bufferBuilder.vertex(matrix, (float) x2, (float) y2, 0.0F).color(r, g, b, alpha).next();
         bufferBuilder.vertex(matrix, (float) x2, (float) y1, 0.0F).color(r, g, b, alpha).next();
         bufferBuilder.vertex(matrix, (float) x1, (float) y1, 0.0F).color(r, g, b, alpha).next();
-        BufferRenderer.drawWithShader(bufferBuilder.end());
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
@@ -579,9 +576,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         matricesSub.scale(xScale * scale, yScale * scale, scale);
 
-        Quaternion yawQuaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f);
-        Quaternion rotationQuaternion = Vec3f.POSITIVE_X.getDegreesQuaternion(pitchOffset * 20.0f);
-        yawQuaternion.hamiltonProduct(rotationQuaternion);
+        Quaternionf yawQuaternion = RotationAxis.POSITIVE_Z.rotationDegrees(180.0f);
+        Quaternionf rotationQuaternion = RotationAxis.POSITIVE_X.rotationDegrees(pitchOffset * 20.0f);
+        // yawQuaternion.hamiltonProduct(rotationQuaternion);
         matricesSub.multiply(yawQuaternion);
         matricesSub.translate(0.0D, (1F - this.openProgress) * 2, 0.0D);
 

@@ -52,7 +52,7 @@ public class BinocularsOverlayRenderer {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, BINOCULARS_SCOPE_TEXTURE);
 
         Tessellator tessellator = Tessellator.getInstance();
@@ -73,7 +73,7 @@ public class BinocularsOverlayRenderer {
         buffer.vertex(left, top, -90.0).texture(0.0f, 0.0f).next();     // top left
         tessellator.draw();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.disableTexture();
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         buffer.vertex(0.0, scaledHeight, -90.0).color(0, 0, 0, 255).next();
@@ -95,7 +95,7 @@ public class BinocularsOverlayRenderer {
         tessellator.draw();
         RenderSystem.enableTexture();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);

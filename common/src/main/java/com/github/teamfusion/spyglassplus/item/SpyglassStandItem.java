@@ -60,7 +60,7 @@ public class SpyglassStandItem extends Item {
 
         ItemStack stack = usage.getStack();
         if (world instanceof ServerWorld serverWorld) {
-            SpyglassStandEntity entity = type.create(serverWorld, stack.getNbt(), null, usage.getPlayer(), pos, SpawnReason.SPAWN_EGG, true, true);
+            SpyglassStandEntity entity = type.create(serverWorld, stack.getNbt(), null, pos, SpawnReason.SPAWN_EGG, true, true);
             if (entity == null) {
                 return ActionResult.FAIL;
             }

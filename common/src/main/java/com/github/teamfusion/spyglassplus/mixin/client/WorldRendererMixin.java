@@ -5,7 +5,7 @@ import dev.architectury.platform.Platform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderEffect;
+import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
@@ -16,10 +16,10 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class WorldRendererMixin {
     @Shadow @Final private MinecraftClient client;
     @Shadow @Final private BufferBuilderStorage bufferBuilders;
-    @Shadow @Nullable private ShaderEffect entityOutlineShader;
+    @Shadow @Nullable private PostEffectProcessor entityOutlinePostProcessor;
     @Shadow private int regularEntityCount;
 
     @Shadow protected abstract boolean canDrawEntityOutlines();
@@ -60,11 +60,11 @@ public abstract class WorldRendererMixin {
         locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void afterRenderEntities(
-        MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
-        GameRenderer gameRenderer, LightmapTextureManager lightmap, Matrix4f positionMatrix, CallbackInfo ci,
-        Profiler profiler, boolean hasNoChunkUpdaters, Vec3d cameraPos, double x, double y, double z,
-        Matrix4f positionMatrix2, boolean hasCapturedFrustum, Frustum frustum, float viewDistance,
-        boolean thickFog, boolean renderOutline, VertexConsumerProvider.Immediate immediate
+            MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
+            GameRenderer gameRenderer, LightmapTextureManager lightmap, Matrix4f positionMatrix, CallbackInfo ci,
+            Profiler profiler, boolean hasNoChunkUpdaters, Vec3d cameraPos, double x, double y, double z,
+            Matrix4f positionMatrix2, boolean hasCapturedFrustum, Frustum frustum, float viewDistance,
+            boolean thickFog, boolean renderOutline, VertexConsumerProvider.Immediate immediate
     ) {
         if (!this.shouldForceRenderPlayer()) {
             return;
@@ -123,7 +123,7 @@ public abstract class WorldRendererMixin {
         }
 
         if (!renderOutline && this.renderOutline) {
-            this.entityOutlineShader.render(tickDelta);
+            this.entityOutlinePostProcessor.render(tickDelta);
             this.client.getFramebuffer().beginWrite(false);
         }
 

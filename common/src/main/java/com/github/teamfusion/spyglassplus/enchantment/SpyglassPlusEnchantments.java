@@ -4,15 +4,14 @@ import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 
 import java.util.function.Function;
 
-import static net.minecraft.enchantment.Enchantment.Rarity.COMMON;
-import static net.minecraft.enchantment.Enchantment.Rarity.UNCOMMON;
+import static net.minecraft.enchantment.Enchantment.Rarity.*;
 
 public interface SpyglassPlusEnchantments {
-    DeferredRegister<Enchantment> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, Registry.ENCHANTMENT_KEY);
+    DeferredRegister<Enchantment> REGISTER = DeferredRegister.create(SpyglassPlus.MOD_ID, RegistryKeys.ENCHANTMENT);
 
     RegistrySupplier<Enchantment> SCRUTINY = register("scrutiny", ScrutinyEnchantment::new, UNCOMMON);
     RegistrySupplier<Enchantment> ILLUMINATE = register("illuminate", IlluminateEnchantment::new, UNCOMMON);

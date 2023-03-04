@@ -4,9 +4,9 @@ import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.entity.SpyglassPlusEntityType;
 import com.github.teamfusion.spyglassplus.item.ISpyglass;
 import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public interface SpyglassPlusItemTags {
     /**
@@ -20,6 +20,6 @@ public interface SpyglassPlusItemTags {
     TagKey<Item> SPYGLASS_STAND_ITEMS = create("spyglass_stand_items");
 
     static TagKey<Item> create(String id) {
-        return TagKey.of(Registry.ITEM_KEY, new Identifier(SpyglassPlus.MOD_ID, id));
+        return TagKey.of(RegistryKeys.ITEM, new Identifier(SpyglassPlus.MOD_ID, id));
     }
 }

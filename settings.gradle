@@ -7,8 +7,5 @@ pluginManagement {
     }
 }
 
-include('common')
-include('fabric')
-include('forge')
-
 rootProject.name = 'spyglassplus'
+include('common', 'fabric', 'forge')

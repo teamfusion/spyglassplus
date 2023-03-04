@@ -8,7 +8,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.item.ModelPredicateProvider;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.item.UnclampedModelPredicateProvider;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
@@ -36,7 +35,7 @@ public abstract class ModelPredicateProviderRegistryMixin {
     }
 
     @Unique
-    private static void register(Item item, Identifier id, UnclampedModelPredicateProvider provider) {
+    private static void register(Item item, Identifier id, ModelPredicateProvider provider) {
         ITEM_SPECIFIC.computeIfAbsent(item, key -> Maps.newHashMap())
                      .put(id, provider);
     }

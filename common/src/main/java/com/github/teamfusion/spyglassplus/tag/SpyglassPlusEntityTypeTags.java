@@ -4,9 +4,9 @@ import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public interface SpyglassPlusEntityTypeTags {
     /**
@@ -45,7 +45,7 @@ public interface SpyglassPlusEntityTypeTags {
         DISCOVERY_ENCHANTMENT_ENTITY_BEHAVIOR_BOSS    = createDiscoveryBehavior("boss");
 
     static TagKey<EntityType<?>> create(String id) {
-        return TagKey.of(Registry.ENTITY_TYPE_KEY, new Identifier(SpyglassPlus.MOD_ID, id));
+        return TagKey.of(RegistryKeys.ENTITY_TYPE, new Identifier(SpyglassPlus.MOD_ID, id));
     }
 
     static TagKey<EntityType<?>> createDiscoveryBehavior(String id) {

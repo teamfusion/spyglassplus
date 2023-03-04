@@ -14,7 +14,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
 
 import static java.lang.Math.PI;
 import static net.minecraft.util.math.MathHelper.sin;
@@ -46,11 +46,11 @@ public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends 
         matrices.push();
 
         matrices.scale(-1.0f, -1.0f, 1.0f);
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-180f));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-180f));
 
         float shake = (float) (entity.world.getTime() - entity.getLastHitTime()) + tickDelta;
         if (shake < 5.0f) {
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(sin((shake / 1.5f) * (float) PI) * 3.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(sin((shake / 1.5f) * (float) PI) * 3.0f));
         }
 
         matrices.translate(0.0, -1.501f, 0.0);
