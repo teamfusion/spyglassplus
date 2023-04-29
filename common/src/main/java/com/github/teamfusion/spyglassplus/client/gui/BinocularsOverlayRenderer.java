@@ -15,7 +15,7 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -38,8 +38,8 @@ public class BinocularsOverlayRenderer {
     /**
      * Modifies inventory-based binocular renders to the correct model in mixins.
      */
-    public static BakedModel modifyRenderItem(ItemStack stack, ModelTransformation.Mode mode) {
-        boolean isInventory = mode == ModelTransformation.Mode.GUI || mode == ModelTransformation.Mode.GROUND || mode == ModelTransformation.Mode.FIXED;
+    public static BakedModel modifyRenderItem(ItemStack stack, ModelTransformationMode mode) {
+        boolean isInventory = mode == ModelTransformationMode.GUI || mode == ModelTransformationMode.GROUND || mode == ModelTransformationMode.FIXED;
         if (isInventory && stack.getItem() instanceof BinocularsItem) {
             BakedModelManager models = MinecraftClient.getInstance().getBakedModelManager();
             return models.getModel(INVENTORY_MODEL_ID);
@@ -74,7 +74,6 @@ public class BinocularsOverlayRenderer {
         tessellator.draw();
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.disableTexture();
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         buffer.vertex(0.0, scaledHeight, -90.0).color(0, 0, 0, 255).next();
         buffer.vertex(scaledWidth, scaledHeight, -90.0).color(0, 0, 0, 255).next();
@@ -93,7 +92,6 @@ public class BinocularsOverlayRenderer {
         buffer.vertex(scaledWidth, top, -90.0).color(0, 0, 0, 255).next();
         buffer.vertex(right, top, -90.0).color(0, 0, 0, 255).next();
         tessellator.draw();
-        RenderSystem.enableTexture();
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.depthMask(true);

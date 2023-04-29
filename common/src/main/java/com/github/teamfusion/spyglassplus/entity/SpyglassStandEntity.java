@@ -33,6 +33,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -48,12 +49,12 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.util.math.MathHelper.clamp;
 import static net.minecraft.util.math.MathHelper.lerp;
@@ -101,7 +102,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     public SpyglassStandEntity(EntityType<? extends LivingEntity> type, World world) {
         super(type, world);
-        this.stepHeight = 0.0f;
+        this.setStepHeight(0.0f);
     }
 
     public SpyglassStandEntity(World world, double x, double y, double z) {
@@ -303,7 +304,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             return false;
         }
 
-        if (DamageSource.OUT_OF_WORLD.equals(source)) {
+        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             this.kill();
             return false;
         }
@@ -312,20 +313,20 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             return false;
         }
 
-        if (source.isExplosive()) {
+        if (source.isIn(DamageTypeTags.IS_EXPLOSION)) {
             this.onBreak(source);
             this.kill();
             return false;
         }
 
-        if (DamageSource.IN_FIRE.equals(source)) {
+        if (source.isIn(DamageTypeTags.IGNITES_ARMOR_STANDS)) {
             if (this.isOnFire()) {
                 this.updateHealth(source, 0.15f);
             } else this.setOnFireFor(5);
             return false;
         }
 
-        if (DamageSource.ON_FIRE.equals(source) && this.getHealth() > 0.5f) {
+        if (source.isIn(DamageTypeTags.BURNS_ARMOR_STANDS) && this.getHealth() > 0.5f) {
             this.updateHealth(source, 4.0f);
             return false;
         }
@@ -493,7 +494,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             Box box = this.getDimensions(false).getBoxAt(this.getPos());
             BlockPos pos = this.getBlockPos();
             int i = Integer.MIN_VALUE;
-            for (BlockPos posx : BlockPos.iterate(new BlockPos(box.minX, box.minY, box.minZ), new BlockPos(box.maxX, box.maxY, box.maxZ))) {
+            for (BlockPos posx : BlockPos.iterate(new BlockPos((int) box.minX, (int) box.minY, (int) box.minZ), new BlockPos((int) box.maxX, (int) box.maxY, (int) box.maxZ))) {
                 int j = Math.max(this.world.getLightLevel(LightType.BLOCK, posx), this.world.getLightLevel(LightType.SKY, posx));
                 if (j == 15) return Vec3d.ofCenter(posx);
                 if (j <= i) continue;

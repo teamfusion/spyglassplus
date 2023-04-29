@@ -85,16 +85,15 @@ loom {
       source sourceSets.test
     }
 
-    datagen {
-      name "Data Generation"
-
+    create("Data Generation") {
       server()
       source sourceSets.datagen
 
-      vmArg "-Dfabric-api.datagen"
-      vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file(project.output_datagen)}"
+      vmArg("-Dfabric-api.datagen")
+      vmArg("-Dfabric-api.datagen.output-dir=${project(":common").file(project.output_datagen)}")
+      vmArg("-Dfabric-api.datagen.modid=$project.mod_id-datagen")
 
-      runDir "build/datagen"
+      runDir("build/datagen")
     }
   }
 }

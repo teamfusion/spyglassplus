@@ -277,10 +277,10 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             // box
             RenderSystem.setShaderTexture(0, ICONS_TEXTURE);
-            this.drawTexture(matrices, leftX, boxTopY, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
+            drawTexture(matrices, leftX, boxTopY, 0, hasRenderBox ? 0 : BOX_HEIGHT, boxWidth, boxHeight);
 
             int eyeTextureVOffset = floor(clamp(this.eyePhase, 0.0F, 1.0F) * (EYE_PHASES - 1)) * EYE_HEIGHT;
-            this.drawTexture(matrices, (int) (centerLeftX - (EYE_WIDTH / 2d)) + 1, boxTopY + 3, boxWidth, eyeTextureVOffset, EYE_WIDTH, EYE_HEIGHT);
+            drawTexture(matrices, (int) (centerLeftX - (EYE_WIDTH / 2d)) + 1, boxTopY + 3, boxWidth, eyeTextureVOffset, EYE_WIDTH, EYE_HEIGHT);
 
             if (this.openProgress > 0.5F) {
                 if (hasRenderBox) {
@@ -416,7 +416,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 RenderSystem.setShaderTexture(0, sprite.getAtlasId());
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
                 int size = 18;
-                this.drawSprite(matrices, x + 3, y + 3, this.getZOffset(), size, size, sprite);
+                this.drawSprite(matrices, x + 3, y + 3, size, size, sprite);
 
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             }
@@ -426,30 +426,30 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     }
 
     public void drawTexture(MatrixStack matrices, float x, float y, int u, int v, int width, int height) {
-        this.drawTexture(matrices, x, y, this.getZOffset(), (float) u, (float) v, width, height, 256, 256);
+        this.drawTexture(matrices, x, y, (float) u, (float) v, width, height, 256, 256);
     }
 
-    public void drawTexture(MatrixStack matrices, float x, float y, float z, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-        this.drawTexture(matrices, x, x + width, y, y + height, z, width, height, u, v, textureWidth, textureHeight);
+    public void drawTexture(MatrixStack matrices, float x, float y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+        this.drawTexture(matrices, x, x + width, y, y + height, width, height, u, v, textureWidth, textureHeight);
     }
 
-    public void drawTexture(MatrixStack matrices, float x0, float x1, float y0, float y1, float z, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight) {
-        this.drawTexturedQuad(matrices, x0, x1, y0, y1, z, (u + 0.0F) / (float) textureWidth, (u + (float) regionWidth) / (float) textureWidth, (v + 0.0F) / (float) textureHeight, (v + (float) regionHeight) / (float) textureHeight);
+    public void drawTexture(MatrixStack matrices, float x0, float x1, float y0, float y1, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight) {
+        this.drawTexturedQuad(matrices, x0, x1, y0, y1, (u + 0.0F) / (float) textureWidth, (u + (float) regionWidth) / (float) textureWidth, (v + 0.0F) / (float) textureHeight, (v + (float) regionHeight) / (float) textureHeight);
     }
 
-    public void drawSprite(MatrixStack matrices, float x, float y, float z, int width, int height, Sprite sprite) {
-        this.drawTexturedQuad(matrices, x, x + width, y, y + height, z, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+    public void drawSprite(MatrixStack matrices, float x, float y, int width, int height, Sprite sprite) {
+        this.drawTexturedQuad(matrices, x, x + width, y, y + height, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
     }
 
-    public void drawTexturedQuad(MatrixStack matrices, float x0, float x1, float y0, float y1, float z, float u0, float u1, float v0, float v1) {
+    public void drawTexturedQuad(MatrixStack matrices, float x0, float x1, float y0, float y1, float u0, float u1, float v0, float v1) {
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
-        buffer.vertex(matrix, x0, y1, z).texture(u0, v1).next();
-        buffer.vertex(matrix, x1, y1, z).texture(u1, v1).next();
-        buffer.vertex(matrix, x1, y0, z).texture(u1, v0).next();
-        buffer.vertex(matrix, x0, y0, z).texture(u0, v0).next();
+        buffer.vertex(matrix, x0, y1, 0).texture(u0, v1).next();
+        buffer.vertex(matrix, x1, y1, 0).texture(u1, v1).next();
+        buffer.vertex(matrix, x1, y0, 0).texture(u1, v0).next();
+        buffer.vertex(matrix, x0, y0, 0).texture(u0, v0).next();
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
@@ -525,7 +525,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         RenderSystem.enableBlend();
-        RenderSystem.disableTexture();
         RenderSystem.defaultBlendFunc();
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -536,7 +535,6 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         bufferBuilder.vertex(matrix, (float) x1, (float) y1, 0.0F).color(r, g, b, alpha).next();
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
-        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 

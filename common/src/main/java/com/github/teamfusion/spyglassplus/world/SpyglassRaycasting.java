@@ -13,9 +13,9 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Predicate;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Responsible for spyglass raycasting functionality.

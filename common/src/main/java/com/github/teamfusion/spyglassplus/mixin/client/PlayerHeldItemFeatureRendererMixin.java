@@ -6,7 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.PlayerHeldItemFeatureRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -27,7 +27,7 @@ public abstract class PlayerHeldItemFeatureRendererMixin {
      * Render non-spyglass spyglass items.
      */
     @Inject(method = "renderItem", at = @At("HEAD"), cancellable = true)
-    private void onRenderItem(LivingEntity entity, ItemStack stack, ModelTransformation.Mode mode, Arm arm, MatrixStack matrices, VertexConsumerProvider vertices, int light, CallbackInfo ci) {
+    private void onRenderItem(LivingEntity entity, ItemStack stack, ModelTransformationMode mode, Arm arm, MatrixStack matrices, VertexConsumerProvider vertices, int light, CallbackInfo ci) {
         if (!stack.isOf(Items.SPYGLASS) && stack.getItem() instanceof ISpyglass && entity.getActiveItem() == stack && entity.handSwingTicks == 0) {
             this.renderSpyglass(entity, stack, arm, matrices, vertices, light);
             ci.cancel();

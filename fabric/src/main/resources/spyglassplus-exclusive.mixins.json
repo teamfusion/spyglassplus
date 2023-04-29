@@ -3,7 +3,6 @@
   "package": "com.github.teamfusion.spyglassplus.mixin.exclusive",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "client.ControlsListWidgetKeyBindingEntryMixin",
     "client.ItemEntityRendererMixin",
     "client.ItemRendererMixin",
     "client.KeyBindingMixin",

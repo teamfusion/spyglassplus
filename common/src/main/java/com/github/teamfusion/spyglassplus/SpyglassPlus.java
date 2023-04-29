@@ -48,7 +48,7 @@ public interface SpyglassPlus {
             output.add(new ItemStack(SpyglassPlusItems.SPYGLASS_STAND.get()));
 
             Registries.ENCHANTMENT.forEach(enchantment -> {
-                if (enchantment.type == SpyglassPlusEnchantmentTargets.SCOPING) {
+                if (enchantment.target == SpyglassPlusEnchantmentTargets.SCOPING) {
                     for (int level = enchantment.getMinLevel(); level <= enchantment.getMaxLevel(); level++) {
                         output.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(enchantment, level)), ItemGroup.StackVisibility.PARENT_AND_SEARCH_TABS);
                     }

@@ -27,14 +27,7 @@ public abstract class ModelLoaderMixin {
     /**
      * Adds the inventory model for {@link SpyglassPlusItems#BINOCULARS}.
      */
-    @Inject(
-        method = "<init>",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/render/model/ModelLoader;addModel(Lnet/minecraft/client/util/ModelIdentifier;)V",
-            ordinal = 3
-        )
-    )
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(BlockColors blockColors, Profiler profiler, Map<Identifier, JsonUnbakedModel> jsonUnbakedModels, Map<Identifier, List<ModelLoader.SourceTrackedData>> blockStates, CallbackInfo ci) {
         this.addModel(BinocularsOverlayRenderer.INVENTORY_IN_HAND_MODEL_ID);
     }

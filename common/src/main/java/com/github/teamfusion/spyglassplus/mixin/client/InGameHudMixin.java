@@ -40,7 +40,7 @@ public abstract class InGameHudMixin implements InGameHudAccess {
      * Renders the Binoculars' overlay instead of the Spyglass' overlay on use.
      */
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
-    private void renderBinocularsOverlay(float scale, CallbackInfo ci) {
+    private void renderBinocularsOverlay(MatrixStack matrices, float scale, CallbackInfo ci) {
         if (this.client.getCameraEntity() instanceof ScopingEntity scoping && scoping.getScopingStack().getItem() instanceof BinocularsItem) {
             if (BinocularsHudOverlayRenderEvent.PRE.invoker().render(this.binocularsOverlayRenderer, scale, this.scaledWidth, this.scaledHeight).isFalse()) {
                 return;
