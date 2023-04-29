@@ -34,11 +34,8 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 
-import java.util.function.Predicate;
-
 import static com.github.teamfusion.spyglassplus.network.SpyglassPlusNetworking.COMMAND_TRIGGERED_PACKET_ID;
 
-@SuppressWarnings("UnstableApiUsage")
 @Environment(EnvType.CLIENT)
 public interface SpyglassPlusClient extends SpyglassPlus {
     ConfigHolder<SpyglassPlusConfig> CONFIG_HOLDER = AutoConfig.register(SpyglassPlusConfig.class, JanksonConfigSerializer::new);
@@ -78,18 +75,18 @@ public interface SpyglassPlusClient extends SpyglassPlus {
             ItemStack stack = scopingPlayer.getScopingStack();
             if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
                 long handle = client.getWindow().getHandle();
-                sendCommandTriggerToServer(code -> InputUtil.isKeyPressed(handle, code));
+                sendCommandTriggerToServer(handle);
             }
         }
     }
 
-    static void sendCommandTriggerToServer(Predicate<Integer> keyPressedPredicate) {
+    static void sendCommandTriggerToServer(long handle) {
         int targetCode = getKeyCode(SpyglassPlusKeyBindings.COMMAND_TARGET);
-        if (keyPressedPredicate.test(targetCode)) {
+        if (isKeyPressed(handle, targetCode)) {
             NetworkManager.sendToServer(COMMAND_TRIGGERED_PACKET_ID, createCommandTriggeredPacketBuf(true));
         } else {
             int untargetCode = getKeyCode(SpyglassPlusKeyBindings.COMMAND_UNTARGET);
-            if (keyPressedPredicate.test(untargetCode)) {
+            if (isKeyPressed(handle, untargetCode)) {
                 NetworkManager.sendToServer(COMMAND_TRIGGERED_PACKET_ID, createCommandTriggeredPacketBuf(false));
             }
         }
@@ -98,6 +95,10 @@ public interface SpyglassPlusClient extends SpyglassPlus {
     static int getKeyCode(KeyBinding keyBinding) {
         int code = ((KeyBindingAccessor) keyBinding).getBoundKey().getCode();
         return code >= 0 && code <= 7 ? -1 : code;
+    }
+
+    static boolean isKeyPressed(long handle, int code) {
+        return code != -1 && InputUtil.isKeyPressed(handle, code);
     }
 
     static PacketByteBuf createCommandTriggeredPacketBuf(boolean target) {

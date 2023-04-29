@@ -1,6 +1,5 @@
 package com.github.teamfusion.spyglassplus.mixin.client;
 
-import com.github.teamfusion.spyglassplus.client.SpyglassPlusClient;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import com.github.teamfusion.spyglassplus.entity.ScopingEntity;
 import com.github.teamfusion.spyglassplus.entity.ScopingPlayer;
@@ -108,26 +107,6 @@ public class MouseMixin {
                 }
 
                 ci.cancel();
-            }
-        }
-    }
-
-    /**
-     * Resets the local scrutiny level on middle mouse click.
-     */
-    @Inject(
-        method = "onMouseButton",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/option/KeyBinding;setKeyPressed(Lnet/minecraft/client/util/InputUtil$Key;Z)V"
-        )
-    )
-    private void checkForTriggerCommandMouse(long window, int button, int action, int mods, CallbackInfo ci) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player instanceof ScopingPlayer scopingPlayer && scopingPlayer.isScoping()) {
-            ItemStack stack = scopingPlayer.getScopingStack();
-            if (EnchantmentHelper.getLevel(SpyglassPlusEnchantments.COMMAND.get(), stack) > 0) {
-                SpyglassPlusClient.sendCommandTriggerToServer(code -> button == code);
             }
         }
     }
