@@ -51,7 +51,7 @@ public abstract class LivingEntityMixin extends Entity {
      */
     @Inject(method = "tickStatusEffects", at = @At("TAIL"))
     private void onTickStatusEffects(CallbackInfo ci) {
-        if (!this.world.isClient) {
+        if (!this.getWorld().isClient) {
             NbtCompound nbt = new NbtCompound();
 
             NbtList nbtEffects = new NbtList();

@@ -4,6 +4,7 @@ import com.github.teamfusion.spyglassplus.client.gui.DiscoveryHudRenderer;
 import com.github.teamfusion.spyglassplus.client.gui.InGameHudAccess;
 import com.github.teamfusion.spyglassplus.enchantment.SpyglassPlusEnchantments;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -32,11 +33,11 @@ public abstract class ForgeGuiMixin extends InGameHud implements InGameHudAccess
         method = "lambda$render$0",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraftforge/client/gui/overlay/ForgeGui;post(Lnet/minecraftforge/client/gui/overlay/NamedGuiOverlay;Lnet/minecraft/client/util/math/MatrixStack;)V",
+            target = "Lnet/minecraftforge/client/gui/overlay/ForgeGui;post(Lnet/minecraftforge/client/gui/overlay/NamedGuiOverlay;Lnet/minecraft/client/gui/DrawContext;)V",
             shift = At.Shift.AFTER
         )
     )
-    private void onRender(MatrixStack matrices, float tickDelta, NamedGuiOverlay overlay, CallbackInfo ci) {
-        if (overlay == VanillaGuiOverlay.SPYGLASS.type()) DiscoveryHudRenderer.render(this.getDiscoveryHudRenderer(), matrices, tickDelta, this.client.getCameraEntity());
+    private void onRender(DrawContext context, float tickDelta, NamedGuiOverlay overlay, CallbackInfo ci) {
+        if (overlay == VanillaGuiOverlay.SPYGLASS.type()) DiscoveryHudRenderer.render(this.getDiscoveryHudRenderer(), context, tickDelta, this.client.getCameraEntity());
     }
 }

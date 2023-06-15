@@ -6,18 +6,19 @@ import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 
 @Environment(EnvType.CLIENT)
 public interface DiscoveryHudRenderEvent {
     /**
-     * @see Pre#render(DiscoveryHudRenderer, MatrixStack, float, Entity)
+     * @see Pre#render(DiscoveryHudRenderer, DrawContext, float, Entity)
      */
     Event<Pre> PRE = EventFactory.createEventResult();
 
     /**
-     * @see Post#render(DiscoveryHudRenderer, MatrixStack, float, Entity)
+     * @see Post#render(DiscoveryHudRenderer, DrawContext, float, Entity)
      */
     Event<Post> POST = EventFactory.createLoop();
 
@@ -29,7 +30,7 @@ public interface DiscoveryHudRenderEvent {
          * @return An {@link EventResult} determining the outcome of the event,
          *         the execution may be cancelled by the result.
          */
-        EventResult render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera);
+        EventResult render(DiscoveryHudRenderer discoveryHud, DrawContext context, float tickDelta, Entity camera);
     }
 
     @FunctionalInterface
@@ -37,6 +38,6 @@ public interface DiscoveryHudRenderEvent {
         /**
          * Invoked after the discovery HUD is rendered.
          */
-        void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera);
+        void render(DiscoveryHudRenderer discoveryHud, DrawContext context, float tickDelta, Entity camera);
     }
 }

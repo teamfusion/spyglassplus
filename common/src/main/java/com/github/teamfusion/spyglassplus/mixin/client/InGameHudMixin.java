@@ -10,6 +10,7 @@ import com.github.teamfusion.spyglassplus.item.BinocularsItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 import org.spongepowered.asm.mixin.Final;
@@ -40,7 +41,7 @@ public abstract class InGameHudMixin implements InGameHudAccess {
      * Renders the Binoculars' overlay instead of the Spyglass' overlay on use.
      */
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
-    private void renderBinocularsOverlay(MatrixStack matrices, float scale, CallbackInfo ci) {
+    private void renderBinocularsOverlay(DrawContext context, float scale, CallbackInfo ci) {
         if (this.client.getCameraEntity() instanceof ScopingEntity scoping && scoping.getScopingStack().getItem() instanceof BinocularsItem) {
             if (BinocularsHudOverlayRenderEvent.PRE.invoker().render(this.binocularsOverlayRenderer, scale, this.scaledWidth, this.scaledHeight).isFalse()) {
                 return;
@@ -63,7 +64,7 @@ public abstract class InGameHudMixin implements InGameHudAccess {
             shift = At.Shift.BEFORE
         )
     )
-    private void renderDiscoveryHud(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        DiscoveryHudRenderer.render(this.discoveryHudRenderer, matrices, tickDelta, this.client.getCameraEntity());
+    private void renderDiscoveryHud(DrawContext context, float tickDelta, CallbackInfo ci) {
+        DiscoveryHudRenderer.render(this.discoveryHudRenderer, context, tickDelta, this.client.getCameraEntity());
     }
 }

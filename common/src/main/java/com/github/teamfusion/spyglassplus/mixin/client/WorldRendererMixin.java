@@ -62,9 +62,7 @@ public abstract class WorldRendererMixin {
     private void afterRenderEntities(
             MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
             GameRenderer gameRenderer, LightmapTextureManager lightmap, Matrix4f positionMatrix, CallbackInfo ci,
-            Profiler profiler, boolean hasNoChunkUpdaters, Vec3d cameraPos, double x, double y, double z,
-            Matrix4f positionMatrix2, boolean hasCapturedFrustum, Frustum frustum, float viewDistance,
-            boolean thickFog, boolean renderOutline, VertexConsumerProvider.Immediate immediate
+            Profiler profiler, Vec3d cameraPos, double x, double y, double z
     ) {
         if (!this.shouldForceRenderPlayer()) {
             return;
@@ -93,7 +91,7 @@ public abstract class WorldRendererMixin {
             int b = teamColor       & 0xFF;
             outlineVertices.setColor(r, g, b, 0xFF);
         } else {
-            vertex = immediate;
+            vertex = this.bufferBuilders.getEntityVertexConsumers();
         }
 
         this.renderEntity(entity, x, y, z, tickDelta, matrices, vertex);
@@ -114,7 +112,7 @@ public abstract class WorldRendererMixin {
     private void beforeTryRenderOutlines(
         MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
         GameRenderer gameRenderer, LightmapTextureManager lightmap, Matrix4f positionMatrix, CallbackInfo ci,
-        Profiler profiler, boolean hasNoChunkUpdaters, Vec3d cameraPos, double x, double y, double z,
+        Profiler profiler, Vec3d cameraPos, double x, double y, double z,
         Matrix4f positionMatrix2, boolean hasCapturedFrustum, Frustum frustum, float viewDistance,
         boolean thickFog, boolean renderOutline
     ) {

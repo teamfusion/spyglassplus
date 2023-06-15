@@ -35,7 +35,7 @@ public interface SpyglassRaycasting {
         Vec3d max = min.add(vector.x * distance, vector.y * distance, vector.z * distance);
 
         // grab default hit result
-        HitResult hit = camera.world.raycast(new RaycastContext(min, max, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, camera));
+        HitResult hit = camera.getWorld().raycast(new RaycastContext(min, max, RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, camera));
         if (hit != null) {
             distance = hit.getPos().squaredDistanceTo(min);
         }
@@ -81,7 +81,7 @@ public interface SpyglassRaycasting {
         Entity resultEntity = null;
         Vec3d resultPos = null;
 
-        for (Entity candidate : entity.world.getOtherEntities(entity, box, predicate)) {
+        for (Entity candidate : entity.getWorld().getOtherEntities(entity, box, predicate)) {
             float margin = candidate.getTargetingMargin();
             Box candidateBoundingBox = candidate.getBoundingBox().expand(
                 margin == 0.0F && !candidate.getType().isIn(SpyglassPlusEntityTypeTags.IGNORE_MARGIN_EXPANSION_DISCOVERY)

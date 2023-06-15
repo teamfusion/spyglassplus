@@ -48,7 +48,7 @@ public class SpyglassStandEntityRenderer<T extends SpyglassStandEntity> extends 
         matrices.scale(-1.0f, -1.0f, 1.0f);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-180f));
 
-        float shake = (float) (entity.world.getTime() - entity.getLastHitTime()) + tickDelta;
+        float shake = (float) (entity.getWorld().getTime() - entity.getLastHitTime()) + tickDelta;
         if (shake < 5.0f) {
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(sin((shake / 1.5f) * (float) PI) * 3.0f));
         }

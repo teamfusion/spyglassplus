@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[44,)"
+loaderVersion = "[47,)"
 issueTrackerURL = "https://github.com/teamfusion/spyglassplus/issues"
 license = "MIT (Code); All Rights Reserved (Assets)"
 
@@ -18,27 +18,27 @@ logoFile = "icon.png"
 [[dependencies.spyglassplus]]
 modId = "forge"
 mandatory = true
-versionRange = "[41,)"
+versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.spyglassplus]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.3,)"
+versionRange = "[1.20,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.spyglassplus]]
 modId = "architectury"
 mandatory = true
-versionRange = "[7.1,)"
+versionRange = "[9.0,)"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.spyglassplus]]
 modId = "cloth_config"
 mandatory = true
-versionRange = "[9.0,)"
+versionRange = "[11.0,)"
 ordering = "AFTER"
 side = "BOTH"

@@ -161,11 +161,12 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
         super.tickMovement();
 
-        if (!this.world.isClient || this.isClientUser()) {
+        World world = this.getWorld();
+        if (!world.isClient || this.isClientUser()) {
             Optional<PlayerEntity> maybePlayer = this.getUserAsPlayer();
             maybePlayer.ifPresent(this::tickUser);
 
-            if (!this.world.isClient && this.hasUser()) {
+            if (!world.isClient && this.hasUser()) {
                 if (maybePlayer.isEmpty()) {
                     this.setUser(null);
                 }
@@ -174,7 +175,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     }
 
     public Optional<PlayerEntity> getUserAsPlayer() {
-        return this.getUser().map(this.world::getPlayerByUuid);
+        return this.getUser().map(this.getWorld()::getPlayerByUuid);
     }
 
     public boolean isUser(PlayerEntity player) {
@@ -228,7 +229,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
         scopingPlayer.setSpyglassStandEntity(this);
         this.setUser(player.getUuid());
 
-        if (this.world.isClient) {
+        if (this.getWorld().isClient) {
             this.useSpyglassClient(player);
         } else {
             this.playSound(spyglass.getUseSound(), 1.0F, 1.0F);
@@ -256,7 +257,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
         scopingPlayer.setSpyglassStand(null);
         this.setUser(null);
 
-        if (this.world.isClient) {
+        if (this.getWorld().isClient) {
             this.stopUsingSpyglassClient(player);
         } else {
             this.playSound(spyglass != null ? spyglass.getStopUsingSound() : SoundEvents.ITEM_SPYGLASS_STOP_USING, 1.0F, 1.0F);
@@ -300,7 +301,9 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if (this.world.isClient || this.isRemoved()) {
+        World world = this.getWorld();
+
+        if (world.isClient || this.isRemoved()) {
             return false;
         }
 
@@ -347,13 +350,13 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             return pierces;
         }
 
-        long time = this.world.getTime();
+        long time = world.getTime();
         if (time - this.lastHitTime <= 5L || isProjectile) {
             this.breakAndDropItem(source);
             this.spawnBreakParticles();
             this.kill();
         } else {
-            this.world.sendEntityStatus(this, EntityStatuses.HIT_ARMOR_STAND);
+            world.sendEntityStatus(this, EntityStatuses.HIT_ARMOR_STAND);
             this.emitGameEvent(GameEvent.ENTITY_DAMAGE, source.getAttacker());
             this.lastHitTime = time;
         }
@@ -365,9 +368,10 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     @Environment(EnvType.CLIENT)
     public void handleStatus(byte status) {
         if (status == EntityStatuses.HIT_ARMOR_STAND) {
-            if (this.world.isClient) {
-                this.world.playSound(this.getX(), this.getY(), this.getZ(), SpyglassPlusSoundEvents.ENTITY_SPYGLASS_STAND_HIT.get(), this.getSoundCategory(), 0.3f, 1.0f, false);
-                this.lastHitTime = this.world.getTime();
+            World world = this.getWorld();
+            if (world.isClient) {
+                world.playSound(this.getX(), this.getY(), this.getZ(), SpyglassPlusSoundEvents.ENTITY_SPYGLASS_STAND_HIT.get(), this.getSoundCategory(), 0.3f, 1.0f, false);
+                this.lastHitTime = world.getTime();
             }
         } else super.handleStatus(status);
     }
@@ -494,8 +498,9 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             Box box = this.getDimensions(false).getBoxAt(this.getPos());
             BlockPos pos = this.getBlockPos();
             int i = Integer.MIN_VALUE;
+            World world = this.getWorld();
             for (BlockPos posx : BlockPos.iterate(new BlockPos((int) box.minX, (int) box.minY, (int) box.minZ), new BlockPos((int) box.maxX, (int) box.maxY, (int) box.maxZ))) {
-                int j = Math.max(this.world.getLightLevel(LightType.BLOCK, posx), this.world.getLightLevel(LightType.SKY, posx));
+                int j = Math.max(world.getLightLevel(LightType.BLOCK, posx), world.getLightLevel(LightType.SKY, posx));
                 if (j == 15) return Vec3d.ofCenter(posx);
                 if (j <= i) continue;
                 i = j;
@@ -528,7 +533,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
             NbtCompound nbtEntityTag = stack.getOrCreateSubNbt(EntityType.ENTITY_TAG_KEY);
             nbtEntityTag.putBoolean(SMALL_KEY, true);
         }
-        Block.dropStack(this.world, this.getBlockPos(), stack);
+        Block.dropStack(this.getWorld(), this.getBlockPos(), stack);
 
         this.onBreak(source);
     }
@@ -550,11 +555,11 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
     }
 
     public void playBreakSound() {
-        this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SpyglassPlusSoundEvents.ENTITY_SPYGLASS_STAND_BREAK.get(), this.getSoundCategory(), 1.0f, 1.0f);
+        this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(), SpyglassPlusSoundEvents.ENTITY_SPYGLASS_STAND_BREAK.get(), this.getSoundCategory(), 1.0f, 1.0f);
     }
 
     public void spawnBreakParticles() {
-        if (this.world instanceof ServerWorld serverWorld) {
+        if (this.getWorld() instanceof ServerWorld serverWorld) {
             serverWorld.spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SpyglassPlusItems.SPYGLASS_STAND.get())), this.getX(), this.getBodyY(0.6D), this.getZ(), 10, this.getWidth() / 4.0f, this.getHeight() / 4.0f, this.getWidth() / 4.0f, 0.05);
         }
     }
@@ -567,7 +572,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     @Override
     public boolean handleAttack(Entity attacker) {
-        return attacker instanceof PlayerEntity player && !this.world.canPlayerModifyAt(player, this.getBlockPos());
+        return attacker instanceof PlayerEntity player && !this.getWorld().canPlayerModifyAt(player, this.getBlockPos());
     }
 
     @Override
@@ -611,7 +616,7 @@ public class SpyglassStandEntity extends LivingEntity implements ScopingEntity, 
 
     @Override
     protected void tickCramming() {
-        List<Entity> list = this.world.getOtherEntities(this, this.getBoundingBox(), RIDEABLE_MINECART_PREDICATE);
+        List<Entity> list = this.getWorld().getOtherEntities(this, this.getBoundingBox(), RIDEABLE_MINECART_PREDICATE);
         for (Entity entity : list) {
             if (this.squaredDistanceTo(entity) <= 0.2) {
                 entity.pushAwayFrom(this);

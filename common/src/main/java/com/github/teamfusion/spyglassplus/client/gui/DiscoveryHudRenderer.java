@@ -19,13 +19,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -84,7 +86,7 @@ import static net.minecraft.util.math.MathHelper.lerp;
  */
 @SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
-public class DiscoveryHudRenderer extends DrawableHelper {
+public class DiscoveryHudRenderer {
     private static DiscoveryHudRenderer INSTANCE;
     public static final Identifier ICONS_TEXTURE = new Identifier(SpyglassPlus.MOD_ID, "textures/gui/discovery_icons.png");
 
@@ -176,16 +178,16 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     /**
      * @see InGameHudMixin
      */
-    public static void render(DiscoveryHudRenderer discoveryHud, MatrixStack matrices, float tickDelta, Entity camera) {
-        if (discoveryHud.render(matrices, tickDelta, camera)) {
-            DiscoveryHudRenderEvent.POST.invoker().render(discoveryHud, matrices, tickDelta, camera);
+    public static void render(DiscoveryHudRenderer discoveryHud, DrawContext context, float tickDelta, Entity camera) {
+        if (discoveryHud.render(context, tickDelta, camera)) {
+            DiscoveryHudRenderEvent.POST.invoker().render(discoveryHud, context, tickDelta, camera);
         } else {
             discoveryHud.reset();
         }
     }
 
     /**
-     * Called when the HUD is not being rendered (when {@link #render(MatrixStack, float, Entity)} returns false).
+     * Called when the HUD is not being rendered (when {@link #render(DrawContext, float, Entity)} returns false).
      */
     public void reset() {
         this.openProgress = 0.0F;
@@ -194,9 +196,9 @@ public class DiscoveryHudRenderer extends DrawableHelper {
     }
 
     /**
-     * @see DiscoveryHudRenderer#render(DiscoveryHudRenderer, MatrixStack, float, Entity)
+     * @see DiscoveryHudRenderer#render(DiscoveryHudRenderer, DrawContext, float, Entity)
      */
-    public boolean render(MatrixStack matrices, float tickDelta, Entity camera) {
+    public boolean render(DrawContext context, float tickDelta, Entity camera) {
         if (!this.client.options.getPerspective().isFirstPerson() || !(camera instanceof ScopingEntity scopingEntity) || !scopingEntity.isScoping()) {
             this.activeEntity = null;
             this.targetedEntity = null;
@@ -205,7 +207,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
         this.targetedEntity = SpyglassRaycasting.raycast(camera, this.getRotation(camera, tickDelta), tickDelta);
 
-        if (DiscoveryHudRenderEvent.PRE.invoker().render(this, matrices, tickDelta, camera).isFalse()) {
+        if (DiscoveryHudRenderEvent.PRE.invoker().render(this, context, tickDelta, camera).isFalse()) {
             return false;
         }
 
@@ -264,6 +266,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             /* Left */
 
+            MatrixStack matrices = context.getMatrices();
             matrices.push();
 
             int leftX = 10;
@@ -293,7 +296,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                 }
 
                 // draw entity name
-                this.drawTrimmedCentredText(matrices, this.activeEntity.getDisplayName(), 90, (int) (leftX + (boxWidth / 2f)) + 1, (int) (boxTopY + 14 + (textHeight / 2f)) + 1);
+                this.drawTrimmedCentredText(context, this.activeEntity.getDisplayName(), 90, (int) (leftX + (boxWidth / 2f)) + 1, (int) (boxTopY + 14 + (textHeight / 2f)) + 1);
             }
 
             if (renderStats) {
@@ -334,7 +337,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                     Text behaviorText = EntityBehavior.getText(this.activeEntity);
                     if (behaviorText != null) {
                         int behaviorY = halfHeight - (textHeight * 3) - 1;
-                        this.drawTextClusterFromRight(matrices, rightX, behaviorY,
+                        this.drawTextClusterFromRight(context, rightX, behaviorY,
                             Text.translatable(BEHAVIOR_KEY, BEHAVIOR_ICON),
                             Text.translatable(BEHAVIOR_HOLDER_KEY, behaviorText, BEHAVIOR_ICON).formatted(Formatting.GRAY)
                         );
@@ -344,7 +347,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                         // health
                         float hurt = (float) livingEntity.hurtTime / livingEntity.maxHurtTime;
                         float br = (livingEntity.isDead() ? 1F : (Float.isNaN(hurt) ? 0F : hurt)) * (1 - BLACK_OPACITY);
-                        this.drawTextClusterFromRight(matrices, rightX, halfHeight, br + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
+                        this.drawTextClusterFromRight(context, rightX, halfHeight, br + BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY,
                             Text.translatable(HEALTH_KEY, HEALTH_ICON),
                             this.createHealthHolderText(HEALTH_HOLDER_KEY, HEALTH_ICON, livingEntity.getHealth())
                         );
@@ -352,7 +355,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
                         if (livingEntity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE) != null) {
                             // strength
                             int strengthY = halfHeight + (textHeight * 3) + 1;
-                            this.drawTextClusterFromRight(matrices, rightX, strengthY,
+                            this.drawTextClusterFromRight(context, rightX, strengthY,
                                 Text.translatable(STRENGTH_KEY, STRENGTH_ICON),
                                 this.createHealthHolderText(STRENGTH_HOLDER_KEY, STRENGTH_ICON,
                                     (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE)
@@ -453,7 +456,7 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
-    public void drawTrimmedCentredText(MatrixStack matrices, Text text, int maxWidth, int x, int y) {
+    public void drawTrimmedCentredText(DrawContext context, Text text, int maxWidth, int x, int y) {
         List<OrderedText> wrapped = this.textRenderer.wrapLines(text, maxWidth);
         if (wrapped.size() > 1) { // the text has been wrapped
             // calculate dots
@@ -466,26 +469,26 @@ public class DiscoveryHudRenderer extends DrawableHelper {
 
             // draw text and dots
             int width = textWidth + dotsWidth;
-            this.textRenderer.draw(matrices, orderedText, (int) (x - (width / 2f)), y, 0x000000);
-            this.textRenderer.draw(matrices, DOTS_TEXT, (int) (x - (width / 2f) + textWidth), y, 0x000000);
+            context.drawTextWithShadow(this.textRenderer, orderedText, (int) (x - (width / 2f)), y, 0xFFFFFF);
+            context.drawTextWithShadow(this.textRenderer, DOTS_TEXT, (int) (x - (width / 2f) + textWidth), y, 0xFFFFFF);
         } else {
             // the text wasn't wrapped, draw normally
             OrderedText orderedText = wrapped.get(0);
             int width = this.textRenderer.getWidth(orderedText);
-            this.textRenderer.draw(matrices, orderedText, (int) (x - (width / 2f)), y, 0x000000);
+            context.drawTextWithShadow(this.textRenderer, orderedText, (int) (x - (width / 2f)), y, 0xFFFFFF);
         }
     }
 
     /**
      * Draws text leftwards from the right side of the screen, with a transparent background.
      */
-    public void drawTextClusterFromRight(MatrixStack matrices, int rawX, int y, float br, float bg, float bb, Text... texts) {
+    public void drawTextClusterFromRight(DrawContext context, int rawX, int y, float br, float bg, float bb, Text... texts) {
         int x = this.scaledWidth - rawX;
         int l = texts.length;
 
         // background
         int longestWidth = Stream.of(texts).mapToInt(this.textRenderer::getWidth).max().orElse(0);
-        fill(matrices,
+        fill(context,
             x - longestWidth - RIGHT_SIDEBAR_TEXT_BORDER_SIZE,
             y - RIGHT_SIDEBAR_TEXT_BORDER_SIZE,
             x + RIGHT_SIDEBAR_TEXT_BORDER_SIZE - 1,
@@ -497,19 +500,19 @@ public class DiscoveryHudRenderer extends DrawableHelper {
         for (int i = 0; i < texts.length; i++) {
             Text text = texts[i];
             int width = this.textRenderer.getWidth(text);
-            this.textRenderer.draw(matrices, text, x - width, y + (i * (this.textRenderer.fontHeight + 1)), 0xFFFFFF);
+            context.drawTextWithShadow(this.textRenderer, text, x - width, y + (i * (this.textRenderer.fontHeight + 1)), 0xFFFFFF);
         }
     }
 
-    public void drawTextClusterFromRight(MatrixStack matrices, int rawX, int y, Text... texts) {
-        this.drawTextClusterFromRight(matrices, rawX, y, BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY, texts);
+    public void drawTextClusterFromRight(DrawContext context, int rawX, int y, Text... texts) {
+        this.drawTextClusterFromRight(context, rawX, y, BLACK_OPACITY, BLACK_OPACITY, BLACK_OPACITY, texts);
     }
 
     /**
-     * Implementation of {@link #fill(MatrixStack, int, int, int, int, int)} for RGB.
+     * Implementation of {@link DrawContext#fill(int, int, int, int, int)} for RGB.
      */
-    public void fill(MatrixStack matrices, int x1, int y1, int x2, int y2, float r, float g, float b, float alpha) {
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
+    public void fill(DrawContext context, int x1, int y1, int x2, int y2, float r, float g, float b, float alpha) {
+        Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 
         if (x1 < x2) {
             int i = x1;
@@ -523,19 +526,13 @@ public class DiscoveryHudRenderer extends DrawableHelper {
             y2 = i;
         }
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(matrix, (float) x1, (float) y2, 0.0F).color(r, g, b, alpha).next();
-        bufferBuilder.vertex(matrix, (float) x2, (float) y2, 0.0F).color(r, g, b, alpha).next();
-        bufferBuilder.vertex(matrix, (float) x2, (float) y1, 0.0F).color(r, g, b, alpha).next();
-        bufferBuilder.vertex(matrix, (float) x1, (float) y1, 0.0F).color(r, g, b, alpha).next();
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-
-        RenderSystem.disableBlend();
+        VertexConsumer vertexConsumer = context.getVertexConsumers().getBuffer(RenderLayer.getGui());
+        vertexConsumer.vertex(matrix, (float) x1, (float) y2, 0.0F).color(r, g, b, alpha).next();
+        vertexConsumer.vertex(matrix, (float) x2, (float) y2, 0.0F).color(r, g, b, alpha).next();
+        vertexConsumer.vertex(matrix, (float) x2, (float) y1, 0.0F).color(r, g, b, alpha).next();
+        vertexConsumer.vertex(matrix, (float) x1, (float) y1, 0.0F).color(r, g, b, alpha).next();
+        context.draw();
     }
 
     /**

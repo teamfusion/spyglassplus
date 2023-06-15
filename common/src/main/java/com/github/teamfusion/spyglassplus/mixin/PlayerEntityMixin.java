@@ -57,7 +57,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements ScopingP
     @Override
     public Optional<SpyglassStandEntity> getSpyglassStandEntity() {
         return this.getSpyglassStand()
-                   .map(this.world::getEntityById)
+                   .map(this.getWorld()::getEntityById)
                    .filter(SpyglassStandEntity.class::isInstance)
                    .map(SpyglassStandEntity.class::cast);
     }
